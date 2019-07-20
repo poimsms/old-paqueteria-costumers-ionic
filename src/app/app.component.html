@@ -1,0 +1,75 @@
+<ion-app>
+  <ion-router-outlet main></ion-router-outlet>
+
+
+  <ion-menu side="start" menuId="first">
+    <!-- <ion-header>
+      <ion-toolbar color="primary">
+        <ion-title>Start Menu</ion-title>
+      </ion-toolbar>
+    </ion-header> -->
+    <ion-content>
+      <!-- <div style="background:orange;padding:15px;display:flex;align-items:center;">
+        <img src="assets/user.jpg" style="width:40px;height:40px;border-radius:50%;object-fit:cover">
+        <div style="margin-left:10px;color:white;font-weight:600">
+          Oscar Garcia
+        </div>
+      </div> -->
+      <div style="padding:15px">
+        <img src="assets/user.jpg" style="width:50px;height:50px;border-radius:50%;object-fit:cover">
+        <div style="margin-top:10px;color:#222;font-weight:600">
+          Oscar Garcia
+        </div>
+      </div>
+      <ion-list>
+        <ion-item (click)="openPage('pedidos')"  lines="none">
+          <ion-icon slot="start" name="pin"></ion-icon>
+          Mis pedidos
+        </ion-item>
+
+        <ion-item (click)="openPage('usuario')" lines="none">
+          <ion-icon slot="start" name="contact"></ion-icon>
+          Mi cuenta
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-icon slot="start" name="headset"></ion-icon>
+          Ayuda
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-icon slot="start" name="log-out"></ion-icon>
+          Cerrar sesión
+        </ion-item>
+      </ion-list>
+    </ion-content>
+  </ion-menu>
+
+
+
+  <!-- <ion-tabs>
+      <ion-tab-bar slot="bottom">
+        <ion-tab-button tab="map">
+          <ion-icon name="map"></ion-icon>
+          <ion-label>Mapa</ion-label>
+        </ion-tab-button>
+    
+        <ion-tab-button tab="enviar">
+          <ion-icon name="bicycle"></ion-icon>
+          <ion-label>Pedir</ion-label>
+        </ion-tab-button>
+  
+        <ion-tab-button tab="soporte">
+            <ion-icon name="call"></ion-icon>
+            <ion-label>Soporte</ion-label>
+          </ion-tab-button>
+    
+        <ion-tab-button tab="usuario">
+          <ion-icon name="person"></ion-icon>
+          <ion-label>Cuenta</ion-label>
+        </ion-tab-button>
+       
+      </ion-tab-bar>
+    </ion-tabs> -->
+
+</ion-app>

@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-toolbar>
+      <ion-buttons slot="start">
+          <ion-back-button></ion-back-button>
+        </ion-buttons>
+    <ion-title>Pedidos</ion-title>
+  </ion-toolbar>
+  <ion-segment (ionChange)="segmentChanged($event)">
+      <ion-segment-button value="friends">
+        <ion-label>Anteriores</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="enemies">
+        <ion-label>Próximos</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+</ion-header>
+
+<ion-content>
+
+</ion-content>

@@ -1,0 +1,126 @@
+<div style="z-index:999;position:fixed;top:10px;left:10px">
+  <div (click)="openMenu()"
+    style="background:white;height:32px;width:32px;display:flex;align-items:center;justify-content:center;border-radius:50%">
+    <ion-icon name="menu" style="color:#777"></ion-icon>
+  </div>
+</div>
+<div style="z-index:999;position:fixed;top:10px;right:10px">
+  <div
+    style="background:white;height:32px;width:32px;display:flex;align-items:center;justify-content:center;border-radius:50%">
+    <ion-icon name="notifications" style="color:#777"></ion-icon>
+  </div>
+</div>
+
+<div style="z-index:999;position:fixed;top:60px;left:10px;width:90%">
+  <div (click)="openMapa('origen')"
+    style="border:1px solid #eee;width:100%;background:white;padding:10px;padding-left:20px;border-radius:20px;color:#777;font-size:18px;display:flex;align-items:center">
+    <div style="border-radius:50%;height:7px;width:7px;background:orange;margin-right:15px"></div>
+    {{textoRecoger}}
+  </div>
+
+  <div (click)="openMapa('destino')"
+    style="border:1px solid #eee;width:100%;margin-top:20px;background:white;padding:10px;padding-left:20px;border-radius:20px;color:#777;font-size:18px;display:flex;align-items:center">
+    <div style="border-radius:50%;height:7px;width:7px;background:orange;margin-right:15px"></div>
+    {{textoEntregar}}
+  </div>
+</div>
+
+<ion-content>
+
+  <div id='map'></div>
+
+</ion-content>
+
+<ion-footer style="padding:15px;padding-bottom:0px;background:#fff">
+
+  <div *ngIf="!confirmado">
+
+    <div style="width:100%;display:flex;align-items:center;justify-content:space-around">
+
+      <div (click)="selectTransport('bici')">
+        <div class="burbuja" [ngClass]="{'burbujaActiva': isBicicleta}">
+          <img src="assets/bici.png" class="transporte" [ngClass]="{'transporteActivo': isBicicleta}">
+        </div>
+        <div class="small" [ngClass]="{'smallActivo': isBicicleta}">
+          Bicicleta
+        </div>
+        <div class="large" [ngClass]="{'largeActivo': isBicicleta}">
+          ${{precioBici}}
+        </div>
+      </div>
+
+      <div (click)="selectTransport('moto')">
+        <div class="burbuja" [ngClass]="{'burbujaActiva': isMoto}">
+          <img src="assets/moto.png" class="transporte" [ngClass]="{'transporteActivo': isMoto}">
+        </div>
+        <div class="small" [ngClass]="{'smallActivo': isMoto}">
+          Moto
+        </div>
+        <div class="large" [ngClass]="{'largeActivo': isMoto}">
+          ${{precioMoto}}
+        </div>
+      </div>
+
+      <div (click)="selectTransport('camioneta')">
+        <div class="burbuja" [ngClass]="{'burbujaActiva': isCamioneta}">
+          <img src="assets/camioneta.png" class="transporte" [ngClass]="{'transporteActivo': isCamioneta}">
+        </div>
+        <div class="small" [ngClass]="{'smallActivo': isCamioneta}">
+          Camioneta
+        </div>
+        <div class="large" [ngClass]="{'largeActivo': isCamioneta}">
+          ${{precioCamioneta}}
+        </div>
+      </div>
+    </div>
+
+    <div padding>
+      <ion-button (click)="confirmar()" expand="block" color="secondary">
+        Confirmar Órden
+      </ion-button>
+    </div>
+
+  </div>
+
+  <div *ngIf="confirmado">
+
+    <div style="width:100%;padding:15px;display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;">
+        <img [src]="rider.img.url" style="width:40px;height:40px;border-radius:50%;object-fit:cover">
+        <div style="margin-left:20px">
+          <div>
+            {{rider.name}}
+          </div>
+          <div style="display:flex;align-items:center">
+            <ion-icon name="star" style="color:gold"></ion-icon>
+            <ion-icon name="star" style="color:gold"></ion-icon>
+            <ion-icon name="star" style="color:gold"></ion-icon>
+            <ion-icon name="star" style="color:gold"></ion-icon>
+            ({{rider.startsAvg}})
+          </div>
+          <div style="font-size:14px;color:#999">
+            ({{rider.transporte}})
+          </div>
+        </div>
+      </div>
+
+
+      <div style="margin-left:30px">
+        <ion-button color="secondary">
+          <ion-icon slot="start" name="call"></ion-icon>
+          Llamar
+        </ion-button>
+      </div>
+
+      <!-- <div style="margin-left:20px;border:1px solid #bbb;border-radius:4px;">
+          <ion-icon name="call"></ion-icon>
+          Llamar
+      </div> -->
+
+    </div>
+
+  </div>
+
+
+
+</ion-footer>
