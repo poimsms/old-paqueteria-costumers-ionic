@@ -5,6 +5,8 @@ import { Router } from '@angular/router';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { DataService } from 'src/app/services/data.service';
 import { PagarService } from 'src/app/services/pagar.service';
+import { AuthService } from 'src/app/services/auth.service';
+import { MapaService } from 'src/app/services/mapa.service';
 declare var google: any;
 
 @Component({
@@ -18,6 +20,8 @@ export class HomePage implements OnInit {
   service: any;
   directionsDisplay: any;
   directionsService: any;
+  markerReady: boolean;
+  marker: any;
 
   distancia: number;
 
@@ -26,8 +30,8 @@ export class HomePage implements OnInit {
   precioCamioneta = 3500;
 
   transporte = 'moto';
-  textoRecoger = '¿Dónde retirar?';
-  textoEntregar = '¿Dónde lo entregamos?';
+  texto_origen = '¿Dónde retirar?';
+  texto_destino = '¿Dónde lo entregamos?';
 
   isBicicleta = false;
   isMoto = true;
@@ -35,10 +39,16 @@ export class HomePage implements OnInit {
 
   confirmado = false;
 
+  pedidos = [];
+  pedido: any;
+
   origen: any;
   destino: any;
   rider: any;
-  user: any;
+
+  token: string;
+  usuario: any;
+  isAuth: boolean;
 
   constructor(
     private menu: MenuController,
@@ -46,83 +56,177 @@ export class HomePage implements OnInit {
     private router: Router,
     public wsService: WebsocketService,
     private _data: DataService,
-    private _pagar: PagarService
+    private _pagar: PagarService,
+    private _auth: AuthService,
+    private _mapa: MapaService
   ) {
-    this.service = new google.maps.DistanceMatrixService();
-    this.directionsDisplay = new google.maps.DirectionsRenderer();
-    this.directionsService = new google.maps.DirectionsService();
+
+    this._auth.authState.subscribe((data: any) => {
+
+      if (data.isAuth) {
+        this.usuario = data.usuario;
+        this.token = data.token;
+        this.isAuth = true;
+        this._auth.readFlowOrderStorage(this.token);
+
+        if (this.usuario.tipo == 'empresa') {
+          this.getPedidosEmpresa
+        }
+
+        this.service = new google.maps.DistanceMatrixService();
+        this.directionsDisplay = new google.maps.DirectionsRenderer();
+        this.directionsService = new google.maps.DirectionsService();
+
+      } else {
+        this.router.navigateByUrl('login');
+      }
+
+    });
   }
 
   ngOnInit() {
+
     this.cargarMapa();
-    // this.escucharSockets();
-    this.detectarRider();
+    this.escucharCambiosDelMapa();
   }
 
-  detectarRider() {
+  getPedidosEmpresa() {
+    this._data.getPedidos(this.usuario._id).then((data: any) => {
+      if (data.ok) {
 
+        data.pedidos.forEach(pedido => {
+          this.pedidos.push({
+            isTracking: false,
+            ...pedido
+          });
+        });
+
+        this.pedidos[0].isTracking = true;
+
+        this.rider = this.pedidos[0].rider;
+        const origen = this.pedidos[0].origen;
+        const destino = this.pedidos[0].destino;
+        const id = this.pedidos[0].rider._id;
+        this.confirmado = true;
+
+        this.graficarRuta(origen, destino);
+
+        this._mapa.getRiderCoors(id).subscribe(coors => {
+          if (!this.markerReady) {
+            this.marker = new google.maps.Marker({
+              position: coors,
+              title: "Hello World!"
+            });
+            this.marker.setMap(this.map);
+          } else {
+            this.marker.setPosition(coors);
+          }
+        });
+
+      }
+    });
   }
 
-  confirmar() {
+  getPedidoUsuario() {
+    this._data.getPedidos(this.usuario._id).then((data: any) => {
+      if (data.ok) {
 
-    const payload: any = {};
+        this.pedido = data.pedido;
+        this.rider = this.pedido.rider;
+        this.confirmado = true;
+
+        this.graficarRuta(this.pedido.origen, this.pedido.destino);
+
+        const id = this.rider._id;
+        this._mapa.getRiderCoors(id).subscribe(coors => {
+
+        });
+
+      }
+    });
+  }
+
+  confirmarPedido() {
+
+    let tipo: string;
+    let precio: number;
 
     if (this.isBicicleta) {
-      payload.transporte = 'bici';
-    }
-    if (this.isMoto) {
-      payload.transporte = 'moto';
-    }
-    if (this.isCamioneta) {
-      payload.transporte = 'camioneta';
+      tipo = 'bicicleta';
+      precio = this.precioBici;
+    } else if (this.isMoto) {
+      tipo = 'moto';
+      precio = this.precioMoto;
+    } else {
+      tipo = 'camioneta';
+      precio = this.precioCamioneta;
     }
 
     const lat = this._control.origen.lat;
     const lng = this._control.origen.lng;
 
-    this._data.buscarRider(lat, lng).then((resp: any) => {
+    this._data.buscarRider(tipo, lat, lng).then((resp: any) => {
       if (resp.ok) {
-        this._pagar.iniciarPago('id').then((pago: any) => {
-          if (pago.ok) {
-            this.confirmado = true;
-            this.iniciarTrayecto(resp.rider)
+
+        if (this.usuario.tipo == 'empresa') {
+
+          const body = {
+            email: this.usuario.email,
+            monto: precio,
+            empresa: this.usuario._id
           }
-        });
+
+          this._pagar.registrarPagoEmpresa(this.usuario._id, body).then((pago: any) => {
+            if (pago.ok) {
+
+              const pedido = {
+                precio: precio,
+                origin: this._control.origen,
+                destino: this._control.destino,
+                rider: resp.rider._id,
+                cliente: this.usuario._id,
+                tipo: this.usuario.tipo
+              };
+
+              this._data.crearPedido(pedido).then((pedido: any) => {
+                this.rider = resp.rider;
+                this.confirmado = true;
+                this._pagar.actualizarRegistroEmpresa(pago._id, pedido._id);
+              });
+            }
+          });
+
+        } else {
+
+          const body = {
+            email: this.usuario.email,
+            monto: precio,
+            usuario: this.usuario._id
+          }
+
+          this._pagar.iniciarPagoUsuario(this.usuario._id, body).then((pago: any) => {
+            if (pago.ok) {
+
+              const pedido = {
+                precio: precio,
+                origin: this._control.origen,
+                destino: this._control.destino,
+                rider: resp.rider._id,
+                cliente: this.usuario._id,
+                tipo: this.usuario.tipo
+              };
+
+              this._data.crearPedido(pedido).then(() => {
+                // graficas del mapa
+                this.confirmado = true;
+              });
+            }
+          });
+        }
       } else {
-        this.showAlert('No hay Riders disponibles en estos momentos. Intentalo en 5 minutos.')
+        this.showAlert('No hay Riders disponibles en estos momentos. Intenta más tarde.')
       }
-    })
-  }
-
-  iniciarTrayecto(rider) {
-    const pedido = {
-      precio: 0,
-      origin: this._control.origen,
-      destino: this._control.destino,
-      rider: rider._id,
-      cliente: this.user._id
-    }
-    if (this.isBicicleta) {
-      pedido.precio = this.precioBici;
-    }
-    if (this.isMoto) {
-      pedido.precio = this.precioMoto;
-    }
-    if (this.isCamioneta) {
-      pedido.precio = this.precioCamioneta;
-    }
-    this._data.crearPedido(pedido).then(() => {
-      this.rider = rider;
     });
-  }
-
-  escucharSockets() {
-    this.wsService.listen('rider-moviendose').subscribe(resp => {
-      this.agregarMarcador(resp);
-    });
-  }
-
-  agregarMarcador(marcador) {
   }
 
   cargarMapa() {
@@ -133,17 +237,24 @@ export class HomePage implements OnInit {
       zoomControl: true
     });
     this.directionsDisplay.setMap(this.map);
-    this.calcularDistancia();
   }
 
-  openMenu() {
-    this.menu.enable(true, 'first');
-    this.menu.open('first');
-  }
+  openMapaPage(tipo) {
 
-  openMapa(tipo) {
     this._control.coorsTipo = tipo;
     this.router.navigateByUrl('mapa');
+
+    // if (this.usuario.tipo == 'empresa') {
+    //   this._control.coorsTipo = tipo;
+    //   this.router.navigateByUrl('mapa');
+    // } else {
+    //   if (this.confirmado) {
+    //     Espere a que termine su pedido en progreso
+    //   } else {
+    //     this._control.coorsTipo = tipo;
+    //     this.router.navigateByUrl('mapa');
+    //   }
+    // }  
   }
 
   selectTransport(tipo) {
@@ -165,13 +276,15 @@ export class HomePage implements OnInit {
     }
   }
 
-  calcularDistancia() {
+  escucharCambiosDelMapa() {
+
     this._control.mapState.subscribe((data: any) => {
-      
+
       let self = this;
-      if (data.lugar == 'todo') {
-        this.textoRecoger = data.origen.direccion;
-        this.textoEntregar = data.destino.direccion;
+
+      if (data.accion == 'calcular-ruta') {
+        this.texto_origen = data.origen.direccion;
+        this.texto_destino = data.destino.direccion;
         this.service.getDistanceMatrix(
           {
             origins: [data.origen.direccion],
@@ -179,23 +292,24 @@ export class HomePage implements OnInit {
             travelMode: 'DRIVING',
           }, function (response, status) {
             self.distancia = response.rows[0].elements[0].distance.value;
-            self.setRoute(data.origen, data.destino);
-            self.calcularPrecio(self.distancia, 'bici');
+            self.graficarRuta(data.origen, data.destino);
+            self.calcularPrecio(self.distancia, 'bicicleta');
             self.calcularPrecio(self.distancia, 'moto');
             self.calcularPrecio(self.distancia, 'camioneta');
           });
       }
-      if (data.lugar == 'origen') {
-        this.textoRecoger = data.origen.direccion;
+
+      if (data.accion == 'actualizar-origen') {
+        this.texto_origen = data.origen.direccion;
       }
-      if (data.lugar == 'destino') {
-        this.textoEntregar = data.destino.direccion;
+
+      if (data.accion == 'actualizar-destino') {
+        this.texto_destino = data.destino.direccion;
       }
     });
-
   }
 
-  setRoute(origen, destino) {
+  graficarRuta(origen, destino) {
     var self = this;
     this.directionsService.route({
       origin: origen.direccion,
@@ -206,28 +320,21 @@ export class HomePage implements OnInit {
     });
   }
 
-  callback(response, status) {
-    this.distancia = response.rows[0].elements[0].distance.value;
-    this.calcularPrecio(this.distancia, 'bici');
-    this.calcularPrecio(this.distancia, 'moto');
-    this.calcularPrecio(this.distancia, 'camioneta');
-  }
-
   calcularPrecio(distancia, transporte) {
-    if (transporte == 'bici' && distancia < 4000) {
-      if (distancia < 2000) {
+    if (transporte == 'bicicleta' && distancia < 4000) {
+      if (distancia < 1000) {
         this.precioBici = 2000;
       } else {
         this.precioBici = 1.0 * distancia + 1000;
       }
     }
 
-    if (transporte == 'bici' && distancia > 4000) {
-      this.showAlert('Mucha distancia para una bici')
+    if (transporte == 'bicicleta' && distancia > 4000) {
+      this.showAlert('Mucha distancia para una bicicleta')
     }
 
     if (transporte == 'moto') {
-      if (distancia < 2000) {
+      if (distancia < 1000) {
         this.precioMoto = 2000;
       } else {
         this.precioMoto = 1.3 * distancia + 1000;
@@ -235,7 +342,7 @@ export class HomePage implements OnInit {
     }
 
     if (transporte == 'camioneta') {
-      if (distancia < 2000) {
+      if (distancia < 1000) {
         this.precioCamioneta = 2000;
       } else {
         this.precioCamioneta = 1.5 * distancia + 1000;
@@ -246,5 +353,10 @@ export class HomePage implements OnInit {
 
   showAlert(texto) {
 
+  }
+
+  openMenu() {
+    this.menu.enable(true, 'first');
+    this.menu.open('first');
   }
 }

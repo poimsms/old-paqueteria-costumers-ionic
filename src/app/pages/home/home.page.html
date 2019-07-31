@@ -12,16 +12,16 @@
 </div>
 
 <div style="z-index:999;position:fixed;top:60px;left:10px;width:90%">
-  <div (click)="openMapa('origen')"
+  <div (click)="openMapaPage('origen')"
     style="border:1px solid #eee;width:100%;background:white;padding:10px;padding-left:20px;border-radius:20px;color:#777;font-size:18px;display:flex;align-items:center">
     <div style="border-radius:50%;height:7px;width:7px;background:orange;margin-right:15px"></div>
-    {{textoRecoger}}
+    {{texto_origen}}
   </div>
 
-  <div (click)="openMapa('destino')"
+  <div (click)="openMapaPage('destino')"
     style="border:1px solid #eee;width:100%;margin-top:20px;background:white;padding:10px;padding-left:20px;border-radius:20px;color:#777;font-size:18px;display:flex;align-items:center">
     <div style="border-radius:50%;height:7px;width:7px;background:orange;margin-right:15px"></div>
-    {{textoEntregar}}
+    {{texto_destino}}
   </div>
 </div>
 
@@ -75,8 +75,10 @@
     </div>
 
     <div padding>
-      <ion-button (click)="confirmar()" expand="block" color="secondary">
-        Confirmar Órden
+      <ion-button mode="ios" (click)="confirmar()" expand="block" color="secondary">
+        <div style="font-size:18px;font-weight:600">
+          Confirmar Órden
+       </div> 
       </ion-button>
     </div>
 

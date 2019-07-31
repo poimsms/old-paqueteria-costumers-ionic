@@ -20,19 +20,19 @@ export class ControlService {
     let data = {};
     if (tipo == 'destino-origen-definidos') {
       data = {
-        lugar: 'todo',
+        lugar: 'calcular-ruta',
         origen: this.origen,
         destino: this.destino
       }
     }
-    if (tipo == 'origen') {
+    if (tipo == 'actualizar-origen') {
       this.origen = posicion;
       data = {
         lugar: tipo,
         origen: posicion
       }
     }
-    if (tipo == 'destino') {
+    if (tipo == 'actualizar-destino') {
       this.destino = posicion;
       data = {
         lugar: tipo,

@@ -1,0 +1,67 @@
+<ion-header no-border>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>Registrar</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <div padding style="font-size:20px;color:#555;font-weight:550">
+    Ingresa el código de verificación
+  </div>
+
+  <!-- <div style="width:100%;display:flex;justify-content:center">
+      <div style="border:1px dashed #eee;height:100px;width:100px;display:flex;align-items:center;justify-content:center">
+        <ion-icon name="camera" style="font-size:40px;color:#bbb"></ion-icon>
+      </div>
+    </div> -->
+  <div style="height:20px;width:100%"></div>
+
+  <div style="padding:15px;padding-bottom:0px;width:100%;text-align:center;color:#888">
+    Te hemos enviado tu código de verificación a + 56 9 75293302. Por favor ingresa el código acá.
+  </div>
+
+  <div padding style="display:flex;justify-content:space-around">
+    <div style="background:#fff;border-radius:3px;width:35px"
+      [ngStyle]="{'border': isActive[0] ? '1px solid #0cd1e8':'1px solid #eee'}">
+      <ion-input type="tel" maxlength="1" [(ngModel)]="n1" placeholder="" (ionChange)="codigoListo(0)"></ion-input>
+    </div>
+    <div style="background:#fff;border-radius:3px;width:35px"
+      [ngStyle]="{'border': isActive[1] ? '1px solid #0cd1e8':'1px solid #eee'}">
+      <ion-input type="tel" maxlength="1" [(ngModel)]="n2" placeholder="" (ionChange)="codigoListo(1)"></ion-input>
+    </div>
+    <div style="background:#fff;border-radius:3px;width:35px"
+      [ngStyle]="{'border': isActive[2] ? '1px solid #0cd1e8':'1px solid #eee'}">
+      <ion-input type="tel" maxlength="1" [(ngModel)]="n3" placeholder="" (ionChange)="codigoListo(2)"></ion-input>
+    </div>
+    <div style="background:#fff;border-radius:3px;width:35px"
+      [ngStyle]="{'border': isActive[3] ? '1px solid #0cd1e8':'1px solid #eee'}">
+      <ion-input type="tel" maxlength="1" [(ngModel)]="n4" placeholder="" (ionChange)="codigoListo(3)"></ion-input>
+    </div>
+  </div>
+
+  <div *ngIf="counter == 0" style="margin-top:10px;width:100%;text-align:center;">
+    <span style="color:#0cd1e8">Reenviar</span>
+  </div>
+
+
+  <div *ngIf="counter > 0" style="margin-top:10px;width:100%;text-align:center;color:#888">
+    Reenviando código de verificación
+    <span style="color:#0cd1e8">
+      {{textTime}}
+    </span>
+  </div>
+
+  <ion-button (click)="cancelar()">
+    Cancelar
+  </ion-button>
+
+
+  <div padding style="margin-top:20px;width:100%;display:flex;justify-content:flex-end">
+    <ion-icon (click)="checkCode()" name="ios-arrow-dropright-circle" style="color:#0cd1e8;font-size:55px"></ion-icon>
+  </div>
+
+</ion-content>

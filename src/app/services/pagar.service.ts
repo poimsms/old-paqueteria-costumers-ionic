@@ -16,8 +16,21 @@ export class PagarService {
     this.apiURL = this._config.apiURL;
    }
 
-  iniciarPago(body) {
-    const url = `${this.apiURL}/riders/buscar-rider`;
+  iniciarPagoUsuario(id, body) {
+    const url = `${this.apiURL}/pago/pagar-con-flow?${id}`;
+    return this.http.post(url, body).toPromise();
+  }
+
+  registrarPagoEmpresa(id, body) {
+    const url = `${this.apiURL}/pago/registrar-pago-empresa?${id}`;
+    return this.http.post(url, body).toPromise();
+  }
+
+  actualizarRegistroEmpresa(id, pedidoID) {
+    const body = { 
+      pedido: pedidoID
+    };
+    const url = `${this.apiURL}/pago/actualizar-pago-empresa?${id}`;
     return this.http.post(url, body).toPromise();
   }
 }

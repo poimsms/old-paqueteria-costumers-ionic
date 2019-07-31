@@ -8,6 +8,6 @@ export class ConfigService {
   apiURL: string;
 
   constructor() {
-    this.apiURL = 'https://localhost:3000';
+    this.apiURL = 'http://localhost:3000';
    }
 }

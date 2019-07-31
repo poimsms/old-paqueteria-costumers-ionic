@@ -17,8 +17,8 @@ export class DataService {
     this.apiURL = this._config.apiURL;
    }
 
-  buscarRider(lat, lng) {
-    const url = `${this.apiURL}/riders/buscar-rider?lat=${lat}&lng=${lng}`;
+  buscarRider(tipo, lat, lng) {
+    const url = `${this.apiURL}/riders/buscar-rider?tipo=${tipo},lat=${lat}&lng=${lng}`;
     return this.http.get(url).toPromise();
   }
 
@@ -26,5 +26,12 @@ export class DataService {
     const url = `${this.apiURL}/riders/crear-pedido`;
     return this.http.post(url, body).toPromise();
   }
+
+  getPedidos(id) {
+    const url = `${this.apiURL}/riders/obtener-pedidos?id=${id}`;
+    return this.http.get(url).toPromise();
+  }
+
+
 }
 
