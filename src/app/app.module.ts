@@ -26,9 +26,12 @@ export const firebaseConfig = {
   appId: "1:905180881415:web:3d4928246302074a"
 };
 
+import { AppVersion } from '@ionic-native/app-version/ngx';
+import { ForceUpgradeComponent } from './component/force-upgrade/force-upgrade.component';
+
 @NgModule({
-  declarations: [AppComponent],
-  entryComponents: [],
+  declarations: [AppComponent, ForceUpgradeComponent],
+  entryComponents: [ForceUpgradeComponent],
   imports: [
     BrowserModule,
     HttpClientModule,
@@ -42,7 +45,8 @@ export const firebaseConfig = {
   providers: [
     StatusBar,
     SplashScreen,  
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    AppVersion
   ],
   bootstrap: [AppComponent]
 })

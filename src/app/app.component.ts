@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
 
-import { Platform, MenuController } from '@ionic/angular';
+import { Platform, MenuController, ModalController } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { Router } from '@angular/router';
 import { AuthService } from './services/auth.service';
+import { GlobalService } from './services/global.service';
+import { ForceUpgradeComponent } from './component/force-upgrade/force-upgrade.component';
 
 
 @Component({
@@ -23,7 +25,10 @@ export class AppComponent {
     private statusBar: StatusBar,
     private menu: MenuController,
     private router: Router,
-    private _auth: AuthService
+    private _auth: AuthService,
+    private _global: GlobalService,
+    public modalController: ModalController
+
   ) {
     this.initializeApp();
   }
@@ -32,21 +37,41 @@ export class AppComponent {
     this.platform.ready().then(() => {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
-      this._auth.authState.subscribe((data: any) => {
 
-        if (data.isAuth) {
-          this.usuario = data.usuario;
-          this.token = data.token;
-          this.isAuth = true;
-          this.router.navigateByUrl('home');
+    
+      this._global.checkAppVersion().then((data: any) => {
+
+        if (data.forceUpgrade) {
+
+          this.openForceModal();
+
+        } else if (data.recommendUpgrade) {
+          
+          this.openForceModal();
+
         } else {
-          this.router.navigateByUrl('login');
-        }
+          this._auth.authState.subscribe((data: any) => {
 
-        console.log(data)
-        
-      });
+            if (data.isAuth) {
+              this.usuario = data.usuario;
+              this.token = data.token;
+              this.isAuth = true;
+              this.router.navigateByUrl('home');
+            } else {
+              this.router.navigateByUrl('login');
+            }        
+          });
+              
+        }
+      });     
     });
+  }
+
+  async openForceModal() {
+    const modal = await this.modalController.create({
+      component: ForceUpgradeComponent
+    });   
+    await modal.present();
   }
 
   openFirst() {

@@ -6,7 +6,9 @@ import { WebsocketService } from 'src/app/services/websocket.service';
 import { DataService } from 'src/app/services/data.service';
 import { PagarService } from 'src/app/services/pagar.service';
 import { AuthService } from 'src/app/services/auth.service';
+import { AlertController } from '@ionic/angular';
 import { MapaService } from 'src/app/services/mapa.service';
+
 declare var google: any;
 
 @Component({
@@ -58,115 +60,94 @@ export class HomePage implements OnInit {
     private _data: DataService,
     private _pagar: PagarService,
     private _auth: AuthService,
+    public alertController: AlertController,
     private _mapa: MapaService
   ) {
-
-    this._auth.authState.subscribe((data: any) => {
-
-      if (data.isAuth) {
-        this.usuario = data.usuario;
-        this.token = data.token;
-        this.isAuth = true;
-        this._auth.readFlowOrderStorage(this.token);
-
-        if (this.usuario.tipo == 'empresa') {
-          this.getPedidosEmpresa
-        }
-
-        this.service = new google.maps.DistanceMatrixService();
-        this.directionsDisplay = new google.maps.DirectionsRenderer();
-        this.directionsService = new google.maps.DirectionsService();
-
-      } else {
-        this.router.navigateByUrl('login');
-      }
-
-    });
+    this.usuario = _auth.usuario;
+    this.token = _auth.token;
+    this.service = new google.maps.DistanceMatrixService();
+    this.directionsDisplay = new google.maps.DirectionsRenderer();
+    this.directionsService = new google.maps.DirectionsService();
   }
 
   ngOnInit() {
-
     this.cargarMapa();
     this.escucharCambiosDelMapa();
+    this.getPedido();
   }
 
-  getPedidosEmpresa() {
-    this._data.getPedidos(this.usuario._id).then((data: any) => {
+  getPedido() {
+    this._data.obtener_pedido(this.usuario._id).then((data: any) => {
+
       if (data.ok) {
-
-        data.pedidos.forEach(pedido => {
-          this.pedidos.push({
-            isTracking: false,
-            ...pedido
-          });
-        });
-
-        this.pedidos[0].isTracking = true;
-
-        this.rider = this.pedidos[0].rider;
-        const origen = this.pedidos[0].origen;
-        const destino = this.pedidos[0].destino;
-        const id = this.pedidos[0].rider._id;
+        this.rider = data.pedido.rider;
+        const origen = data.pedido.origen;
+        const destino = data.pedido.destino;
         this.confirmado = true;
+        this.texto_origen = data.pedido.origen.direccion;
+        this.texto_destino = data.pedido.destino.direccion;
 
         this.graficarRuta(origen, destino);
+        const id = data.pedido.rider._id;
 
-        this._mapa.getRiderCoors(id).subscribe(coors => {
-          if (!this.markerReady) {
-            this.marker = new google.maps.Marker({
-              position: coors,
-              title: "Hello World!"
-            });
-            this.marker.setMap(this.map);
+        this._data.getRiderCoorsFirebase(id).subscribe((res: any) => {
+          // res.cliente == this.usuario._id
+          if (res.cliente == this.usuario._id) {
+
+            let coors = {
+              lat: res[0].lat,
+              lng: res[0].lng
+            }
+
+            if (!this.markerReady) {
+              this.marker = new google.maps.Marker({
+                position: coors,
+                map: this.map,
+                title: "Hello World!"
+              });
+              this.markerReady = true;
+            } else {
+              this.marker.setPosition(coors);
+            }
           } else {
-            this.marker.setPosition(coors);
+            // this.getPedido();
+            // unsusbcribe()
           }
         });
-
       }
+
     });
   }
 
-  getPedidoUsuario() {
-    this._data.getPedidos(this.usuario._id).then((data: any) => {
-      if (data.ok) {
-
-        this.pedido = data.pedido;
-        this.rider = this.pedido.rider;
-        this.confirmado = true;
-
-        this.graficarRuta(this.pedido.origen, this.pedido.destino);
-
-        const id = this.rider._id;
-        this._mapa.getRiderCoors(id).subscribe(coors => {
-
-        });
-
-      }
-    });
-  }
 
   confirmarPedido() {
 
-    let tipo: string;
+    if (this.texto_origen == '¿Dónde retirar?' || this.texto_destino == '¿Dónde lo entregamos?') {
+      return;
+    }
+
+    let vehiculo: string;
     let precio: number;
 
     if (this.isBicicleta) {
-      tipo = 'bicicleta';
+      vehiculo = 'bicicleta';
       precio = this.precioBici;
     } else if (this.isMoto) {
-      tipo = 'moto';
+      vehiculo = 'moto';
       precio = this.precioMoto;
     } else {
-      tipo = 'camioneta';
+      vehiculo = 'camioneta';
       precio = this.precioCamioneta;
     }
 
     const lat = this._control.origen.lat;
     const lng = this._control.origen.lng;
 
-    this._data.buscarRider(tipo, lat, lng).then((resp: any) => {
+    this._mapa.getRiderMasCercano(vehiculo, lat, lng).then((resp: any) => {
       if (resp.ok) {
+
+        this._mapa.updateRider(resp.rider._id, { isPay: true });
+
 
         if (this.usuario.tipo == 'empresa') {
 
@@ -176,24 +157,23 @@ export class HomePage implements OnInit {
             empresa: this.usuario._id
           }
 
-          this._pagar.registrarPagoEmpresa(this.usuario._id, body).then((pago: any) => {
-            if (pago.ok) {
+          this._pagar.registrarPagoEmpresa(body).then((pago: any) => {
 
-              const pedido = {
-                precio: precio,
-                origin: this._control.origen,
-                destino: this._control.destino,
-                rider: resp.rider._id,
-                cliente: this.usuario._id,
-                tipo: this.usuario.tipo
-              };
+            const pedido = {
+              precio: precio,
+              distancia: this.distancia,
+              metodoPago: 'Tarjeta',
+              origen: this._control.origen,
+              destino: this._control.destino,
+              rider: resp.rider._id,
+              cliente: this.usuario._id,
+              tipo: this.usuario.tipo
+            };
 
-              this._data.crearPedido(pedido).then((pedido: any) => {
-                this.rider = resp.rider;
-                this.confirmado = true;
-                this._pagar.actualizarRegistroEmpresa(pago._id, pedido._id);
-              });
-            }
+            this._data.crearPedido(pedido).then((pedido: any) => {
+              this.getPedido();
+              this._pagar.actualizarRegistroEmpresa(pago._id, { pedido: pedido._id });
+            });
           });
 
         } else {
@@ -209,22 +189,25 @@ export class HomePage implements OnInit {
 
               const pedido = {
                 precio: precio,
-                origin: this._control.origen,
+                distancia: this.distancia,
+                metodoPago: 'Tarjeta',
+                origen: this._control.origen,
                 destino: this._control.destino,
                 rider: resp.rider._id,
                 cliente: this.usuario._id,
                 tipo: this.usuario.tipo
               };
 
-              this._data.crearPedido(pedido).then(() => {
-                // graficas del mapa
-                this.confirmado = true;
+              this._data.crearPedido(pedido).then((pedido: any) => {
+                this._mapa.updateRider(resp.rider._id, { actividad: 'activo', cliente: this.usuario._id });
+                this._mapa.updatePedido(resp.rider._id, { nuevoPedido: true, pedido: pedido._id });
+                this.getPedido();
               });
             }
           });
         }
       } else {
-        this.showAlert('No hay Riders disponibles en estos momentos. Intenta más tarde.')
+        this.presentAlert('Oops', 'No hay Riders disponibles en estos momentos. Intenta más tarde.')
       }
     });
   }
@@ -243,23 +226,11 @@ export class HomePage implements OnInit {
 
     this._control.coorsTipo = tipo;
     this.router.navigateByUrl('mapa');
-
-    // if (this.usuario.tipo == 'empresa') {
-    //   this._control.coorsTipo = tipo;
-    //   this.router.navigateByUrl('mapa');
-    // } else {
-    //   if (this.confirmado) {
-    //     Espere a que termine su pedido en progreso
-    //   } else {
-    //     this._control.coorsTipo = tipo;
-    //     this.router.navigateByUrl('mapa');
-    //   }
-    // }  
   }
 
   selectTransport(tipo) {
     this.transporte = tipo;
-    if (tipo == 'bici') {
+    if (tipo == 'bicicleta') {
       this.isBicicleta = true;
       this.isMoto = false;
       this.isCamioneta = false;
@@ -311,9 +282,13 @@ export class HomePage implements OnInit {
 
   graficarRuta(origen, destino) {
     var self = this;
+
+    const origenLatLng = new google.maps.LatLng(origen.lat, origen.lng);
+    const destinoLatLng = new google.maps.LatLng(destino.lat, destino.lng);
+
     this.directionsService.route({
-      origin: origen.direccion,
-      destination: destino.direccion,
+      origin: origenLatLng,
+      destination: destinoLatLng,
       travelMode: 'DRIVING',
     }, function (response, status) {
       self.directionsDisplay.setDirections(response);
@@ -330,7 +305,7 @@ export class HomePage implements OnInit {
     }
 
     if (transporte == 'bicicleta' && distancia > 4000) {
-      this.showAlert('Mucha distancia para una bicicleta')
+      this.presentAlert('Imposible', 'Mucha distancia para una bicicleta')
     }
 
     if (transporte == 'moto') {
@@ -351,8 +326,15 @@ export class HomePage implements OnInit {
 
   }
 
-  showAlert(texto) {
+  async presentAlert(titulo, mensaje) {
+    const alert = await this.alertController.create({
+      header: titulo,
+      subHeader: 'Subtitle',
+      message: mensaje,
+      buttons: ['Aceptar']
+    });
 
+    await alert.present();
   }
 
   openMenu() {

@@ -60,15 +60,28 @@ export class MapaPage implements OnInit {
       data.puerta = this.puerta;
     }
 
-    data.direccion = this.position.address;
-    data.lat = this.position.coors.lat;
-    data.lat = this.position.coors.lng;
+    console.log('TSMAP', this.position)
 
-    this._control.cargarCordenadas(this._control.coorsTipo, data);
 
-    if (this._control.origen && this._control.destino) {
-      
-      this._control.cargarCordenadas('destino-origen-definidos', undefined);
+    console.log('TSMAP', this.position.coors)
+    console.log('TSMAP', this.position.coors.lat)
+
+    data = {
+      direccion: this.position.address,
+      lat: this.position.coors.lat,
+      lng: this.position.coors.lng
+    }
+
+    if ( this._control.coorsTipo == 'origen') {
+      this._control.actualizarOrigen(data);
+    }
+
+    if ( this._control.coorsTipo == 'destino') {
+      this._control.actualizarDestino(data);
+    }
+
+    if (this._control.origenReady && this._control.destinoReady) {
+      this._control.calcularRuta();
     }
 
     this.router.navigateByUrl('home');
@@ -93,6 +106,7 @@ export class MapaPage implements OnInit {
   selectSearchResult(item) {
     this.clearMarkers();
     this.autocompleteItems = [];
+    // this.autocomplete.input = item.description;
 
     this.geocoder.geocode({ 'placeId': item.place_id }, (results, status) => {
       if (status === 'OK' && results[0]) {
@@ -100,8 +114,8 @@ export class MapaPage implements OnInit {
           ok: true,
           address: item.description,
           coors: {
-            lat: results[0].geometry.location.lat,
-            lng: results[0].geometry.location.lng
+            lat: results[0].geometry.location.lat(),
+            lng: results[0].geometry.location.lng()
           }
         };
         let marker = new google.maps.Marker({

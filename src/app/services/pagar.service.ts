@@ -21,15 +21,12 @@ export class PagarService {
     return this.http.post(url, body).toPromise();
   }
 
-  registrarPagoEmpresa(id, body) {
-    const url = `${this.apiURL}/pago/registrar-pago-empresa?${id}`;
+  registrarPagoEmpresa(body) {
+    const url = `${this.apiURL}/pago/registrar-pago-empresa`;
     return this.http.post(url, body).toPromise();
   }
 
-  actualizarRegistroEmpresa(id, pedidoID) {
-    const body = { 
-      pedido: pedidoID
-    };
+  actualizarRegistroEmpresa(id, body) {
     const url = `${this.apiURL}/pago/actualizar-pago-empresa?${id}`;
     return this.http.post(url, body).toPromise();
   }

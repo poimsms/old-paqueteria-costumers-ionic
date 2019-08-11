@@ -16,6 +16,9 @@ export class AuthService {
   idPhone: string;
   authState = new BehaviorSubject({ isAuth: false, usuario: {}, token: null });
 
+  usuario: any;
+  token: string;
+
   constructor(
     private http: HttpClient,
     private platform: Platform,
@@ -168,10 +171,14 @@ export class AuthService {
 
           if (tipo == 'usuario') {
             this.getUser(token, uid).then(usuario => {
+              this.usuario = usuario;
+              this.token = token;
               this.authState.next({ isAuth: true, usuario, token });
             });
           } else {
             this.getEmpresa(token, uid).then(usuario => {
+              this.usuario = usuario;
+              this.token = token;
               this.authState.next({ isAuth: true, usuario, token });
             });
           }
@@ -188,15 +195,17 @@ export class AuthService {
         const uid = JSON.parse(res).uid;
         const tipo = JSON.parse(res).tipo;
 
-        console.log(uid, 'uid')
-        console.log('mmmmm');
 
         if (tipo == 'usuario') {
           this.getUser(token, uid).then(usuario => {
+            this.usuario = usuario;
+            this.token = token;
             this.authState.next({ isAuth: true, usuario, token });
           });
         } else {
           this.getEmpresa(token, uid).then(usuario => {
+            this.usuario = usuario;
+            this.token = token;
             this.authState.next({ isAuth: true, usuario, token });
           });
         }

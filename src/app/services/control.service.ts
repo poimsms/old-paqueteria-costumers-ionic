@@ -11,33 +11,41 @@ export class ControlService {
   origen: any;
   destino: any;
 
+  origenReady = false;
+  destinoReady = false;
+  rutaReady = false;
+
   mapState = new Subject();
 
 
   constructor() { }
 
-  cargarCordenadas(tipo, posicion) {
-    let data = {};
-    if (tipo == 'destino-origen-definidos') {
-      data = {
-        lugar: 'calcular-ruta',
-        origen: this.origen,
-        destino: this.destino
-      }
+  actualizarOrigen(posicion) {
+    this.origen = posicion;
+    this.origenReady = true;
+    const data = {
+      accion: 'actualizar-origen',
+      origen: posicion
     }
-    if (tipo == 'actualizar-origen') {
-      this.origen = posicion;
-      data = {
-        lugar: tipo,
-        origen: posicion
-      }
+    this.mapState.next(data);
+  }
+
+  actualizarDestino(posicion) {
+    this.destino = posicion;
+    this.destinoReady = true;
+    const data = {
+      accion: 'actualizar-destino',
+      destino: posicion
     }
-    if (tipo == 'actualizar-destino') {
-      this.destino = posicion;
-      data = {
-        lugar: tipo,
-        destino: posicion
-      }
+    this.mapState.next(data);
+  }
+
+  calcularRuta() {
+    this.rutaReady = true;
+    const data = {
+      accion: 'calcular-ruta',
+      origen: this.origen,
+      destino: this.destino
     }
     this.mapState.next(data);
   }

@@ -1,22 +1,22 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PopupPage } from './popup.page';
+import { ForceUpgradeComponent } from './force-upgrade.component';
 
-describe('PopupPage', () => {
-  let component: PopupPage;
-  let fixture: ComponentFixture<PopupPage>;
+describe('ForceUpgradeComponent', () => {
+  let component: ForceUpgradeComponent;
+  let fixture: ComponentFixture<ForceUpgradeComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PopupPage ],
+      declarations: [ ForceUpgradeComponent ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(PopupPage);
+    fixture = TestBed.createComponent(ForceUpgradeComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

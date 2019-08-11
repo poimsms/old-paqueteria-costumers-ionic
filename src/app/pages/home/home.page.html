@@ -37,14 +37,14 @@
 
     <div style="width:100%;display:flex;align-items:center;justify-content:space-around">
 
-      <div (click)="selectTransport('bici')">
+      <div (click)="selectTransport('bicicleta')">
         <div class="burbuja" [ngClass]="{'burbujaActiva': isBicicleta}">
           <img src="assets/bici.png" class="transporte" [ngClass]="{'transporteActivo': isBicicleta}">
         </div>
         <div class="small" [ngClass]="{'smallActivo': isBicicleta}">
           Bicicleta
         </div>
-        <div class="large" [ngClass]="{'largeActivo': isBicicleta}">
+        <div *ngIf="_control.rutaReady" class="large" [ngClass]="{'largeActivo': isBicicleta}">
           ${{precioBici}}
         </div>
       </div>
@@ -56,7 +56,7 @@
         <div class="small" [ngClass]="{'smallActivo': isMoto}">
           Moto
         </div>
-        <div class="large" [ngClass]="{'largeActivo': isMoto}">
+        <div *ngIf="_control.rutaReady" class="large" [ngClass]="{'largeActivo': isMoto}">
           ${{precioMoto}}
         </div>
       </div>
@@ -68,17 +68,17 @@
         <div class="small" [ngClass]="{'smallActivo': isCamioneta}">
           Camioneta
         </div>
-        <div class="large" [ngClass]="{'largeActivo': isCamioneta}">
+        <div *ngIf="_control.rutaReady" class="large" [ngClass]="{'largeActivo': isCamioneta}">
           ${{precioCamioneta}}
         </div>
       </div>
     </div>
 
     <div padding>
-      <ion-button mode="ios" (click)="confirmar()" expand="block" color="secondary">
+      <ion-button mode="ios" (click)="confirmarPedido()" expand="block" color="secondary">
         <div style="font-size:18px;font-weight:600">
           Confirmar Órden
-       </div> 
+        </div>
       </ion-button>
     </div>
 
@@ -86,22 +86,22 @@
 
   <div *ngIf="confirmado">
 
-    <div style="width:100%;padding:15px;display:flex;align-items:center;justify-content:space-between">
+    <div style="width:100%;padding-bottom:15px;display:flex;align-items:center;justify-content:space-between">
       <div style="display:flex;align-items:center;">
-        <img [src]="rider.img.url" style="width:40px;height:40px;border-radius:50%;object-fit:cover">
+        <img [src]="rider?.img.url" style="width:50px;height:50px;border-radius:50%;object-fit:cover">
         <div style="margin-left:20px">
           <div>
-            {{rider.name}}
+            {{rider?.nombre}}
           </div>
           <div style="display:flex;align-items:center">
             <ion-icon name="star" style="color:gold"></ion-icon>
             <ion-icon name="star" style="color:gold"></ion-icon>
             <ion-icon name="star" style="color:gold"></ion-icon>
             <ion-icon name="star" style="color:gold"></ion-icon>
-            ({{rider.startsAvg}})
+            ({{rider?.startsAvg}})
           </div>
-          <div style="font-size:14px;color:#999">
-            ({{rider.transporte}})
+          <div style="font-size:14px;color:#999;text-transform:capitalize">
+            ({{rider?.vehiculo}})
           </div>
         </div>
       </div>
@@ -123,6 +123,5 @@
 
   </div>
 
-
-
 </ion-footer>
+
