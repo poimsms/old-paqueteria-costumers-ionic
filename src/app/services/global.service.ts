@@ -11,6 +11,8 @@ export class GlobalService {
 
   apiURL: string;
 
+  tarifas: any;
+
   constructor(
     private appVersion: AppVersion,
     private platform: Platform,
@@ -18,13 +20,13 @@ export class GlobalService {
     private _config: ConfigService
   ) {
     this.apiURL = this._config.apiURL;
+    this.getTarifas();
   }
 
   checkAppVersion() {
     return new Promise((resolve, reject) => {
 
       if (this.platform.is('cordova')) {
-        console.log('pasoo')
         this.appVersion.getVersionNumber().then(version => {
           const url = `${this.apiURL}/global/app-version?version=${version}`;
           this.http.get(url).toPromise().then(data => {
@@ -33,7 +35,6 @@ export class GlobalService {
         });
 
       } else {
-
         const version = this._config.version;
         const url = `${this.apiURL}/global/app-version?version=${version}`;
         this.http.get(url).toPromise().then(data => {
@@ -43,7 +44,10 @@ export class GlobalService {
     });
   }
 
-
+  getTarifas() {
+    const url = `${this.apiURL}/global/tarifas`;
+    this.http.get(url).toPromise().then(tarifas => this.tarifas = tarifas);
+  }
 
 
 }

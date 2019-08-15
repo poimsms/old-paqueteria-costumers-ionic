@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MenuController } from '@ionic/angular';
 import { ControlService } from 'src/app/services/control.service';
 import { Router } from '@angular/router';
@@ -7,7 +7,9 @@ import { DataService } from 'src/app/services/data.service';
 import { PagarService } from 'src/app/services/pagar.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { AlertController } from '@ionic/angular';
-import { MapaService } from 'src/app/services/mapa.service';
+import { FireService } from 'src/app/services/fire.service';
+import { Subscription, Subject } from 'rxjs';
+import { GlobalService } from 'src/app/services/global.service';
 
 declare var google: any;
 
@@ -16,7 +18,7 @@ declare var google: any;
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
 })
-export class HomePage implements OnInit {
+export class HomePage implements OnInit, OnDestroy {
 
   map: any;
   service: any;
@@ -26,10 +28,8 @@ export class HomePage implements OnInit {
   marker: any;
 
   distancia: number;
-
-  precioBici = 2000;
-  precioMoto = 2800;
-  precioCamioneta = 3500;
+  precioBici = 0;
+  precioMoto = 0;
 
   transporte = 'moto';
   texto_origen = '¿Dónde retirar?';
@@ -37,20 +37,31 @@ export class HomePage implements OnInit {
 
   isBicicleta = false;
   isMoto = true;
-  isCamioneta = false;
 
-  confirmado = false;
+  pedidoActivo = false;
 
-  pedidos = [];
   pedido: any;
-
-  origen: any;
-  destino: any;
   rider: any;
+  riders = [];
 
   token: string;
   usuario: any;
   isAuth: boolean;
+
+  riderSubscription$: Subscription;
+  actionsSubscripcion$: Subscription;
+  actions$: Subject<any>;
+
+  solicitudAceptada = false;
+  coors: any;
+  vehiculo: string;
+  precio: number;
+  payloadFLOW: any;
+  pago = 'tarjeta';
+
+  timer: any;
+  riderIndex = 0;
+
 
   constructor(
     private menu: MenuController,
@@ -61,7 +72,8 @@ export class HomePage implements OnInit {
     private _pagar: PagarService,
     private _auth: AuthService,
     public alertController: AlertController,
-    private _mapa: MapaService
+    private _fire: FireService,
+    private _global: GlobalService
   ) {
     this.usuario = _auth.usuario;
     this.token = _auth.token;
@@ -74,48 +86,61 @@ export class HomePage implements OnInit {
     this.cargarMapa();
     this.escucharCambiosDelMapa();
     this.getPedido();
+    this.actionsSub();
   }
+
+  ngOnDestroy() {
+    this.actionsSubscripcion$.unsubscribe();
+  }
+
+  actionsSub() {
+    this.actionsSubscripcion$ = this.actions$.subscribe(action => {
+      if (action == 'buscar rider') {
+        this.buscarRider();
+      }
+
+      if (action == 'subscribirse al rider') {
+        this.riderSub();
+      }
+
+      if (action == 'cancelar subscripción del rider') {
+        this.riderSub();
+      }
+
+      if (action == 'iniciar pago empresa') {
+        this.pagoEmpresa();
+      }
+
+      if (action == 'iniciar pago usuario') {
+        this.pagoUsuario();
+      }
+
+      if (action == 'evaluar rider') {
+
+      }
+    })
+  }
+
+  riderSub() {
+    this.riderSubscription$ = this._fire.getRiderCoors(this.rider._id).subscribe((res: any) => {
+      const coors = { lat: res[0].lat, lng: res[0].lng };
+      this.graficarMarcador(coors);
+    });
+  }
+
 
   getPedido() {
     this._data.obtener_pedido(this.usuario._id).then((data: any) => {
 
-      if (data.ok) {
-        this.rider = data.pedido.rider;
-        const origen = data.pedido.origen;
-        const destino = data.pedido.destino;
-        this.confirmado = true;
-        this.texto_origen = data.pedido.origen.direccion;
-        this.texto_destino = data.pedido.destino.direccion;
+      this.rider = data.pedido.rider;
+      const origen = data.pedido.origen;
+      const destino = data.pedido.destino;
+      this.texto_origen = data.pedido.origen.direccion;
+      this.texto_destino = data.pedido.destino.direccion;
+      this.pedidoActivo = true;
 
-        this.graficarRuta(origen, destino);
-        const id = data.pedido.rider._id;
-
-        this._data.getRiderCoorsFirebase(id).subscribe((res: any) => {
-          // res.cliente == this.usuario._id
-          if (res.cliente == this.usuario._id) {
-
-            let coors = {
-              lat: res[0].lat,
-              lng: res[0].lng
-            }
-
-            if (!this.markerReady) {
-              this.marker = new google.maps.Marker({
-                position: coors,
-                map: this.map,
-                title: "Hello World!"
-              });
-              this.markerReady = true;
-            } else {
-              this.marker.setPosition(coors);
-            }
-          } else {
-            // this.getPedido();
-            // unsusbcribe()
-          }
-        });
-      }
-
+      this.graficarRuta(origen, destino);
+      this.actions$.next('subscribirse al rider');
     });
   }
 
@@ -126,124 +151,194 @@ export class HomePage implements OnInit {
       return;
     }
 
-    let vehiculo: string;
-    let precio: number;
-
     if (this.isBicicleta) {
-      vehiculo = 'bicicleta';
-      precio = this.precioBici;
-    } else if (this.isMoto) {
-      vehiculo = 'moto';
-      precio = this.precioMoto;
+      this.vehiculo = 'bicicleta';
+      this.precio = this.precioBici;
     } else {
-      vehiculo = 'camioneta';
-      precio = this.precioCamioneta;
+      this.vehiculo = 'moto';
+      this.precio = this.precioMoto;
     }
 
-    const lat = this._control.origen.lat;
-    const lng = this._control.origen.lng;
+    this.coors.lat = this._control.origen.lat;
+    this.coors.lng = this._control.origen.lng;
+    this.actions$.next('buscar rider');
+  }
 
-    this._mapa.getRiderMasCercano(vehiculo, lat, lng).then((resp: any) => {
-      if (resp.ok) {
+  buscarRider() {
+    const vehiculo = this.vehiculo;
+    const lat = this.coors.lat;
+    const lng = this.coors.lng;
+    const precio = this.precio;
 
-        this._mapa.updateRider(resp.rider._id, { isPay: true });
+    this._fire.getRiderMasCercano(vehiculo, lat, lng).then((resp: any) => {
+      
+      if (resp.hayRiders) {
 
+        this.riders = resp.riders;
+        this.sendRiderSolicitude();
 
-        if (this.usuario.tipo == 'empresa') {
+        this._fire.rider$.subscribe(riderFire => {
 
-          const body = {
-            email: this.usuario.email,
-            monto: precio,
-            empresa: this.usuario._id
+          // Si rider está libre
+          if (riderFire.actividad == 'disponible' && riderFire.isOnline && riderFire.pagoPendiente) {
+            const data = {
+              solicitud: true,
+              pagoPendiente: true,
+              cliente: this.usuario._id,
+              created: new Date().getTime()
+            }
+
+            // Enviar solicitud
+            this._fire.updateRider(riderFire.rider, data);
           }
 
-          this._pagar.registrarPagoEmpresa(body).then((pago: any) => {
+          // Si rider acepta solicitud
+          if (riderFire.solicitudAceptada && riderFire.cliente == this.usuario._id) {
 
-            const pedido = {
-              precio: precio,
-              distancia: this.distancia,
-              metodoPago: 'Tarjeta',
-              origen: this._control.origen,
-              destino: this._control.destino,
-              rider: resp.rider._id,
+            clearInterval(this.timer);
+            this.solicitudAceptada = true;
+
+            this.payloadFLOW = {
+              email: this.usuario.email,
+              monto: precio,
               cliente: this.usuario._id,
               tipo: this.usuario.tipo
-            };
+            }
 
-            this._data.crearPedido(pedido).then((pedido: any) => {
-              this.getPedido();
-              this._pagar.actualizarRegistroEmpresa(pago._id, { pedido: pedido._id });
+            this._data.getOneRider(riderFire.rider).then(rider => {
+              this.rider = rider;
+              this.actions$.next(`iniciar pago ${this.usuario.tipo}`);
             });
-          });
-
-        } else {
-
-          const body = {
-            email: this.usuario.email,
-            monto: precio,
-            usuario: this.usuario._id
           }
 
-          this._pagar.iniciarPagoUsuario(this.usuario._id, body).then((pago: any) => {
-            if (pago.ok) {
+          // Si rider rechaza solicitud
+          if (!riderFire.solicitudAceptada && riderFire.cliente == this.usuario._id) {
 
-              const pedido = {
-                precio: precio,
-                distancia: this.distancia,
-                metodoPago: 'Tarjeta',
-                origen: this._control.origen,
-                destino: this._control.destino,
-                rider: resp.rider._id,
-                cliente: this.usuario._id,
-                tipo: this.usuario.tipo
-              };
+            clearInterval(this.timer);
+            this.sendRiderSolicitude();
+          }
 
-              this._data.crearPedido(pedido).then((pedido: any) => {
-                this._mapa.updateRider(resp.rider._id, { actividad: 'activo', cliente: this.usuario._id });
-                this._mapa.updatePedido(resp.rider._id, { nuevoPedido: true, pedido: pedido._id });
-                this.getPedido();
-              });
-            }
-          });
-        }
+        });
+
+
       } else {
         this.presentAlert('Oops', 'No hay Riders disponibles en estos momentos. Intenta más tarde.')
       }
     });
   }
 
-  cargarMapa() {
-    this.map = new google.maps.Map(document.getElementById('map'), {
-      center: { lat: -34.9011, lng: -56.1645 },
-      zoom: 14,
-      disableDefaultUI: true,
-      zoomControl: true
+  sendRiderSolicitude() {
+    this.timer = setTimeout(() => {
+      if (!this.solicitudAceptada && this.riderIndex != 4) {
+        const id = this.riders[this.riderIndex];
+        this._fire.rider_query$.next(id);
+        this.riderIndex += 1;
+      } else {
+        // rebuscar getRiderMasCercano()
+      }
+    }, 45000);
+  }
+
+  pagoEmpresa() {
+
+    const pedido = {
+      precio: this.precio,
+      distancia: this.distancia,
+      metodoPago: 'Tarjeta',
+      origen: this._control.origen,
+      destino: this._control.destino,
+      rider: this.rider._id,
+      cliente: this.usuario._id,
+      tipo: this.usuario.tipo
+    };
+
+    this._data.crearPedido(pedido).then((pedido: any) => {
+
+      const data = {
+        pagoPendiente: false,
+        actividad: 'ocupado',
+        pedido: pedido._id
+      }
+
+      this._fire.updateRider(this.rider._id, data);
+      this.getPedido();
     });
-    this.directionsDisplay.setMap(this.map);
+  }
+
+  pagoUsuario() {
+
+    if (this.pago == 'tarjeta') {
+      this._pagar.pagarConFlow(this.usuario._id, this.payloadFLOW).then(pagoExitoso => {
+        if (pagoExitoso) {
+
+          const pedido = {
+            precio: this.precio,
+            distancia: this.distancia,
+            metodoPago: 'tarjeta',
+            origen: this._control.origen,
+            destino: this._control.destino,
+            rider: this.rider._id,
+            cliente: this.usuario._id,
+            tipo: this.usuario.tipo
+          };
+
+          this._data.crearPedido(pedido).then((pedido: any) => {
+
+            const data = {
+              pagoPendiente: false,
+              actividad: 'ocupado',
+              pedido: pedido._id
+            }
+
+            this._fire.updateRider(this.rider._id, data);
+            this.getPedido();
+          });
+        }
+      });
+
+    } else {
+
+      const pedido = {
+        precio: this.precio,
+        distancia: this.distancia,
+        metodoPago: 'efectivo',
+        origen: this._control.origen,
+        destino: this._control.destino,
+        rider: this.rider._id,
+        cliente: this.usuario._id,
+        tipo: this.usuario.tipo
+      };
+
+      this._data.crearPedido(pedido).then((pedido: any) => {
+
+        const data = {
+          pagoPendiente: false,
+          actividad: 'ocupado',
+          pedido: pedido._id
+        }
+
+        this._fire.updateRider(this.rider._id, data);
+        this.getPedido();
+      });
+
+    }
+
   }
 
   openMapaPage(tipo) {
-
     this._control.coorsTipo = tipo;
     this.router.navigateByUrl('mapa');
   }
 
-  selectTransport(tipo) {
+  transportToggle(tipo) {
     this.transporte = tipo;
     if (tipo == 'bicicleta') {
       this.isBicicleta = true;
       this.isMoto = false;
-      this.isCamioneta = false;
     }
     if (tipo == 'moto') {
       this.isBicicleta = false;
       this.isMoto = true;
-      this.isCamioneta = false;
-    }
-    if (tipo == 'camioneta') {
-      this.isBicicleta = false;
-      this.isMoto = false;
-      this.isCamioneta = true;
     }
   }
 
@@ -266,7 +361,6 @@ export class HomePage implements OnInit {
             self.graficarRuta(data.origen, data.destino);
             self.calcularPrecio(self.distancia, 'bicicleta');
             self.calcularPrecio(self.distancia, 'moto');
-            self.calcularPrecio(self.distancia, 'camioneta');
           });
       }
 
@@ -278,6 +372,16 @@ export class HomePage implements OnInit {
         this.texto_destino = data.destino.direccion;
       }
     });
+  }
+
+  cargarMapa() {
+    this.map = new google.maps.Map(document.getElementById('map'), {
+      center: { lat: -34.9011, lng: -56.1645 },
+      zoom: 14,
+      disableDefaultUI: true,
+      zoomControl: true
+    });
+    this.directionsDisplay.setMap(this.map);
   }
 
   graficarRuta(origen, destino) {
@@ -295,33 +399,45 @@ export class HomePage implements OnInit {
     });
   }
 
+  graficarMarcador(coors) {
+    if (!this.markerReady) {
+      this.marker = new google.maps.Marker({
+        position: coors,
+        map: this.map,
+        title: "Hello World!"
+      });
+      this.markerReady = true;
+    } else {
+      this.marker.setPosition(coors);
+    }
+  }
+
   calcularPrecio(distancia, transporte) {
-    if (transporte == 'bicicleta' && distancia < 4000) {
-      if (distancia < 1000) {
-        this.precioBici = 2000;
+    const bici = this._global.tarifas.bici;
+    const moto = this._global.tarifas.moto;
+
+    if (transporte == 'bicicleta' && distancia < bici.maxDistancia) {
+      if (distancia < bici.limite) {
+        this.precioBici = bici.minima;
       } else {
-        this.precioBici = 1.0 * distancia + 1000;
+        this.precioBici = bici.distancia * distancia + bici.base;
       }
     }
 
-    if (transporte == 'bicicleta' && distancia > 4000) {
+    if (transporte == 'bicicleta' && distancia > bici.maxDistancia) {
       this.presentAlert('Imposible', 'Mucha distancia para una bicicleta')
     }
 
     if (transporte == 'moto') {
-      if (distancia < 1000) {
-        this.precioMoto = 2000;
+      if (distancia < moto.limite) {
+        this.precioMoto = moto.minima;
       } else {
-        this.precioMoto = 1.3 * distancia + 1000;
+        this.precioMoto = moto.distancia * distancia + moto.base;
       }
     }
 
-    if (transporte == 'camioneta') {
-      if (distancia < 1000) {
-        this.precioCamioneta = 2000;
-      } else {
-        this.precioCamioneta = 1.5 * distancia + 1000;
-      }
+    if (transporte == 'moto' && distancia > moto.maxDistancia) {
+      this.presentAlert('Imposible', 'La distancia excede nuestros recorridos')
     }
 
   }
@@ -329,7 +445,6 @@ export class HomePage implements OnInit {
   async presentAlert(titulo, mensaje) {
     const alert = await this.alertController.create({
       header: titulo,
-      subHeader: 'Subtitle',
       message: mensaje,
       buttons: ['Aceptar']
     });

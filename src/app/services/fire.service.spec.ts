@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 
-import { MapaService } from './mapa.service';
+import { FireService } from './fire.service';
 
-describe('MapaService', () => {
+describe('FireService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
 
   it('should be created', () => {
-    const service: MapaService = TestBed.get(MapaService);
+    const service: FireService = TestBed.get(FireService);
     expect(service).toBeTruthy();
   });
 });

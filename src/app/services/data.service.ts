@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { ConfigService } from './config.service';
 import { AngularFirestore } from '@angular/fire/firestore';
+import { Subject, Observable } from 'rxjs';
 
 
 @Injectable({
@@ -15,6 +16,8 @@ export class DataService {
   pedidosActivos = [];
   pedidos = [];
 
+ 
+
   constructor(
     public http: HttpClient,
     private _config: ConfigService,
@@ -25,6 +28,11 @@ export class DataService {
 
   buscarRider(vehiculo, lat, lng) {
     const url = `${this.apiURL}/riders/riders-buscar?vehiculo=${vehiculo}&lat=${lat}&lng=${lng}`;
+    return this.http.get(url).toPromise();
+  }
+
+  getOneRider(id) {
+    const url = `${this.apiURL}/riders/riders-get-one?id=${id}`;
     return this.http.get(url).toPromise();
   }
 

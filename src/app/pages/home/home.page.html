@@ -33,11 +33,11 @@
 
 <ion-footer style="padding:15px;padding-bottom:0px;background:#fff">
 
-  <div *ngIf="!confirmado">
+  <div *ngIf="!pedidoActivo">
 
     <div style="width:100%;display:flex;align-items:center;justify-content:space-around">
 
-      <div (click)="selectTransport('bicicleta')">
+      <div (click)="transportToggle('bicicleta')">
         <div class="burbuja" [ngClass]="{'burbujaActiva': isBicicleta}">
           <img src="assets/bici.png" class="transporte" [ngClass]="{'transporteActivo': isBicicleta}">
         </div>
@@ -49,7 +49,7 @@
         </div>
       </div>
 
-      <div (click)="selectTransport('moto')">
+      <div (click)="transportToggle('moto')">
         <div class="burbuja" [ngClass]="{'burbujaActiva': isMoto}">
           <img src="assets/moto.png" class="transporte" [ngClass]="{'transporteActivo': isMoto}">
         </div>
@@ -60,18 +60,7 @@
           ${{precioMoto}}
         </div>
       </div>
-
-      <div (click)="selectTransport('camioneta')">
-        <div class="burbuja" [ngClass]="{'burbujaActiva': isCamioneta}">
-          <img src="assets/camioneta.png" class="transporte" [ngClass]="{'transporteActivo': isCamioneta}">
-        </div>
-        <div class="small" [ngClass]="{'smallActivo': isCamioneta}">
-          Camioneta
-        </div>
-        <div *ngIf="_control.rutaReady" class="large" [ngClass]="{'largeActivo': isCamioneta}">
-          ${{precioCamioneta}}
-        </div>
-      </div>
+      
     </div>
 
     <div padding>
@@ -84,7 +73,7 @@
 
   </div>
 
-  <div *ngIf="confirmado">
+  <div *ngIf="pedidoActivo">
 
     <div style="width:100%;padding-bottom:15px;display:flex;align-items:center;justify-content:space-between">
       <div style="display:flex;align-items:center;">
