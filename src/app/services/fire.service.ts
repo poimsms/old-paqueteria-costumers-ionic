@@ -21,21 +21,6 @@ export class FireService {
 
   }
 
-
-  getRiderCoors2(id) {
-    return this.db.collection('riders', ref =>
-      ref.where('id', '==', id).where('isActive', '==', true))
-      .snapshotChanges().pipe(map(docArray => {
-        return docArray.map(doc => {
-          return {
-            id: doc.payload.doc.id,
-            ...doc.payload.doc.data()
-          };
-        })
-      })
-      );
-  }
-
   getRiderCoors(id) {
     return this.db.collection('riders_coors', ref =>
       ref.where('rider', '==', id)).valueChanges();
@@ -104,40 +89,4 @@ export class FireService {
     return ridersOrdenados;
   }
 
-
-  calcularRider(riders, lat, lng) {
-    const distanceMatrix = [];
-
-    riders.forEach(rider => {
-      const distance = Math.sqrt((rider.lat - lat) * (rider.lat - lat) + (rider.lng - lng) * (rider.lng - lng));
-      distanceMatrix.push({
-        distance,
-        riderId: rider
-      });
-    });
-
-    let a = 0;
-    let b = distanceMatrix[0].distance;
-    let id = distanceMatrix[0].riderId;
-
-    distanceMatrix.forEach(data => {
-      a = data.distance;
-      if (a < b) {
-        b = a;
-        id = data.riderId;
-      }
-    });
-
-    let riderMasCercano = {};
-
-    riders.forEach(rider => {
-      if (id == rider.rider) {
-        riderMasCercano = rider;
-      }
-    });
-
-    return riderMasCercano;
-  }
-
- 
 }

@@ -29,11 +29,12 @@ export const firebaseConfig = {
 import { AppVersion } from '@ionic-native/app-version/ngx';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
 
-import { ForceUpgradeComponent } from './component/force-upgrade/force-upgrade.component';
+import { ForceUpgradeComponent } from './components/force-upgrade/force-upgrade.component';
+import { RatingComponent } from './components/rating/rating.component';
 
 @NgModule({
-  declarations: [AppComponent, ForceUpgradeComponent],
-  entryComponents: [ForceUpgradeComponent],
+  declarations: [AppComponent, ForceUpgradeComponent, RatingComponent],
+  entryComponents: [ForceUpgradeComponent, RatingComponent],
   imports: [
     BrowserModule,
     HttpClientModule,

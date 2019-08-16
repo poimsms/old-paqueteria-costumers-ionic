@@ -6,7 +6,7 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { Router } from '@angular/router';
 import { AuthService } from './services/auth.service';
 import { GlobalService } from './services/global.service';
-import { ForceUpgradeComponent } from './component/force-upgrade/force-upgrade.component';
+import { ForceUpgradeComponent } from './components/force-upgrade/force-upgrade.component';
 
 
 @Component({

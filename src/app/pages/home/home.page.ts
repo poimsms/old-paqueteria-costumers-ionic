@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { MenuController } from '@ionic/angular';
+import { MenuController, ModalController } from '@ionic/angular';
 import { ControlService } from 'src/app/services/control.service';
 import { Router } from '@angular/router';
 import { WebsocketService } from 'src/app/services/websocket.service';
@@ -10,6 +10,7 @@ import { AlertController } from '@ionic/angular';
 import { FireService } from 'src/app/services/fire.service';
 import { Subscription, Subject } from 'rxjs';
 import { GlobalService } from 'src/app/services/global.service';
+import { RatingComponent } from 'src/app/components/rating/rating.component';
 
 declare var google: any;
 
@@ -73,7 +74,8 @@ export class HomePage implements OnInit, OnDestroy {
     private _auth: AuthService,
     public alertController: AlertController,
     private _fire: FireService,
-    private _global: GlobalService
+    private _global: GlobalService,
+    public modalController: ModalController
   ) {
     this.usuario = _auth.usuario;
     this.token = _auth.token;
@@ -87,6 +89,7 @@ export class HomePage implements OnInit, OnDestroy {
     this.escucharCambiosDelMapa();
     this.getPedido();
     this.actionsSub();
+    this.getRatings();
   }
 
   ngOnDestroy() {
@@ -114,10 +117,6 @@ export class HomePage implements OnInit, OnDestroy {
       if (action == 'iniciar pago usuario') {
         this.pagoUsuario();
       }
-
-      if (action == 'evaluar rider') {
-
-      }
     })
   }
 
@@ -128,9 +127,15 @@ export class HomePage implements OnInit, OnDestroy {
     });
   }
 
+  getRatings() {
+    this._data.getPendingRatings(this.usuario._id).then(data => {
+      this.openRatingModal(data);
+    });
+  }
+
 
   getPedido() {
-    this._data.obtener_pedido(this.usuario._id).then((data: any) => {
+    this._data.getPedidoActivo(this.usuario._id).then((data: any) => {
 
       this.rider = data.pedido.rider;
       const origen = data.pedido.origen;
@@ -145,7 +150,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
 
-  confirmarPedido() {
+  iniciarPedido() {
 
     if (this.texto_origen == '¿Dónde retirar?' || this.texto_destino == '¿Dónde lo entregamos?') {
       return;
@@ -171,7 +176,7 @@ export class HomePage implements OnInit, OnDestroy {
     const precio = this.precio;
 
     this._fire.getRiderMasCercano(vehiculo, lat, lng).then((resp: any) => {
-      
+
       if (resp.hayRiders) {
 
         this.riders = resp.riders;
@@ -296,7 +301,9 @@ export class HomePage implements OnInit, OnDestroy {
         }
       });
 
-    } else {
+    }
+
+    if (this.pago == 'efectivo') {
 
       const pedido = {
         precio: this.precio,
@@ -323,6 +330,15 @@ export class HomePage implements OnInit, OnDestroy {
 
     }
 
+  }
+
+  async openRatingModal(data) {
+    const modal = await this.modalController.create({
+      component: RatingComponent,
+      componentProps: {data}
+    });
+
+    await modal.present();
   }
 
   openMapaPage(tipo) {
@@ -413,10 +429,14 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   calcularPrecio(distancia, transporte) {
+
     const bici = this._global.tarifas.bici;
     const moto = this._global.tarifas.moto;
 
-    if (transporte == 'bicicleta' && distancia < bici.maxDistancia) {
+    
+    if (transporte == 'bicicleta' && distancia > bici.maxLimite) {
+      this.presentAlert('Imposible', 'Mucha distancia para una bicicleta')
+    } else {
       if (distancia < bici.limite) {
         this.precioBici = bici.minima;
       } else {
@@ -424,20 +444,15 @@ export class HomePage implements OnInit, OnDestroy {
       }
     }
 
-    if (transporte == 'bicicleta' && distancia > bici.maxDistancia) {
-      this.presentAlert('Imposible', 'Mucha distancia para una bicicleta')
-    }
 
-    if (transporte == 'moto') {
+    if (transporte == 'moto' && distancia > moto.maxLimite) {
+      this.presentAlert('Imposible', 'La distancia excede nuestros recorridos')
+    } else {
       if (distancia < moto.limite) {
         this.precioMoto = moto.minima;
       } else {
         this.precioMoto = moto.distancia * distancia + moto.base;
       }
-    }
-
-    if (transporte == 'moto' && distancia > moto.maxDistancia) {
-      this.presentAlert('Imposible', 'La distancia excede nuestros recorridos')
     }
 
   }
