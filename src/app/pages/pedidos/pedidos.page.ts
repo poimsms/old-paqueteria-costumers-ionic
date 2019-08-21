@@ -19,7 +19,7 @@ export class PedidosPage implements OnInit {
   ) {
     // this._data.getPedidos(this._auth.usuario._id).then(pedidos )
 
-    this.pedidos = this._data.pedidos;
+    // this.pedidos = this._data.pedidos;
 
     // if (this._data.pedidos.length > 0) {
     //  this.pedidos = this._data.pedidos;

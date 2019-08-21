@@ -1,3 +1,48 @@
-<p>
-  rating works!
-</p>
+<div style="display:flex;flex-wrap:wrap">
+
+
+  <div style="background:#0cd1e8;width:100%">
+    <div style="width:100%;padding:20px;display:flex;align-items:center;justify-content:space-between">
+      <ion-icon (click)="closeModal()" name="close" style="color:#fff;font-size:27px"></ion-icon>
+      <div (click)="rate()" style="color:#fff;font-size:16px">
+        Guardar
+      </div>
+    </div>
+    <div style="width:100%;display:flex;justify-content:center">
+      <img src="https://res.cloudinary.com/ddon9fx1n/image/upload/v1561055940/capturas/descarga.jpg"
+        style="width:60px;height:60px;border-radius:50%;object-fit:cover">
+    </div>
+
+    <div
+      style="margin-top:10px;padding:20px;padding-left:50px;padding-right:50px;font-size:20px;font-weight:700;color:#fff;text-align:center">
+      Califica tu experiencia con Oscar Garcia Fuentes
+    </div>
+
+    <div style="margin-bottom:25%;margin-top:10%;width:100%;display:flex;justify-content:center">
+      <div style="display:flex;justify-content:center">
+        <ion-icon (click)="starts = 1" *ngIf="starts >= 1" name="star" style="color:white;font-size:38px;margin-right:5px"></ion-icon>
+        <ion-icon (click)="starts = 1" *ngIf="starts < 1" name="star-outline" style="color:white;font-size:38px;margin-right:5px"></ion-icon>
+        <ion-icon (click)="starts = 2" *ngIf="starts >= 2" name="star" style="color:white;font-size:38px;margin-right:5px"></ion-icon>
+        <ion-icon (click)="starts = 2" *ngIf="starts < 2" name="star-outline" style="color:white;font-size:38px;margin-right:5px"></ion-icon>
+        <ion-icon (click)="starts = 3" *ngIf="starts >= 3" name="star" style="color:white;font-size:38px;margin-right:5px"></ion-icon>
+        <ion-icon (click)="starts = 3" *ngIf="starts < 3" name="star-outline" style="color:white;font-size:38px;margin-right:5px"></ion-icon>
+        <ion-icon (click)="starts = 4" *ngIf="starts >= 4" name="star" style="color:white;font-size:38px;margin-right:5px"></ion-icon>
+        <ion-icon (click)="starts = 4" *ngIf="starts < 4" name="star-outline" style="color:white;font-size:38px;margin-right:5px"></ion-icon>
+        <ion-icon (click)="starts = 5" *ngIf="starts >= 5" name="star" style="color:white;font-size:38px;margin-right:5px"></ion-icon>
+        <ion-icon (click)="starts = 5" *ngIf="starts < 5" name="star-outline" style="color:white;font-size:38px;margin-right:5px"></ion-icon>
+      </div>
+    </div>
+
+    <div style="margin-bottom:15%;width:100%;text-align:center;color:white;font-size:15.5px">
+      Tap para comenzar a evaluar
+    </div>
+  </div>
+
+
+  <div style="width:100%">
+    <ion-item>
+      <ion-textarea rows="4" placeholder="Deja una reseña (Opcional)" [(ngModel)]="comentario"></ion-textarea>
+    </ion-item>
+  </div>
+
+</div>

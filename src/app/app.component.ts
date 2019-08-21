@@ -51,7 +51,7 @@ export class AppComponent {
 
         } else {
           this._auth.authState.subscribe((data: any) => {
-
+            console.log(data, 'authhhh')
             if (data.isAuth) {
               this.usuario = data.usuario;
               this.token = data.token;

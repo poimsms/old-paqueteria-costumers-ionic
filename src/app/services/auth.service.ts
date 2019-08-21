@@ -52,11 +52,11 @@ export class AuthService {
 
   signUpUsuario(nombre, telefono, password) {
     return new Promise((resolve, reject) => {
-      const url = `${this.apiURL}/usuarios/usuario-signup`;
+      const url = `${this.apiURL}/usuarios/signup`;
       const body = { nombre, telefono, password };
       this.http.post(url, body).toPromise().then((res: any) => {
         if (res.ok) {
-          this.saveStorage('usuario', res.token, res.usuario, res.usuario._id);
+          this.saveStorage(res.token, res.usuario, res.usuario._id);
           resolve(true);
         }
       });
@@ -66,11 +66,11 @@ export class AuthService {
 
   signInUsuario(telefono, password) {
     return new Promise((resolve, reject) => {
-      const url = `${this.apiURL}/usuarios/usuario-signin`;
+      const url = `${this.apiURL}/usuarios/signin-phone`;
       const body = { telefono, password };
       this.http.post(url, body).toPromise().then((res: any) => {
         if (res.ok) {
-          this.saveStorage('usuario', res.token, res.usuario, res.usuario._id);
+          this.saveStorage(res.token, res.usuario, res.usuario._id);
           resolve(true);
         } else {
           resolve(false)
@@ -85,7 +85,7 @@ export class AuthService {
       const body = { telefono, password };
       this.http.post(url, body).toPromise().then((res: any) => {
         if (res.ok) {
-          this.saveStorage('empresa', res.token, res.usuario, res.usuario._id);
+          this.saveStorage(res.token, res.usuario, res.usuario._id);
           resolve(true);
         } else {
           resolve(false)
@@ -137,8 +137,8 @@ export class AuthService {
     }
   }
 
-  saveStorage(tipo, token, usuario, uid) {
-    const authData = { tipo, token, uid };
+  saveStorage(token, usuario, uid) {
+    const authData = { token, uid };
 
     if (this.platform.is("cordova")) {
       this.storage.set("authData", JSON.stringify(authData));
@@ -167,21 +167,12 @@ export class AuthService {
 
           const token = JSON.parse(res).token;
           const uid = JSON.parse(res).uid;
-          const tipo = JSON.parse(res).tipo;
 
-          if (tipo == 'usuario') {
-            this.getUser(token, uid).then(usuario => {
-              this.usuario = usuario;
-              this.token = token;
-              this.authState.next({ isAuth: true, usuario, token });
-            });
-          } else {
-            this.getEmpresa(token, uid).then(usuario => {
-              this.usuario = usuario;
-              this.token = token;
-              this.authState.next({ isAuth: true, usuario, token });
-            });
-          }
+          this.getUser(token, uid).then(usuario => {
+            this.usuario = usuario;
+            this.token = token;
+            this.authState.next({ isAuth: true, usuario, token });
+          });
 
         } else {
           this.authState.next({ isAuth: false, usuario: null, token: null });
@@ -193,22 +184,12 @@ export class AuthService {
         const res = localStorage.getItem('authData');
         const token = JSON.parse(res).token;
         const uid = JSON.parse(res).uid;
-        const tipo = JSON.parse(res).tipo;
 
-
-        if (tipo == 'usuario') {
-          this.getUser(token, uid).then(usuario => {
-            this.usuario = usuario;
-            this.token = token;
-            this.authState.next({ isAuth: true, usuario, token });
-          });
-        } else {
-          this.getEmpresa(token, uid).then(usuario => {
-            this.usuario = usuario;
-            this.token = token;
-            this.authState.next({ isAuth: true, usuario, token });
-          });
-        }
+        this.getUser(token, uid).then(usuario => {
+          this.usuario = usuario;
+          this.token = token;
+          this.authState.next({ isAuth: true, usuario, token });
+        });
 
       } else {
         this.authState.next({ isAuth: false, usuario: null, token: null });
@@ -218,21 +199,10 @@ export class AuthService {
 
 
   getUser(token, id) {
-    const url = `${this.apiURL}/usuarios/usuario-get-one?id=${id}`;
+    const url = `${this.apiURL}/usuarios/get-one?id=${id}`;
     const headers = new HttpHeaders({
       Authorization: `JWT ${token}`
     });
     return this.http.get(url, { headers }).toPromise();
   }
-
-
-  getEmpresa(token, id) {
-    const url = `${this.apiURL}/usuarios/empresa-get-one?id=${id}`;
-    const headers = new HttpHeaders({
-      Authorization: `JWT ${token}`
-    });
-    return this.http.get(url, { headers }).toPromise();
-  }
-
-
 }

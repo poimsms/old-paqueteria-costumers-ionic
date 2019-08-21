@@ -60,12 +60,6 @@ export class MapaPage implements OnInit {
       data.puerta = this.puerta;
     }
 
-    console.log('TSMAP', this.position)
-
-
-    console.log('TSMAP', this.position.coors)
-    console.log('TSMAP', this.position.coors.lat)
-
     data = {
       direccion: this.position.address,
       lat: this.position.coors.lat,

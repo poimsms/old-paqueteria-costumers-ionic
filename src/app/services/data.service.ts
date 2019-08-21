@@ -21,8 +21,8 @@ export class DataService {
     return this.http.put(url, body).toPromise();
   }
 
-  getPendingRatings(id) {
-    const url = `${this.apiURL}/riders/riders-pending-ratings?id=${id}`;
+  getActiveRating(id) {
+    const url = `${this.apiURL}/riders/rating-get-active-one?id=${id}`;
     return this.http.get(url).toPromise();
   }
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
-import { map, take, switchMap, filter } from 'rxjs/operators';
+import { take, switchMap } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
 
 @Injectable({
@@ -8,7 +8,7 @@ import { Observable, Subject } from 'rxjs';
 })
 export class FireService {
 
-  rider_query$: Subject<any>;
+  rider_query$ = new Subject();
   rider$: Observable<any>;
 
   constructor(private db: AngularFirestore) {
@@ -26,22 +26,25 @@ export class FireService {
       ref.where('rider', '==', id)).valueChanges();
   }
 
-  updateRider(id, newData) {
-    this.db.doc('riders/' + id).update(newData);
-    this.db.doc('riders_coors/' + id).update(newData);
+  updateRider(id, tipo, data) {
+    if (tipo == 'coors') {
+      this.db.doc('riders_coors/' + id).update(data);
+    } else {
+      this.db.doc('riders/' + id).update(data);
+    }
   }
 
   getRiderMasCercano(vehiculo, lat, lng) {
     return new Promise((resolve, reject) => {
       this.db.collection('riders_coors', ref =>
-        ref.where('isOnline', '==', true).where('isAccountActive', '==', true).where('isPay', '==', false).where('actividad', '==', 'disponible').where('vehiculo', '==', vehiculo))
+        ref.where('isOnline', '==', true))
         .valueChanges().pipe(take(1)).subscribe((riders: any) => {
-
-          if (riders.lenght > 0) {
-
+          console.log(riders)
+          console.log(riders.length)
+          if (riders.length > 0) {
             const ridersOrdenados = this.ordenarRiders(riders, lat, lng);
-
-            resolve({ hayRiders: false, riders: ridersOrdenados });
+            console.log(ridersOrdenados)
+            resolve({ hayRiders: true, riders: ridersOrdenados });
 
           } else {
             resolve({ hayRiders: false });
@@ -50,6 +53,10 @@ export class FireService {
         });
     });
   }
+  // .where('isActive', '==', true)
+  // .where('pagoPendiente', '==', false)
+  // .where('actividad', '==', 'disponible')
+  // .where('vehiculo', '==', vehiculo)
 
   ordenarRiders(riders, lat, lng) {
     const distanceMatrix = [];
@@ -58,9 +65,11 @@ export class FireService {
       const distance = Math.sqrt((rider.lat - lat) * (rider.lat - lat) + (rider.lng - lng) * (rider.lng - lng));
       distanceMatrix.push({
         distance,
-        id: rider
+        id: rider.rider
       });
     });
+
+    console.log(distanceMatrix, 'MATRIX')
 
     const ridersOrdenados = [];
 
@@ -85,6 +94,10 @@ export class FireService {
       }
 
     });
+
+    console.log(distanceMatrix, 'MATRIX2222')
+    console.log(ridersOrdenados, 'o')
+
 
     return ridersOrdenados;
   }

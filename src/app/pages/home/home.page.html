@@ -1,27 +1,31 @@
-<div style="z-index:999;position:fixed;top:10px;left:10px">
+<div style="z-index:990;position:fixed;top:10px;left:10px">
   <div (click)="openMenu()"
     style="background:white;height:32px;width:32px;display:flex;align-items:center;justify-content:center;border-radius:50%">
     <ion-icon name="menu" style="color:#777"></ion-icon>
   </div>
 </div>
-<div style="z-index:999;position:fixed;top:10px;right:10px">
+<div style="z-index:990;position:fixed;top:10px;right:10px">
   <div
     style="background:white;height:32px;width:32px;display:flex;align-items:center;justify-content:center;border-radius:50%">
     <ion-icon name="notifications" style="color:#777"></ion-icon>
   </div>
 </div>
 
-<div style="z-index:999;position:fixed;top:60px;left:10px;width:90%">
+<div style="z-index:990;position:fixed;top:60px;left:10px;width:90%">
   <div (click)="openMapaPage('origen')"
     style="border:1px solid #eee;width:100%;background:white;padding:10px;padding-left:20px;border-radius:20px;color:#777;font-size:18px;display:flex;align-items:center">
     <div style="border-radius:50%;height:7px;width:7px;background:orange;margin-right:15px"></div>
-    {{texto_origen}}
+    <div>
+      {{texto_origen}}
+    </div>
   </div>
 
   <div (click)="openMapaPage('destino')"
     style="border:1px solid #eee;width:100%;margin-top:20px;background:white;padding:10px;padding-left:20px;border-radius:20px;color:#777;font-size:18px;display:flex;align-items:center">
     <div style="border-radius:50%;height:7px;width:7px;background:orange;margin-right:15px"></div>
-    {{texto_destino}}
+    <div>
+      {{texto_destino}}
+    </div>
   </div>
 </div>
 
@@ -44,8 +48,11 @@
         <div class="small" [ngClass]="{'smallActivo': isBicicleta}">
           Bicicleta
         </div>
-        <div *ngIf="_control.rutaReady" class="large" [ngClass]="{'largeActivo': isBicicleta}">
+        <div *ngIf="_control.rutaReady && !distancia_excedida_bici" class="large" [ngClass]="{'largeActivo': isBicicleta}">
           ${{precioBici}}
+        </div>
+        <div *ngIf="distancia_excedida_bici" class="large" [ngClass]="{'largeActivo': isBicicleta}">
+            --
         </div>
       </div>
 
@@ -56,19 +63,27 @@
         <div class="small" [ngClass]="{'smallActivo': isMoto}">
           Moto
         </div>
-        <div *ngIf="_control.rutaReady" class="large" [ngClass]="{'largeActivo': isMoto}">
+        <div *ngIf="_control.rutaReady && !distancia_excedida_moto" class="large" [ngClass]="{'largeActivo': isMoto}">
           ${{precioMoto}}
+        </div>
+        <div *ngIf="distancia_excedida_moto" class="large" [ngClass]="{'largeActivo': isMoto}">
+            --
         </div>
       </div>
       
     </div>
 
     <div padding>
-      <ion-button mode="ios" (click)="confirmarPedido()" expand="block" color="secondary">
+      <ion-button *ngIf="!rutaReady" mode="ios" expand="block" color="medium">
         <div style="font-size:18px;font-weight:600">
           Confirmar Órden
         </div>
       </ion-button>
+      <ion-button *ngIf="rutaReady" mode="ios" (click)="iniciarPedido()" expand="block" color="secondary">
+          <div style="font-size:18px;font-weight:600">
+            Confirmar Órden
+          </div>
+        </ion-button>
     </div>
 
   </div>
@@ -87,7 +102,7 @@
             <ion-icon name="star" style="color:gold"></ion-icon>
             <ion-icon name="star" style="color:gold"></ion-icon>
             <ion-icon name="star" style="color:gold"></ion-icon>
-            ({{rider?.startsAvg}})
+            ({{rider?.stats.startsAvg}})
           </div>
           <div style="font-size:14px;color:#999;text-transform:capitalize">
             ({{rider?.vehiculo}})
@@ -113,4 +128,16 @@
   </div>
 
 </ion-footer>
+
+
+
+<div *ngIf="loadingRider" style="z-index:999;position:fixed;top:0px;left:0px;height:100%;width:100%;display:flex;align-items:center;justify-content:center;background:rgb(34, 34, 34, 0.5)">  
+  <div style="box-shadow: 0 0 20px rgba(68, 68, 68, 0.75);padding:40px;border-radius:2px;background:white;display:flex;align-items:center;">
+      <ion-spinner color="secondary"></ion-spinner>
+      <div style="margin-left:20px">
+        Buscando Rider...
+      </div>
+  </div>
+</div>
+
 

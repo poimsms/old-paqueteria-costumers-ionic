@@ -13,7 +13,7 @@ export class RatingComponent implements OnInit {
   cliente: any;
 
   comentario = '';
-  starts: number;
+  starts = 3;
 
   constructor(
     public modalCtrl: ModalController,
@@ -28,33 +28,30 @@ export class RatingComponent implements OnInit {
     this.modalCtrl.dismiss();
   }
 
-  omitir() {
-
-    const body: any = {
-      omitir: true,
-      pendiente: false
-    };
-
-    this._data.rateRider(this.rating._id, this.rating.rider, body).then(() => {
-      this.closeModal();
-    });
-  }
-
   rate() {
 
     const body: any = {
+      comentario: this.comentario,
       starts: this.starts,
-      omitir: false,
       pendiente: false
     };
+    console.log(body)
 
-    if (this.comentario.length > 5) {
-      body.comentario = this.comentario;
-    }
+    this.closeModal();
 
-    this._data.rateRider(this.rating._id, this.rating.rider, body).then(() => {
-      this.closeModal();
-    });
+    // const body: any = {
+    //   starts: this.starts,
+    //   omitir: false,
+    //   pendiente: false
+    // };
+
+    // if (this.comentario.length > 5) {
+    //   body.comentario = this.comentario;
+    // }
+
+    // this._data.rateRider(this.rating._id, this.rating.rider, body).then(() => {
+    //   this.closeModal();
+    // });
   }
 
   ngOnInit() { }
