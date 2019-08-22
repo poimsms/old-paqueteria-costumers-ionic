@@ -1,0 +1,81 @@
+<ion-content>
+
+  <div style="width:100%;padding:20px;padding-bottom:0px;text-align:right">
+    <ion-icon (click)="closeModal()" name="close" style="color:#555;font-size:27px"></ion-icon>
+  </div>
+
+
+  <ion-item lines="none" style="padding-left:20px">
+    <ion-label>Rider:</ion-label>
+  </ion-item>
+
+  <div padding style="margin-left:15px;width:100%;display:flex;align-items:center;">
+    <img [src]="rider.img.url" style="width:60px;height:60px;border-radius:50%;object-fit:cover">
+    <div style="margin-left:10px;font-size:16px;font-weight:600">
+      {{ rider.nombre }}
+      <div style="display:flex;align-items:center">
+        <ion-icon name="star" style="color:gold;font-size:22px"></ion-icon>
+        <ion-icon name="star" style="color:gold;font-size:22px"></ion-icon>
+        <ion-icon name="star" style="color:gold;font-size:22px"></ion-icon>
+        <ion-icon name="star" style="color:gold;font-size:22px"></ion-icon>
+        ({{ rider?.stats.startsAvg }})
+      </div>
+    </div>
+  </div>
+
+
+  <div padding>
+    <ion-item>
+      <ion-label>Vehículo:</ion-label>
+      <div slot="end" class="burbuja burbujaActiva">
+        <img *ngIf="rider.vehiculo == 'Moto'" src="assets/moto.png" class="transporte">
+        <img *ngIf="rider.vehiculo == 'Bicicleta'" src="assets/bici.png" class="transporte">
+      </div>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Total:</ion-label>
+      <div slot="end" style="font-size:22px;color:#0cd1e8;font-weight:600">
+        ${{ monto }}
+      </div>
+    </ion-item>
+
+    <ion-item lines="none">
+      <ion-label>Método de pago:</ion-label>
+    </ion-item>
+
+    <ion-item *ngIf="usuario.rol == 'usuario'" (click)="togglePay('Tarjeta')" lines="none">
+      <ion-icon slot="start" name="card" style="color:#666"></ion-icon>
+      <ion-label>Tarjeta</ion-label>
+      <ion-icon *ngIf="mPago == 'Tarjeta'" slot="end" name="checkmark-circle" style="color:darkorange"></ion-icon>
+      <ion-icon *ngIf="mPago != 'Tarjeta'" slot="end" name="radio-button-off" style="color:darkorange"></ion-icon>
+    </ion-item>
+
+    <ion-item *ngIf="usuario.rol == 'usuario'" (click)="togglePay('Efectivo')" lines="none">
+      <ion-icon slot="start" name="cash" style="color:#666"></ion-icon>
+      <ion-label>Efectivo</ion-label>
+      <ion-icon *ngIf="mPago == 'Efectivo'" slot="end" name="checkmark-circle" style="color:darkorange"></ion-icon>
+      <ion-icon *ngIf="mPago != 'Efectivo'" slot="end" name="radio-button-off" style="color:darkorange"></ion-icon>
+    </ion-item>
+
+    <ion-item *ngIf="usuario.rol == 'empresa'" lines="none">
+      <ion-icon slot="start" name="card" style="color:#666"></ion-icon>
+      <ion-label>Tarjeta</ion-label>
+      <ion-icon slot="end" name="checkmark-circle" style="color:darkorange"></ion-icon>
+    </ion-item>
+
+  </div>
+
+
+</ion-content>
+
+
+<ion-footer style="background:white">
+  <div padding>
+    <ion-button (click)="pagar()" mode="ios" expand="block" color="secondary">
+      <div style="font-size:20px;font-weight:600">
+        Continuar
+      </div>
+    </ion-button>
+  </div>
+</ion-footer>

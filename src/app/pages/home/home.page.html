@@ -41,36 +41,36 @@
 
     <div style="width:100%;display:flex;align-items:center;justify-content:space-around">
 
-      <div (click)="transportToggle('bicicleta')">
+      <div (click)="vehiculoToggle('bicicleta')">
         <div class="burbuja" [ngClass]="{'burbujaActiva': isBicicleta}">
           <img src="assets/bici.png" class="transporte" [ngClass]="{'transporteActivo': isBicicleta}">
         </div>
         <div class="small" [ngClass]="{'smallActivo': isBicicleta}">
           Bicicleta
         </div>
-        <div *ngIf="_control.rutaReady && !distancia_excedida_bici" class="large" [ngClass]="{'largeActivo': isBicicleta}">
+        <div *ngIf="rutaReady && !distancia_excedida_bici" class="large" [ngClass]="{'largeActivo': isBicicleta}">
           ${{precioBici}}
         </div>
         <div *ngIf="distancia_excedida_bici" class="large" [ngClass]="{'largeActivo': isBicicleta}">
-            --
+          --
         </div>
       </div>
 
-      <div (click)="transportToggle('moto')">
+      <div (click)="vehiculoToggle('moto')">
         <div class="burbuja" [ngClass]="{'burbujaActiva': isMoto}">
           <img src="assets/moto.png" class="transporte" [ngClass]="{'transporteActivo': isMoto}">
         </div>
         <div class="small" [ngClass]="{'smallActivo': isMoto}">
           Moto
         </div>
-        <div *ngIf="_control.rutaReady && !distancia_excedida_moto" class="large" [ngClass]="{'largeActivo': isMoto}">
+        <div *ngIf="rutaReady && !distancia_excedida_moto" class="large" [ngClass]="{'largeActivo': isMoto}">
           ${{precioMoto}}
         </div>
         <div *ngIf="distancia_excedida_moto" class="large" [ngClass]="{'largeActivo': isMoto}">
-            --
+          --
         </div>
       </div>
-      
+
     </div>
 
     <div padding>
@@ -80,10 +80,10 @@
         </div>
       </ion-button>
       <ion-button *ngIf="rutaReady" mode="ios" (click)="iniciarPedido()" expand="block" color="secondary">
-          <div style="font-size:18px;font-weight:600">
-            Confirmar Órden
-          </div>
-        </ion-button>
+        <div style="font-size:18px;font-weight:600">
+          Confirmar Órden
+        </div>
+      </ion-button>
     </div>
 
   </div>
@@ -131,13 +131,25 @@
 
 
 
-<div *ngIf="loadingRider" style="z-index:999;position:fixed;top:0px;left:0px;height:100%;width:100%;display:flex;align-items:center;justify-content:center;background:rgb(34, 34, 34, 0.5)">  
-  <div style="box-shadow: 0 0 20px rgba(68, 68, 68, 0.75);padding:40px;border-radius:2px;background:white;display:flex;align-items:center;">
-      <ion-spinner color="secondary"></ion-spinner>
-      <div style="margin-left:20px">
-        Buscando Rider...
-      </div>
+<div *ngIf="loadingRider"
+  style="z-index:999;position:fixed;top:0px;left:0px;height:100%;width:100%;display:flex;align-items:center;justify-content:center;background:rgb(34, 34, 34, 0.5)">
+  <div
+    style="box-shadow: 0 0 20px rgba(68, 68, 68, 0.75);padding:40px;border-radius:2px;background:white;display:flex;align-items:center;">
+    <ion-spinner color="secondary"></ion-spinner>
+    <div style="margin-left:20px">
+      Buscando Rider...
+    </div>
   </div>
 </div>
 
 
+
+<div *ngIf="graciasPorComprar"
+  style="z-index:999;position:fixed;top:0px;left:0px;height:100%;width:100%;background:#0cd1e8">
+  <div style="width:100%;text-align:center;margin-top:45%">
+    <ion-icon name="checkmark-circle" style="font-size:100px;color:white"></ion-icon>
+  </div>
+  <div style="width:100%;text-align:center;color:white;font-size:20px;font-weight:550">
+    Gracias por su compra
+  </div>
+</div>

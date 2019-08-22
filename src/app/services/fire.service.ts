@@ -37,19 +37,18 @@ export class FireService {
   getRiderMasCercano(vehiculo, lat, lng) {
     return new Promise((resolve, reject) => {
       this.db.collection('riders_coors', ref =>
-        ref.where('isOnline', '==', true))
+        ref.where('isOnline', '==', true)
+          .where('isActive', '==', true)
+          .where('pagoPendiente', '==', false)
+          .where('actividad', '==', 'disponible')
+          .where('vehiculo', '==', vehiculo))
         .valueChanges().pipe(take(1)).subscribe((riders: any) => {
-          console.log(riders)
-          console.log(riders.length)
           if (riders.length > 0) {
             const ridersOrdenados = this.ordenarRiders(riders, lat, lng);
-            console.log(ridersOrdenados)
             resolve({ hayRiders: true, riders: ridersOrdenados });
-
           } else {
             resolve({ hayRiders: false });
           }
-
         });
     });
   }
@@ -68,8 +67,6 @@ export class FireService {
         id: rider.rider
       });
     });
-
-    console.log(distanceMatrix, 'MATRIX')
 
     const ridersOrdenados = [];
 
@@ -94,10 +91,6 @@ export class FireService {
       }
 
     });
-
-    console.log(distanceMatrix, 'MATRIX2222')
-    console.log(ridersOrdenados, 'o')
-
 
     return ridersOrdenados;
   }

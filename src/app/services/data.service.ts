@@ -27,7 +27,7 @@ export class DataService {
   }
 
   getOneRider(id) {
-    const url = `${this.apiURL}/riders/riders-get-one?id=${id}`;
+    const url = `${this.apiURL}/riders/usuario-get-one?id=${id}`;
     return this.http.get(url).toPromise();
   }
 
