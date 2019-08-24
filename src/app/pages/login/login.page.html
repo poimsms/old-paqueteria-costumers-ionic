@@ -15,139 +15,108 @@
 
   <div *ngIf="signUpUsuario" style="width:100%">
 
-  <div style="margin:15px;border:1px solid #eee;border-radius:6px;padding:5px;display:flex;align-items:center;">
-    <div style="background:#eee;color:#666;padding:4px;margin-right:5px">
-      +56 9
-    </div>
-    <ion-input type="tel" [(ngModel)]="telefono" placeholder="Teléfono"></ion-input>
-  </div>
-  <div *ngIf="showErrorPhoneIsFound" style="padding-left:15px;color:red">
-    Este teléfono ya está registrado
-  </div>
-
-  <div style="color:#888;margin:15px">
-    Te enviaremos un mensaje de texto para verificar
-  </div>
-
-  <ion-item>
-    <ion-toggle color="secondary" slot="start"></ion-toggle>
-    <div style="color:#666">
-      Acepto <span style="color:#24d6ea;font-weight:500">política de privacidad</span> de Beat Grow
-    </div>
-  </ion-item>
-
-  <div padding>
-    <ion-button [disabled]="isLoading" (click)="next()" mode="ios" expand="block" color="secondary">
-      <div style="font-size:20px;font-weight:600">
-        Continuar
+    <div style="margin:15px;border:1px solid #eee;border-radius:6px;padding:5px;display:flex;align-items:center;">
+      <div style="background:#eee;color:#666;padding:4px;margin-right:5px">
+        +56 9
       </div>
-    </ion-button>
-  </div>
-
-  <div padding style="color:#666;width:100%;text-align:center">
-    ¿Ya tienes una cuenta? <span (click)="changeLogin('login in normal')" style="color:#24d6ea;font-weight:500">Ingresa acá</span>
-  </div>
-
-  <div padding style="color:#666;width:100%;text-align:center">
-    Cambiar a  <span (click)="changeLogin('login in empresa')" style="color:#24d6ea;font-weight:500">Empresa</span>
-  </div>
-
-</div>
-
-
-
-
-<div *ngIf="signInUsuario" style="width:100%">
-
-  <div style="color:#888;margin-left:15px;margin-top:25px;font-size:18px">
-    Ingresa número de teléfono
-  </div>
-  <div style="margin:15px;margin-top:5px;border:1px solid #eee;border-radius:6px;padding:5px;display:flex;align-items:center;">
-    <div style="background:#eee;color:#666;padding:4px;margin-right:5px">
-      +56 9
+      <ion-input type="tel" [(ngModel)]="telefono" placeholder="Teléfono"></ion-input>
     </div>
-    <ion-input type="tel" [(ngModel)]="telefono" placeholder=""></ion-input>
-  </div>
 
-  <div style="color:#888;margin-left:15px;margin-top:25px;font-size:18px">
-    Porfavor ingresa tu contraseña
-  </div>
-  <div style="margin:15px;margin-top:5px;border:1px solid #eee;border-radius:6px;padding:5px;display:flex;align-items:center;">
-    <ion-input [type]="passwordType" [(ngModel)]="password" placeholder=""></ion-input>
-    <ion-icon (click)="showHidePassword()" *ngIf="passwordType == 'password'" name="eye" style="color:#999;font-size:26px"></ion-icon>
-    <ion-icon (click)="showHidePassword()" *ngIf="passwordType == 'text'" name="eye-off" style="color:#999;font-size:26px"></ion-icon>
-  </div>
-  <div *ngIf="showErrorPassword" style="padding-left:15px;color:red">
-    Teléfono o contraseña incorrectos
-  </div>
-
-  <div padding>
-    <ion-button [disabled]="isLoading" (click)="loginUsuario()" mode="ios" expand="block" color="secondary">
-      <div style="font-size:20px;font-weight:600">
-        Ingresar
-      </div>
-    </ion-button>
-  </div>
-
-  <div padding style="color:#666;width:100%;text-align:center">
-    ¿Aún no tienes una cuenta? <span (click)="changeLogin('login up normal')" style="color:#24d6ea;font-weight:500">Registrate acá</span>
-  </div>
-
-  <div padding style="color:#666;width:100%;text-align:center">
-    Cambiar a  <span (click)="changeLogin('login in empresa')" style="color:#24d6ea;font-weight:500">Empresa</span>
-  </div>
-
-</div>
-
-
-
-
-<div *ngIf="signInEmpresa" style="width:100%">
-
-  <div style="width:100%;text-align:center;padding:15px;padding-bottom:0px;font-weight:600;color:#444;font-size:18px">
-    ¡La forma más rápida de enviar tus pedidos!
-  </div>
-
-  <div style="color:#888;margin-left:15px;margin-top:25px;font-size:18px">
-    Ingresa número de teléfono
-  </div>
-  <div style="margin:15px;margin-top:5px;border:1px solid #eee;border-radius:6px;padding:5px;display:flex;align-items:center;">
-    <div style="background:#eee;color:#666;padding:4px;margin-right:5px">
-      +56 9
+    <div *ngIf="err_8_digitos_telefono" style="padding-left:15px;color:red">
+      Deben ser 8 digitos
     </div>
-    <ion-input type="tel" [(ngModel)]="telefono" placeholder=""></ion-input>
-  </div>
 
-  <div style="color:#888;margin-left:15px;margin-top:25px;font-size:18px">
-    Porfavor ingresa tu contraseña
-  </div>
-  <div style="margin:15px;margin-top:5px;border:1px solid #eee;border-radius:6px;padding:5px;display:flex;align-items:center;">
-    <ion-input [type]="passwordType" [(ngModel)]="password" placeholder=""></ion-input>
-    <ion-icon (click)="showHidePassword()" *ngIf="passwordType == 'password'" name="eye" style="color:#999;font-size:26px"></ion-icon>
-    <ion-icon (click)="showHidePassword()" *ngIf="passwordType == 'text'" name="eye-off" style="color:#999;font-size:26px"></ion-icon>
-  </div>
-  <div *ngIf="showErrorPassword" style="padding-left:15px;color:red">
-    Teléfono o contraseña incorrectos
-  </div>
+    <div *ngIf="err_num_telefono" style="padding-left:15px;color:red">
+      Solo deben ser números
+    </div>
 
-  <div padding>
-    <ion-button [disabled]="isLoading" (click)="loginEmpresa()" mode="ios" expand="block" color="secondary">
-      <div style="font-size:20px;font-weight:600">
-        Ingresar
+    <div *ngIf="err_telefono_en_uso" style="padding-left:15px;color:red">
+      Este teléfono ya está registrado
+    </div>
+
+    <div style="color:#888;margin:15px">
+      Te enviaremos un mensaje de texto para verificar
+    </div>
+
+    <ion-item>
+      <ion-toggle color="secondary" slot="start"></ion-toggle>
+      <div style="color:#666">
+        Acepto <span style="color:#24d6ea;font-weight:500">política de privacidad</span> de Beat Grow
       </div>
-    </ion-button>
+    </ion-item>
+
+    <div padding>
+      <ion-button [disabled]="isLoading" (click)="next()" mode="ios" expand="block" color="secondary">
+        <div style="font-size:20px;font-weight:600">
+          Continuar
+        </div>
+      </ion-button>
+    </div>
+
+    <div padding style="color:#666;width:100%;text-align:center">
+      ¿Ya tienes una cuenta? <span (click)="changeLogin('login in')" style="color:#24d6ea;font-weight:500">Ingresa
+        acá</span>
+    </div>
+
   </div>
 
 
-  <div padding style="color:#666;width:100%;text-align:center">
-    Cambiar a  <span (click)="changeLogin('login up normal')" style="color:#24d6ea;font-weight:500">Usuarios</span>
+  <div *ngIf="signInUsuario" style="width:100%">
+
+    <div style="color:#888;margin-left:15px;margin-top:25px;font-size:18px">
+      Ingresa número de teléfono
+    </div>
+    <div
+      style="margin:15px;margin-top:5px;border:1px solid #eee;border-radius:6px;padding:5px;display:flex;align-items:center;">
+      <div style="background:#eee;color:#666;padding:4px;margin-right:5px">
+        +56 9
+      </div>
+      <ion-input type="tel" [(ngModel)]="telefono" placeholder=""></ion-input>
+    </div>
+
+    <div *ngIf="err_8_digitos_telefono" style="padding-left:15px;color:red">
+      Deben ser 8 digitos
+    </div>
+
+    <div *ngIf="err_num_telefono" style="padding-left:15px;color:red">
+      Solo deben ser números
+    </div>
+
+    <div style="color:#888;margin-left:15px;margin-top:25px;font-size:18px">
+      Por favor ingresa tu contraseña
+    </div>
+
+    <div
+      style="margin:15px;margin-top:5px;border:1px solid #eee;border-radius:6px;padding:5px;display:flex;align-items:center;">
+      <ion-input [type]="passwordType" [(ngModel)]="password" placeholder=""></ion-input>
+      <ion-icon (click)="showHidePassword()" *ngIf="passwordType == 'password'" name="eye"
+        style="color:#999;font-size:26px"></ion-icon>
+      <ion-icon (click)="showHidePassword()" *ngIf="passwordType == 'text'" name="eye-off"
+        style="color:#999;font-size:26px"></ion-icon>
+    </div>
+
+    <div *ngIf="err_password" style="padding-left:15px;color:red">
+      Teléfono o contraseña incorrectos
+    </div>
+
+    <div *ngIf="err_cuenta_desactivada" style="padding-left:15px;color:red">
+      La cuenta está desactivada
+    </div>
+
+    <div padding>
+      <ion-button [disabled]="isLoading" (click)="loginUsuario()" mode="ios" expand="block" color="secondary">
+        <div style="font-size:20px;font-weight:600">
+          Ingresar
+        </div>
+      </ion-button>
+    </div>
+
+    <div padding style="color:#666;width:100%;text-align:center">
+      ¿Aún no tienes una cuenta? <span (click)="changeLogin('login up')"
+        style="color:#24d6ea;font-weight:500">Registrate acá</span>
+    </div>
+
   </div>
-
-</div>
-
-
-
-
 
 
 

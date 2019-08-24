@@ -15,10 +15,14 @@ export class LoginPage implements OnInit {
 
   signInUsuario = false;
   signUpUsuario = true;
-  signInEmpresa = false;
-  showErrorPassword = false;
-  showErrorPhoneIsFound = false;
   isLoading = false;
+
+  err_password = false;
+  err_telefono_en_uso = false;
+  err_cuenta_desactivada = false;
+  err_8_digitos_telefono = false;
+  err_num_telefono = false;
+
 
   passwordType = 'password';
 
@@ -51,62 +55,98 @@ export class LoginPage implements OnInit {
   }
 
   changeLogin(tipo) {
-    if (tipo == 'login in normal') {
+
+    if (tipo == 'login in') {
       this.signInUsuario = true;
       this.signUpUsuario = false;
-      this.signInEmpresa = false;
     }
-    if (tipo == 'login up normal') {
+
+    if (tipo == 'login up') {
       this.signInUsuario = false;
       this.signUpUsuario = true;
-      this.signInEmpresa = false;
     }
-    if (tipo == 'login in empresa') {
-      this.signInUsuario = false;
-      this.signUpUsuario = false;
-      this.signInEmpresa = true;
-    }
+
     this.password = undefined;
     this.telefono = undefined;
-    this.showErrorPassword = false;
-    this.showErrorPhoneIsFound = false;
 
+    this.resetErros();
+  }
+
+  resetErros() {
+    this.err_8_digitos_telefono = false;
+    this.err_cuenta_desactivada = false;
+    this.err_num_telefono = false;
+    this.err_password = false;
+    this.err_telefono_en_uso = false;
   }
 
   next() {
+
+    this.resetErros();
+
+    if (this.telefono.length != 8) {
+      return this.err_8_digitos_telefono = true;
+    }
+
+    if (!Number(this.telefono)) {
+      return this.err_num_telefono = true;
+    }
+
     this.isLoading = true;
-    const phone = Number(`569${this.telefono}`);    
-    this._auth.phoneNumberSendRequest(phone).then((res:any) => {
-     
+
+    this._auth.phoneNumberSendRequest(this.telefono).then((res:any) => {
+
       if (res.ok) {
         if (res.result.status == '0') {
           this._auth.idPhone = res.result.request_id;
-          this._auth.telefono = this.telefono;
-          this._auth.phone = phone;
+          this._auth.telefono = Number(this.telefono);
           this.router.navigateByUrl(`login-verificar`);
         } else {
           this.presentToast();
         }
+      }
 
-        this.isLoading = false;  
-      }      
+      if (!res.ok && res.err.tipo == 'telefono') {
+        this.err_telefono_en_uso = true;
+      }
+
+      this.isLoading = false;
     });    
   }
 
   loginUsuario() {
-    this.isLoading = true;
+
+    this.resetErros();
 
     // if (this.telefono.length != 8) {
-    //   return this.error_telefono = true;
+    //   return this.err_8_digitos_telefono = true;
     // }
 
-    if (this.telefono && this.password) {     
-      this._auth.signInUsuario(this.telefono, this.password).then(done => {
-        if (done) {
-          this.router.navigateByUrl('home');
-        } else {
-          this.showErrorPassword = true;
+    if (!Number(this.telefono)) {
+      return this.err_num_telefono = true;
+    }
+
+    this.isLoading = true;
+
+    if (this.telefono && this.password) {
+
+      this._auth.loginIn(this.telefono, this.password).then((res: any) => {
+        
+        if (!res.ok) {
+
+          if (res.err.tipo == 'password') {
+            this.err_password = true;
+          }
+
+          if (res.err.tipo == 'desactivado') {
+            this.err_cuenta_desactivada = true;
+          }
         }
+
+        if (res.ok) {
+          // Todo normal.. el observable cambiará la vista.
+        }
+
         this.isLoading = false;
       });
     }

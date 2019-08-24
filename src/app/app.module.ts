@@ -32,10 +32,22 @@ import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
 import { ForceUpgradeComponent } from './components/force-upgrade/force-upgrade.component';
 import { RatingComponent } from './components/rating/rating.component';
 import { PayComponent } from './components/pay/pay.component';
+import { BloqueadoComponent } from './components/bloqueado/bloqueado.component';
 
 @NgModule({
-  declarations: [AppComponent, ForceUpgradeComponent, RatingComponent, PayComponent],
-  entryComponents: [ForceUpgradeComponent, RatingComponent, PayComponent],
+  declarations: [
+    AppComponent,
+    ForceUpgradeComponent,
+    RatingComponent,
+    PayComponent,
+    BloqueadoComponent
+  ],
+  entryComponents: [
+    ForceUpgradeComponent,
+    RatingComponent,
+    PayComponent,
+    BloqueadoComponent
+  ],
   imports: [
     BrowserModule,
     HttpClientModule,

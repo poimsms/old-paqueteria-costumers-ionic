@@ -51,7 +51,7 @@ export class PayComponent implements OnInit {
     }
 
     const pedido = {
-      precio: this.monto,
+      costo: this.monto,
       metodoPago: this.mPago,
       distancia: this.pedido.distancia,
       origen: this.pedido.origen,

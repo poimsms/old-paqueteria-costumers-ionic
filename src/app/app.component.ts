@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { AuthService } from './services/auth.service';
 import { GlobalService } from './services/global.service';
 import { ForceUpgradeComponent } from './components/force-upgrade/force-upgrade.component';
+import { BloqueadoComponent } from './components/bloqueado/bloqueado.component';
 
 
 @Component({
@@ -50,13 +51,15 @@ export class AppComponent {
 
         } else {
           this._auth.authState.subscribe((data: any) => {
-            console.log(data, 'authhhh')
             if (data.isAuth) {
               this.usuario = data.usuario;
               this.token = data.token;
-              this.isAuth = true;
-              this.router.navigateByUrl('home');
-            } else {
+              this.isAuth = true;              
+              if (!data.usuario.isActive) {
+                this.openBloqueadoModal();
+              } else {
+                this.router.navigateByUrl('home');
+              }            } else {
               this.router.navigateByUrl('login');
             }        
           });
@@ -69,6 +72,13 @@ export class AppComponent {
   async openForceModal() {
     const modal = await this.modalController.create({
       component: ForceUpgradeComponent
+    });   
+    await modal.present();
+  }
+
+  async openBloqueadoModal() {
+    const modal = await this.modalController.create({
+      component: BloqueadoComponent
     });   
     await modal.present();
   }

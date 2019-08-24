@@ -11,7 +11,7 @@ import { ConfigService } from './config.service';
 export class AuthService {
 
   apiURL: string;
-  telefono: string;
+  telefono: number;
   phone: number;
   idPhone: string;
   authState = new BehaviorSubject({ isAuth: false, usuario: {}, token: null });
@@ -32,9 +32,9 @@ export class AuthService {
 
   }
 
-  phoneNumberSendRequest(number) {
+  phoneNumberSendRequest(telefono) {
     const url = `${this.apiURL}/nexmo/number`;
-    const body = { number };
+    const body = { telefono };
     return this.http.post(url, body).toPromise();
   }
 
@@ -63,38 +63,35 @@ export class AuthService {
     });
   }
 
-
-  signInUsuario(telefono, password) {
+  
+  loginUp(data) {
     return new Promise((resolve, reject) => {
-      const url = `${this.apiURL}/usuarios/signin-phone`;
-      const body = { telefono, password };
-      this.http.post(url, body).toPromise().then((res: any) => {
+      this.signUp(data).then((res: any) => {
+        
         if (res.ok) {
           this.saveStorage(res.token, res.usuario, res.usuario._id);
-          resolve(true);
-        } else {
-          resolve(false)
         }
+
+        resolve(res);
       });
     });
   }
 
-  signInEmpresa(telefono, password) {
+  
+  loginIn(telefono, password) {
     return new Promise((resolve, reject) => {
-      const url = `${this.apiURL}/usuarios/empresa-signin`;
-      const body = { telefono, password };
-      this.http.post(url, body).toPromise().then((res: any) => {
+      this.signIn(telefono, password).then((res: any) => {
+        
         if (res.ok) {
           this.saveStorage(res.token, res.usuario, res.usuario._id);
-          resolve(true);
-        } else {
-          resolve(false)
         }
+
+        resolve(res);
       });
     });
   }
 
-
+  
   logout() {
     this.removeStorage();
     this.authState.next({ isAuth: false, usuario: null, token: null });
@@ -138,7 +135,7 @@ export class AuthService {
   }
 
   saveStorage(token, usuario, uid) {
-    
+
     const authData = { token, uid };
     this.usuario = usuario;
     this.token = token;
@@ -200,6 +197,16 @@ export class AuthService {
     }
   }
 
+  signIn(telefono, password) {
+    const url = `${this.apiURL}/usuarios/signin-phone`;
+    const body = { telefono, password };
+    return this.http.post(url, body).toPromise();
+  }
+
+  signUp(body) {
+    const url = `${this.apiURL}/usuarios/signup`;
+    return this.http.post(url, body).toPromise();
+  }
 
   getUser(token, id) {
     const url = `${this.apiURL}/usuarios/get-one?id=${id}`;
@@ -208,4 +215,5 @@ export class AuthService {
     });
     return this.http.get(url, { headers }).toPromise();
   }
+
 }

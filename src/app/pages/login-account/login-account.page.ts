@@ -12,14 +12,14 @@ export class LoginAccountPage implements OnInit {
   nombre: string;
   passwordType = "password";
   password: string;
-  phone: number;
+  telefono: number;
 
   constructor(
     private _auth: AuthService,
     private router: Router,
     private toastCtrl: ToastController
   ) {
-    this.phone = this._auth.phone;
+    this.telefono = this._auth.telefono;
   }
 
   ngOnInit() {
@@ -47,7 +47,7 @@ export class LoginAccountPage implements OnInit {
 
   next() {
     if (this.nombre && this.password) {
-      this._auth.signUpUsuario(this.nombre, this.phone, this.password)
+      this._auth.signUpUsuario(this.nombre, this.telefono, this.password)
         .then(done => {
           if (done) {
             this.router.navigateByUrl('home');

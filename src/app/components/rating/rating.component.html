@@ -3,8 +3,8 @@
 
   <div style="background:#0cd1e8;width:100%">
     <div style="width:100%;padding:20px;display:flex;align-items:center;justify-content:space-between">
-      <ion-icon (click)="closeModal()" name="close" style="color:#fff;font-size:27px"></ion-icon>
-      <div (click)="rate()" style="color:#fff;font-size:16px">
+      <ion-icon (click)="omitir()" name="close" style="color:#fff;font-size:27px"></ion-icon>
+      <div (click)="calificar()" style="color:#fff;font-size:16px">
         Guardar
       </div>
     </div>
@@ -15,7 +15,7 @@
 
     <div
       style="margin-top:10px;padding:20px;padding-left:50px;padding-right:50px;font-size:20px;font-weight:700;color:#fff;text-align:center">
-      Califica tu experiencia con Oscar Garcia Fuentes
+      Califica tu experiencia con {{rating.rider.nombre}}
     </div>
 
     <div style="margin-bottom:25%;margin-top:10%;width:100%;display:flex;justify-content:center">

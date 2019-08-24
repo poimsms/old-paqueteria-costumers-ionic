@@ -17,7 +17,7 @@ export class DataService {
   }
 
   rateRider(rateId, riderId, body) {
-    const url = `${this.apiURL}/riders/riders-pending-ratings?rate=${rateId}&rider=${riderId}`;
+    const url = `${this.apiURL}/riders/rating-update?rate=${rateId}&rider=${riderId}`;
     return this.http.put(url, body).toPromise();
   }
 
