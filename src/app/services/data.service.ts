@@ -37,7 +37,7 @@ export class DataService {
   }
 
   getPedidos(id) {
-    const url = `${this.apiURL}/riders/pedidos-by-id?id=${id}`;
+    const url = `${this.apiURL}/riders/pedidos-get-by-client-id?id=${id}`;
     return this.http.get(url).toPromise();
   }
 

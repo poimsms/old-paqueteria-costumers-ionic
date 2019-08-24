@@ -5,128 +5,90 @@
     </ion-buttons>
     <ion-title>Historial</ion-title>
   </ion-toolbar>
-  <!-- <ion-segment (ionChange)="segmentChanged($event)">
-    <ion-segment-button value="friends">
-      <ion-label>Anteriores</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="enemies">
-      <ion-label>Próximos</ion-label>
-    </ion-segment-button>
-  </ion-segment> -->
 </ion-header>
 
 <ion-content>
 
-  <div style="width:100%;background:#fbfbfb;padding:15px;display:flex;align-items:center">
-    <img src="assets/moto.png" style="height:30px;width:30px;object-fit:cover">
-    <div style="margin-left:10px;width:100%">
-      <div style="width:100%;display:flex;justify-content:space-between">
-        <div style="color:#777">
-          Moto
-        </div>
-        <div style="display:flex;align-items:center;color:#777">
-          <div style="margin-right:5px;width:10px;height:10px;background:lightblue">
+  <div *ngFor="let pedido of pedidos">
+
+
+    <div style="width:100%;background:#fbfbfb;padding:15px;display:flex;align-items:center">
+      <img *ngIf="pedido.rider.vehiculo == 'Moto'" src="assets/moto.png"
+        style="height:30px;width:30px;object-fit:cover">
+      <img *ngIf="pedido.rider.vehiculo == 'Bicicleta'" src="assets/bici.png"
+        style="height:30px;width:30px;object-fit:cover">
+
+      <div style="margin-left:10px;width:100%">
+        <div style="width:100%;display:flex;justify-content:space-between">
+          <div style="color:#777">
+            {{pedido.rider.vehiculo}}
           </div>
-          PENDIENTE
+          <div style="color:#0cd1e8;font-size:14px">
+            <!-- <div style="margin-right:5px;width:10px;height:10px;background:lightblue">
+          </div> -->
+            <div *ngIf="pedido.entregado">
+              ENTREGADO
+            </div>
+            <div *ngIf="!pedido.entregado">
+              PENDIENTE
+            </div>
+          </div>
         </div>
-      </div>
-      <div style="margin-top:5px;display:flex;justify-content:space-between">
-        <div style="color:#777">
-          15 de diciembre - 07:00 PM
-        </div>
-        <div style="color:#555">
-          $2500
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div style="padding:15px;padding-bottom:0px;padding-left:30px;width:100%;display:flex;justify-content:space-between">
-    <div style="display:flex">
-      <div style="width:10px;height:10px;margin-top:5px;border-radius:50%;background:#bbb">
-      </div>
-      <div style="margin-left:20px">
-        <div style="color:#bbb">
-          Origen
-        </div>
-        <div style="color:#555">
-          Simon Bolivar 802 Valdivia Chile
-        </div>
-      </div>
-    </div>
-    <div style="margin-left:30px">
-      <div style="color:#666;width:100%;text-align:center">Rider:</div>
-      <div style="width:45px;height:45px">
-        <img src="assets/user.jpg" style="width:45px;height:45px;border-radius:50%;object-fit:cover">
-      </div>
-      <div style="color:#666;width:100%;text-align:center">Oscar</div>
-    </div>
-  </div>
-
-  <div style="margin-top:-10px;padding:15px;padding-left:30px;padding-top:0px;width:100%;display:flex;">
-    <ion-icon name="pin" style="font-size:16px;color:#bbb"></ion-icon>
-    <div style="margin-left:20px">
-      <div style="color:#bbb">
-        Destino
-      </div>
-      <div style="color:#555">
-        Simon Bolivar 802 Valdivia Chile Lo Laureles
-      </div>
-    </div>
-  </div>
-
-
-
-  <div style="width:100%;background:#fbfbfb;padding:15px;display:flex;align-items:center">
-    <img src="assets/moto.png" style="height:30px;width:30px;object-fit:cover">
-    <div style="margin-left:10px;width:100%">
-      <div style="color:#777">
-        Moto
-      </div>
-      <div style="margin-top:5px;display:flex;justify-content:space-between">
-          <div style="color:#777;">
+        <div style="margin-top:5px;display:flex;justify-content:space-between">
+          <div style="color:#777">
             15 de diciembre - 07:00 PM
           </div>
           <div style="color:#555">
-            $2500
+            ${{pedido.costo}}
           </div>
         </div>
-    </div>
-  </div>
-
-  <div style="padding:15px;padding-bottom:0px;padding-left:30px;;width:100%;display:flex;justify-content:space-between">
-    <div style="display:flex">
-      <div style="width:10px;height:10px;margin-top:5px;border-radius:50%;background:#bbb">
       </div>
+    </div>
+
+    <div
+      style="padding:15px;padding-bottom:0px;padding-left:30px;width:100%;display:flex;justify-content:space-between">
+      <div style="display:flex">
+        <div style="height:18px;width:18px">
+            <ion-icon name="radio-button-on" style="font-size:16px;color:#bbb"></ion-icon>
+        </div>
+        <div style="margin-left:20px">
+          <div style="color:#bbb">
+            Origen
+          </div>
+          <div style="color:#555;">
+            {{pedido.origen.direccion}}
+          </div>
+        </div>
+      </div>
+      <div style="margin-left:30px">
+        <div style="color:#666;width:100%;text-align:center">Rider:</div>
+        <div style="width:45px;height:45px">
+          <img [src]="pedido.rider.img.url" style="width:45px;height:45px;border-radius:50%;object-fit:cover">
+        </div>
+        <div style="color:#666;width:55px;text-align:center;overflow:hidden;height:20px">
+          {{pedido.rider.nombre}}
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:0px;padding:15px;padding-left:30px;padding-top:0px;width:100%;display:flex;">
+      <div style="height:18px;width:18px">
+          <ion-icon name="pin" style="font-size:16px;color:#bbb"></ion-icon>
+        </div>
       <div style="margin-left:20px">
         <div style="color:#bbb">
-          Origen
+          Destino
         </div>
         <div style="color:#555">
-          Simon Bolivar 802 Valdivia Chile
+          {{pedido.destino.direccion}}
         </div>
       </div>
     </div>
-    <div style="margin-left:30px">
-      <div style="color:#666;width:100%;text-align:center">Rider:</div>
-      <div style="width:45px;height:45px">
-        <img src="assets/user.jpg" style="width:45px;height:45px;border-radius:50%;object-fit:cover">
-      </div>
-      <div style="color:#666;width:100%;text-align:center">Oscar</div>
-    </div>
+
   </div>
 
-  <div style="margin-top:-10px;padding:15px;padding-left:30px;;padding-top:0px;width:100%;display:flex;">
-    <ion-icon name="pin" style="font-size:16px;color:#bbb"></ion-icon>
-    <div style="margin-left:20px">
-      <div style="color:#bbb">
-        Destino
-      </div>
-      <div style="color:#555">
-        Simon Bolivar 802 Valdivia Chile Lo Laureles
-      </div>
-    </div>
-  </div>
+
+
 
 
 

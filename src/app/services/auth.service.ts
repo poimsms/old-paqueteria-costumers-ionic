@@ -138,7 +138,10 @@ export class AuthService {
   }
 
   saveStorage(token, usuario, uid) {
+    
     const authData = { token, uid };
+    this.usuario = usuario;
+    this.token = token;
 
     if (this.platform.is("cordova")) {
       this.storage.set("authData", JSON.stringify(authData));

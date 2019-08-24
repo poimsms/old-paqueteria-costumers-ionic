@@ -66,6 +66,7 @@ export class HomePage implements OnInit, OnDestroy {
   riderIndex = 0;
 
   graciasPorComprar = false;
+  estaBuscandoRider = false;
 
 
   constructor(
@@ -95,8 +96,8 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.riderCoorsSub$.unsubscribe();
-    this.riderSub$.unsubscribe();
+    this.riderCoorsSub$ ? this.riderCoorsSub$.unsubscribe() : console.log();
+    this.riderSub$ ? this.riderSub$.unsubscribe() : console.log();
     clearInterval(this.timer);
   }
 
@@ -160,6 +161,7 @@ export class HomePage implements OnInit, OnDestroy {
       this.precio = this.precioMoto;
     }
 
+    this._control.estaBuscandoRider = true;
     this.buscarRider();
   }
 
@@ -178,59 +180,89 @@ export class HomePage implements OnInit, OnDestroy {
         this.riderSub$ = this._fire.rider$.subscribe(riderFireArr => {
           const riderFire = riderFireArr[0];
 
-          // Ver si rider aun está libre
-          if (riderFire.actividad == 'disponible' && riderFire.isOnline && !riderFire.pagoPendiente) {
+          // Verifica si rider acaba de entregar pedido a este mismo cliente
+          if (riderFire.entregadoId == this.usuario._id) {
 
-            // Enviar solicitud
+            this.riderSub$.unsubscribe();
+
+            if (this._control.estaBuscandoRider) {
+              this.buscarRider();
+            }
+
             this._fire.updateRider(riderFire.rider, 'rider', {
-              solicitud: 'pendiente',
-              pagoPendiente: true,
-              cliente: this.usuario._id,
-              created: new Date().getTime()
+              entregadoId: ''
             });
 
-            this._fire.updateRider(riderFire.rider, 'coors', {
-              pagoPendiente: true
-            });
+          } else {
 
-          }
+            // Ver si rider aun está libre
+            if (riderFire.actividad == 'disponible' && riderFire.isOnline && !riderFire.pagoPendiente) {
 
-          // Si rider acepta solicitud
-          if (riderFire.solicitud == 'aceptada' && riderFire.cliente == this.usuario._id) {
-
-            clearInterval(this.timer);
-            this.solicitudAceptada = true;
-
-            this.loadingRider = false;
-
-            this._data.getOneRider(riderFire.rider).then(rider => {
-
-              this.rider = rider;
-
-              const data = {
-                monto: this.precio,
-                rider: this.rider,
-                usuario: this.usuario,
-                pedido: {
-                  origen: this._control.origen,
-                  destino: this._control.destino,
-                  distancia: this.distancia
+              // Enviar solicitud
+              this._fire.updateRider(riderFire.rider, 'rider', {
+                solicitud: 'pendiente',
+                pagoPendiente: true,
+                cliente: this.usuario._id,
+                created: new Date().getTime(),
+                dataPedido: {
+                  cliente: {
+                    nombre: this.usuario.nombre,
+                    img: this.usuario.img.url,
+                    rol: this.usuario.rol
+                  },
+                  pedido: {
+                    distancia: this.distancia,
+                    origen: this._control.origen.direccion,
+                    destino: this._control.destino.direccion,
+                    costo: this.precio
+                  }
                 }
-              }
+              });
 
-              this.openPayModal(data);
-            });
+              this._fire.updateRider(riderFire.rider, 'coors', {
+                pagoPendiente: true
+              });
+
+            }
+
+            // Si rider acepta solicitud
+            if (riderFire.solicitud == 'aceptada' && riderFire.cliente == this.usuario._id) {
+
+              clearInterval(this.timer);
+              this.solicitudAceptada = true;
+
+              this.loadingRider = false;
+
+              this._data.getOneRider(riderFire.rider).then(rider => {
+
+                this.rider = rider;
+
+                const data = {
+                  monto: this.precio,
+                  rider: this.rider,
+                  usuario: this.usuario,
+                  pedido: {
+                    origen: this._control.origen,
+                    destino: this._control.destino,
+                    distancia: this.distancia
+                  }
+                }
+
+                this.openPayModal(data);
+              });
+            }
+
+            // Si rider rechaza solicitud
+            if (riderFire.solicitud == 'rechazada' && riderFire.cliente == this.usuario._id) {
+              this._fire.updateRider(riderFire.rider, 'rider', { cliente: '' });
+              clearInterval(this.timer);
+              this.riderIndex++;
+              this.sendRiderSolicitude(resp.riders);
+            }
+
+            // Agregar cancelacion del pedido por parte del rider/cliente
+
           }
-
-          // Si rider rechaza solicitud
-          if (riderFire.solicitud == 'rechazada' && riderFire.cliente == this.usuario._id) {
-            this._fire.updateRider(riderFire.rider, 'rider', { cliente: '' });
-            clearInterval(this.timer);
-            this.riderIndex++;
-            this.sendRiderSolicitude(resp.riders);
-          }
-
-          // Agregar cancelacion del pedido por parte del rider/cliente
 
         });
 
@@ -243,8 +275,6 @@ export class HomePage implements OnInit, OnDestroy {
       }
 
     });
-
-
   }
 
   sendRiderSolicitude(riders) {
@@ -259,9 +289,21 @@ export class HomePage implements OnInit, OnDestroy {
 
     this.timer = setTimeout(() => {
       if (!this.solicitudAceptada && this.riderIndex <= 6 && this.riderIndex < riders.length) {
-        let id = this.riders[this.riderIndex];
-        this._fire.rider_query$.next(id);
+
+        let id_previo = riders[this.riderIndex - 1];
+
+        this._fire.updateRider(id_previo, 'rider', {
+          pagoPendiente: false
+        });
+
+        this._fire.updateRider(id_previo, 'coors', {
+          pagoPendiente: false
+        });
+
+        let id_actual = riders[this.riderIndex];
+        this._fire.rider_query$.next(id_actual);
         this.riderIndex++;
+
         this.sendRiderSolicitude(riders);
       } else {
         this.riderIndex = 0;
@@ -301,7 +343,6 @@ export class HomePage implements OnInit, OnDestroy {
       // resetear mapa, liberar rider
       this.directionsDisplay.setMap(null);
       this.presentAlert('Órden cancelada', 'Defina un nuevo trayecto!');
-      console.log(this.rider, 'RIDERRR')
       this.riderSub$.unsubscribe();
       this._fire.updateRider(this.rider._id, 'rider', { pagoPendiente: false, cliente: '' });
       this._fire.updateRider(this.rider._id, 'coors', { pagoPendiente: false });
@@ -317,7 +358,6 @@ export class HomePage implements OnInit, OnDestroy {
       this._control.destinoReady = false;
       this._control.rutaReady = false;
     }
-    console.log(data);
   }
 
   vehiculoToggle(tipo) {
@@ -409,7 +449,6 @@ export class HomePage implements OnInit, OnDestroy {
     const bici = this._global.tarifas.bici;
     const moto = this._global.tarifas.moto;
 
-    // cosas raras aca
     if (transporte == 'bicicleta' && distancia > bici.maxLimite) {
       this.distancia_excedida_bici = true;
     } else if (transporte == 'bicicleta') {
@@ -421,7 +460,6 @@ export class HomePage implements OnInit, OnDestroy {
         this.precioBici = Math.ceil(costo / 10) * 10;
       }
     }
-
 
     if (transporte == 'moto' && distancia > moto.maxLimite) {
       this.distancia_excedida_moto = true;
@@ -448,12 +486,11 @@ export class HomePage implements OnInit, OnDestroy {
 
   }
 
-
   presentCompraExitosa() {
     this.graciasPorComprar = true;
     setTimeout(() => {
       this.graciasPorComprar = false;
-    }, 2000);     
+    }, 2000);
   }
 
   openMenu() {

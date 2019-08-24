@@ -29,6 +29,9 @@ export class LoginPage implements OnInit {
   ) {
     this._auth.authState
   }
+  
+  ngOnInit() {
+  }
 
   async presentToast() {
     const toast = await this.toastController.create({
@@ -93,6 +96,10 @@ export class LoginPage implements OnInit {
   loginUsuario() {
     this.isLoading = true;
 
+    // if (this.telefono.length != 8) {
+    //   return this.error_telefono = true;
+    // }
+
     if (this.telefono && this.password) {     
       this._auth.signInUsuario(this.telefono, this.password).then(done => {
         if (done) {
@@ -105,23 +112,6 @@ export class LoginPage implements OnInit {
     }
   }
 
-  loginEmpresa() {
-    this.isLoading = true;
-
-    if (this.telefono && this.password) {
-      this._auth.signInEmpresa(this.telefono, this.password).then(done => {
-        if (done) {
-          this.router.navigateByUrl('home');
-        } else {
-          this.showErrorPassword = true;
-        }
-        this.isLoading = false;
-      });
-    }
-  }
-
-  ngOnInit() {
-  }
 
 }
 

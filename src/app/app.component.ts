@@ -28,7 +28,6 @@ export class AppComponent {
     private _auth: AuthService,
     private _global: GlobalService,
     public modalController: ModalController
-
   ) {
     this.initializeApp();
   }
