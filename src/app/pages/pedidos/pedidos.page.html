@@ -12,7 +12,7 @@
   <div *ngFor="let pedido of pedidos">
 
 
-    <div style="width:100%;background:#fbfbfb;padding:15px;display:flex;align-items:center">
+    <div style="width:100%;background:whitesmoke;padding:15px;display:flex;align-items:center">
       <img *ngIf="pedido.rider.vehiculo == 'Moto'" src="assets/moto.png"
         style="height:30px;width:30px;object-fit:cover">
       <img *ngIf="pedido.rider.vehiculo == 'Bicicleta'" src="assets/bici.png"
@@ -23,9 +23,11 @@
           <div style="color:#777">
             {{pedido.rider.vehiculo}}
           </div>
-          <div style="color:#0cd1e8;font-size:14px">
-            <!-- <div style="margin-right:5px;width:10px;height:10px;background:lightblue">
-          </div> -->
+          <div style="color:#555;font-size:14px;display:flex;align-items:center">
+            <div *ngIf="pedido.entregado" style="margin-right:5px;width:10px;height:10px;background:lightblue">
+            </div>
+            <div *ngIf="!pedido.entregado" style="margin-right:5px;width:10px;height:10px;background:lightgreen">
+            </div>
             <div *ngIf="pedido.entregado">
               ENTREGADO
             </div>
@@ -36,7 +38,8 @@
         </div>
         <div style="margin-top:5px;display:flex;justify-content:space-between">
           <div style="color:#777">
-            15 de diciembre - 07:00 PM
+            <!-- 15 de diciembre - 07:00 PM -->
+            {{pedido.fecha}}
           </div>
           <div style="color:#555">
             ${{pedido.costo}}
@@ -49,7 +52,7 @@
       style="padding:15px;padding-bottom:0px;padding-left:30px;width:100%;display:flex;justify-content:space-between">
       <div style="display:flex">
         <div style="height:18px;width:18px">
-            <ion-icon name="radio-button-on" style="font-size:16px;color:#bbb"></ion-icon>
+          <ion-icon name="radio-button-on" style="font-size:16px;color:#bbb"></ion-icon>
         </div>
         <div style="margin-left:20px">
           <div style="color:#bbb">
@@ -73,8 +76,8 @@
 
     <div style="margin-top:0px;padding:15px;padding-left:30px;padding-top:0px;width:100%;display:flex;">
       <div style="height:18px;width:18px">
-          <ion-icon name="pin" style="font-size:16px;color:#bbb"></ion-icon>
-        </div>
+        <ion-icon name="pin" style="font-size:16px;color:#bbb"></ion-icon>
+      </div>
       <div style="margin-left:20px">
         <div style="color:#bbb">
           Destino
@@ -86,10 +89,6 @@
     </div>
 
   </div>
-
-
-
-
 
 
 

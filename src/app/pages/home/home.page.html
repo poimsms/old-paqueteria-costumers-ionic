@@ -98,10 +98,15 @@
             {{rider?.nombre}}
           </div>
           <div style="display:flex;align-items:center">
-            <ion-icon name="star" style="color:gold"></ion-icon>
-            <ion-icon name="star" style="color:gold"></ion-icon>
-            <ion-icon name="star" style="color:gold"></ion-icon>
-            <ion-icon name="star" style="color:gold"></ion-icon>
+            <ion-icon *ngIf="rider.stats.startsAvg >= 1" name="star" style="font-size:20px;color:gold"></ion-icon>
+            <ion-icon *ngIf="rider.stats.startsAvg == 1.5" name="star-half" style="font-size:20px;color:gold"></ion-icon>
+            <ion-icon *ngIf="rider.stats.startsAvg >= 2" name="star" style="font-size:20px;color:gold"></ion-icon>
+            <ion-icon *ngIf="rider.stats.startsAvg == 2.5" name="star-half" style="font-size:20px;color:gold"></ion-icon>
+            <ion-icon *ngIf="rider.stats.startsAvg >= 3" name="star" style="font-size:20px;color:gold"></ion-icon>
+            <ion-icon *ngIf="rider.stats.startsAvg == 3.5" name="star-half" style="font-size:20px;color:gold"></ion-icon>
+            <ion-icon *ngIf="rider.stats.startsAvg >= 4" name="star" style="font-size:20px;color:gold"></ion-icon>
+            <ion-icon *ngIf="rider.stats.startsAvg == 4.5" name="star-half" style="font-size:20px;color:gold"></ion-icon>
+            <ion-icon *ngIf="rider?.stats.startsAvg >= 5" name="star" style="font-size:20px;color:gold"></ion-icon>
             ({{rider?.stats.startsAvg}})
           </div>
           <div style="font-size:14px;color:#999;text-transform:capitalize">

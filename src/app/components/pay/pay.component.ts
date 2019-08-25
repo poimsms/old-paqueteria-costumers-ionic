@@ -103,8 +103,8 @@ export class PayComponent implements OnInit {
     this._fire.updateRider(this.rider._id, 'rider', {
       pagoPendiente: false,
       actividad: 'ocupado',
-      solicitud: '',
-      pedido: pedidoId
+      pedido: pedidoId,
+      aceptadoId: ''
     });
 
     this._fire.updateRider(this.rider._id, 'coors', {
