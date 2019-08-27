@@ -20,6 +20,10 @@
   </div>
 
   <div style="margin:15px;border:1px solid #eee;border-radius:6px;padding:5px;display:flex;align-items:center;">
+    <ion-input type="email" [(ngModel)]="email" placeholder="Email"></ion-input>
+  </div>
+
+  <div style="margin:15px;border:1px solid #eee;border-radius:6px;padding:5px;display:flex;align-items:center;">
     <ion-input [type]="passwordType" [(ngModel)]="password" placeholder="Contraseña"></ion-input>
   </div>
 
@@ -28,7 +32,7 @@
   </div>
 
   <div padding style="margin-top:20px;width:100%;display:flex;justify-content:flex-end">
-    <ion-icon (click)="next()" name="ios-arrow-dropright-circle" style="color:#0cd1e8;font-size:55px"></ion-icon>
+    <ion-icon (click)="createAccount()" name="ios-arrow-dropright-circle" style="color:#0cd1e8;font-size:55px"></ion-icon>
   </div>
 
 </ion-content>

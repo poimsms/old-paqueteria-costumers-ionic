@@ -38,7 +38,7 @@ export class AppComponent {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
 
-    
+
       this._global.checkAppVersion().then((data: any) => {
 
         if (data.forceUpgrade) {
@@ -46,7 +46,7 @@ export class AppComponent {
           this.openForceModal();
 
         } else if (data.recommendUpgrade) {
-          
+
           this.openForceModal();
 
         } else {
@@ -54,32 +54,33 @@ export class AppComponent {
             if (data.isAuth) {
               this.usuario = data.usuario;
               this.token = data.token;
-              this.isAuth = true;              
+              this.isAuth = true;
               if (!data.usuario.isActive) {
                 this.openBloqueadoModal();
               } else {
                 this.router.navigateByUrl('home');
-              }            } else {
+              }
+            } else {
               this.router.navigateByUrl('login');
-            }        
+            }
           });
-              
+
         }
-      });     
+      });
     });
   }
 
   async openForceModal() {
     const modal = await this.modalController.create({
       component: ForceUpgradeComponent
-    });   
+    });
     await modal.present();
   }
 
   async openBloqueadoModal() {
     const modal = await this.modalController.create({
       component: BloqueadoComponent
-    });   
+    });
     await modal.present();
   }
 

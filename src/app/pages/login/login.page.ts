@@ -100,7 +100,7 @@ export class LoginPage implements OnInit {
         if (res.result.status == '0') {
           this._auth.idPhone = res.result.request_id;
           this._auth.telefono = Number(this.telefono);
-          this.router.navigateByUrl(`login-verificar`);
+          this.router.navigateByUrl(`login-verify`);
         } else {
           this.presentToast();
         }

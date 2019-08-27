@@ -70,7 +70,6 @@ export class HomePage implements OnInit, OnDestroy {
   graciasPorComprar = false;
   estaBuscandoRider = false;
 
-
   constructor(
     private menu: MenuController,
     private _control: ControlService,
@@ -105,8 +104,18 @@ export class HomePage implements OnInit, OnDestroy {
 
   riderSub() {
     this.riderCoorsSub$ = this._fire.getRiderCoors(this.rider._id).subscribe((res: any) => {
-      const coors = { lat: res[0].lat, lng: res[0].lng };
-      this.graficarMarcador(coors);
+  
+      if (res[0].cliente == this.usuario._id) {
+        const coors = { lat: res[0].lat, lng: res[0].lng };
+        this.graficarMarcador(coors);
+      } else {
+        this.riderCoorsSub$.unsubscribe();
+        setTimeout(() => {
+          this.getRating();
+          this.resetMapa();
+        }, 6000);
+      }
+
     });
   }
 
@@ -118,11 +127,10 @@ export class HomePage implements OnInit, OnDestroy {
     });
   }
 
-
   getPedido() {
     this._data.getPedidoActivo(this.usuario._id).then((data: any) => {
 
-      if (!data.ok) {
+      if (!data.hayPedido) {
         return;
       }
 
@@ -182,26 +190,15 @@ export class HomePage implements OnInit, OnDestroy {
         this.riderSub$ = this._fire.rider$.subscribe(riderFireArr => {
           const riderFire = riderFireArr[0];
 
-          // Verifica si rider acaba de entregar pedido a este mismo cliente
-          if (riderFire.entregadoId == this.usuario._id) {
-
-            this.riderSub$.unsubscribe();
-
-            if (this._control.estaBuscandoRider) {
-              this.buscarRider();
-            }
-
-            this._fire.updateRider(riderFire.rider, 'rider', {
-              entregadoId: ''
-            });
-
-          } else if (riderFire.rechazadoId == this.usuario._id) {
+          if (riderFire.rechazadoId == this.usuario._id) {
 
             this._fire.updateRider(riderFire.rider, 'rider', { rechazadoId: '' });
             clearInterval(this.timer);
             this.sendRiderSolicitude(resp.riders, true);
 
           } else if (riderFire.aceptadoId == this.usuario._id) {
+
+            this.riderSub$.unsubscribe();
 
             clearInterval(this.timer);
 
@@ -228,8 +225,8 @@ export class HomePage implements OnInit, OnDestroy {
           } else {
 
             // Ver si rider aun está libre
-            if (riderFire.actividad == 'disponible' && riderFire.isOnline && !riderFire.pagoPendiente && this.riderPrevio != riderFire.rider) {
-              console.log('ENTROOO')
+            if (riderFire.actividad == 'disponible' && riderFire.isOnline &&
+              !riderFire.pagoPendiente && this.riderPrevio != riderFire.rider) {
 
               // Enviar solicitud
               this._fire.updateRider(riderFire.rider, 'rider', {
@@ -281,14 +278,14 @@ export class HomePage implements OnInit, OnDestroy {
       let id_init = riders[this.riderIndex];
       this._fire.rider_query$.next(id_init);
     }
-    
+
     if (next) {
 
       let id_next = riders[this.riderIndex];
       this._fire.rider_query$.next(id_next);
     }
 
-    this.riderIndex++; 
+    this.riderIndex++;
 
     this.timer = setTimeout(() => {
       if (this.riderIndex <= 4) {
@@ -307,7 +304,7 @@ export class HomePage implements OnInit, OnDestroy {
         });
 
         if (this.riderIndex < riders.length) {
-          
+
           let id_actual = riders[this.riderIndex];
           this._fire.rider_query$.next(id_actual);
 
@@ -328,6 +325,11 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   openMapaPage(tipo) {
+
+    if (this.pedidoActivo) {
+      return;
+    }
+
     this._control.coorsTipo = tipo;
     this.router.navigateByUrl('mapa');
   }
@@ -407,7 +409,7 @@ export class HomePage implements OnInit, OnDestroy {
 
   cargarMapa() {
     this.map = new google.maps.Map(document.getElementById('map'), {
-      center: { lat: -34.9011, lng: -56.1645 },
+      center: { lat: -33.444600, lng: -70.655585 },
       zoom: 14,
       disableDefaultUI: true,
       zoomControl: true
@@ -434,8 +436,7 @@ export class HomePage implements OnInit, OnDestroy {
     if (!this.markerReady) {
       this.marker = new google.maps.Marker({
         position: coors,
-        map: this.map,
-        title: "Hello World!"
+        map: this.map
       });
       this.markerReady = true;
     } else {
@@ -487,8 +488,8 @@ export class HomePage implements OnInit, OnDestroy {
 
   async presentAlert_OrdenCancelada() {
     const alert = await this.alertController.create({
-      header: 'No hay Riders disponibles',
-      message: 'Intenta más tarde :)',
+      header: 'Órden cancelada',
+      message: 'Defina un nuevo trayecto!',
       buttons: [
         {
           text: 'Aceptar',
@@ -524,6 +525,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   resetMapa() {
+    this.pedidoActivo = false;
     this.directionsDisplay.setMap(null);
     this.riderSub$.unsubscribe();
     this.rider = null;
@@ -539,10 +541,10 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   resetMapaAndRider() {
+    this.pedidoActivo = false;
     this.directionsDisplay.setMap(null);
-    this.presentAlert('Órden cancelada', 'Defina un nuevo trayecto!');
     this.riderSub$.unsubscribe();
-    this._fire.updateRider(this.rider._id, 'rider', { pagoPendiente: false });
+    this._fire.updateRider(this.rider._id, 'rider', { pagoPendiente: false, aceptadoId: '' });
     this._fire.updateRider(this.rider._id, 'coors', { pagoPendiente: false });
     this.rider = null;
     this.riderIndex = 0;

@@ -77,17 +77,27 @@ export class FireService {
         let b = distanceMatrix[0].distance;
         let id = distanceMatrix[0].id;
 
-        distanceMatrix.forEach(data => {
-          a = data.distance;
-          if (a < b) {
-            b = a;
-            id = data.id;
-          }
-        });
+        if (distanceMatrix.length != 1) {
+          distanceMatrix.forEach(data => {
+            a = data.distance;
+            if (a < b) {
+              b = a;
+              id = data.id;
+            }
+          });
+  
+          let i_delete = 0;
 
-        const i = riders.indexOf(id);
-        distanceMatrix.splice(i, 1);
-        ridersOrdenados.push(id);
+          distanceMatrix.forEach((item, i) => {
+            if (item.rider == id) {
+              i_delete = i;
+            }
+          });
+
+          distanceMatrix.splice(i_delete, 1);
+        }
+
+        ridersOrdenados.push(id);  
       }
 
     });

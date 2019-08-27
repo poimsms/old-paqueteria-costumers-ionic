@@ -9,10 +9,12 @@ import { ToastController } from '@ionic/angular';
   styleUrls: ['./login-account.page.scss'],
 })
 export class LoginAccountPage implements OnInit {
+  
   nombre: string;
   passwordType = "password";
   password: string;
   telefono: number;
+  email: string;
 
   constructor(
     private _auth: AuthService,
@@ -33,10 +35,10 @@ export class LoginAccountPage implements OnInit {
     }
   }
 
-  async toastPresent() {
+  async toastPresent(text) {
 
     const toast = await this.toastCtrl.create({
-      message: 'Favor completar todo los datos',
+      message: text,
       duration: 2000,
       position: 'middle'
     });
@@ -44,19 +46,28 @@ export class LoginAccountPage implements OnInit {
     toast.present();
   }
 
+  validateEmail(email) {
+    var re = /\S+@\S+\.\S+/;
+    return re.test(email);
+  }
 
-  next() {
-    if (this.nombre && this.password) {
-      this._auth.signUpUsuario(this.nombre, this.telefono, this.password)
-        .then(done => {
-          if (done) {
-            this.router.navigateByUrl('home');
-          } else {
-            console.log('error');
-          }
-        });
-    } else {
-      this.toastPresent();
+  createAccount() {
+
+    if (!(this.nombre && this.password && this.email)) {
+      return this.toastPresent('Favor completar todo los datos');
     }
+
+    if (!this.validateEmail(this.email)) {
+      return this.toastPresent('Email incorrecto');
+    }
+
+    const data = {
+      nombre: this.nombre,
+      email: this.email,
+      telefono: this.telefono,
+      password: this.password
+    }
+
+    this._auth.loginUp(data);
   }
 }

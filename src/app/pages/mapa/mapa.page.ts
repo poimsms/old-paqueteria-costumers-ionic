@@ -54,16 +54,12 @@ export class MapaPage implements OnInit {
   }
 
   close() {
-    let data: any = {};
 
-    if (this.puerta.length > 4) {
-      data.puerta = this.puerta;
-    }
-
-    data = {
+    const data = {
       direccion: this.position.address,
       lat: this.position.coors.lat,
-      lng: this.position.coors.lng
+      lng: this.position.coors.lng,
+      puerta: this.puerta
     }
 
     if ( this._control.coorsTipo == 'origen') {
@@ -100,7 +96,7 @@ export class MapaPage implements OnInit {
   selectSearchResult(item) {
     this.clearMarkers();
     this.autocompleteItems = [];
-    // this.autocomplete.input = item.description;
+    this.autocomplete.input = item.description;
 
     this.geocoder.geocode({ 'placeId': item.place_id }, (results, status) => {
       if (status === 'OK' && results[0]) {

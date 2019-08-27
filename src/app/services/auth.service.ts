@@ -25,9 +25,11 @@ export class AuthService {
     private storage: Storage,
     private _config: ConfigService
   ) {
+
     platform.ready().then(() => {
       this.loadStorage();
     });
+
     this.apiURL = this._config.apiURL;
 
   }
@@ -50,24 +52,10 @@ export class AuthService {
     return this.http.post(url, body).toPromise();
   }
 
-  signUpUsuario(nombre, telefono, password) {
-    return new Promise((resolve, reject) => {
-      const url = `${this.apiURL}/usuarios/signup`;
-      const body = { nombre, telefono, password };
-      this.http.post(url, body).toPromise().then((res: any) => {
-        if (res.ok) {
-          this.saveStorage(res.token, res.usuario, res.usuario._id);
-          resolve(true);
-        }
-      });
-    });
-  }
-
-  
   loginUp(data) {
     return new Promise((resolve, reject) => {
       this.signUp(data).then((res: any) => {
-        
+
         if (res.ok) {
           this.saveStorage(res.token, res.usuario, res.usuario._id);
         }
@@ -77,11 +65,10 @@ export class AuthService {
     });
   }
 
-  
   loginIn(telefono, password) {
     return new Promise((resolve, reject) => {
       this.signIn(telefono, password).then((res: any) => {
-        
+
         if (res.ok) {
           this.saveStorage(res.token, res.usuario, res.usuario._id);
         }
@@ -91,7 +78,6 @@ export class AuthService {
     });
   }
 
-  
   logout() {
     this.removeStorage();
     this.authState.next({ isAuth: false, usuario: null, token: null });
