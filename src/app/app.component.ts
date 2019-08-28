@@ -8,6 +8,7 @@ import { AuthService } from './services/auth.service';
 import { GlobalService } from './services/global.service';
 import { ForceUpgradeComponent } from './components/force-upgrade/force-upgrade.component';
 import { BloqueadoComponent } from './components/bloqueado/bloqueado.component';
+import { FcmService } from './services/fcm.service';
 
 
 @Component({
@@ -28,7 +29,8 @@ export class AppComponent {
     private router: Router,
     private _auth: AuthService,
     private _global: GlobalService,
-    public modalController: ModalController
+    public modalController: ModalController,
+    private _fcm: FcmService
   ) {
     this.initializeApp();
   }
@@ -55,11 +57,16 @@ export class AppComponent {
               this.usuario = data.usuario;
               this.token = data.token;
               this.isAuth = true;
+
               if (!data.usuario.isActive) {
+                
                 this.openBloqueadoModal();
+                this._fcm.getToken(this.usuario._id)
+
               } else {
                 this.router.navigateByUrl('home');
               }
+
             } else {
               this.router.navigateByUrl('login');
             }
