@@ -11,6 +11,9 @@ export class FireService {
   rider_query$ = new Subject();
   rider$: Observable<any>;
 
+  distanceMatrix = [];
+  ids = [];
+
   constructor(private db: AngularFirestore) {
 
     this.rider$ = this.rider_query$.pipe(
@@ -52,57 +55,74 @@ export class FireService {
         });
     });
   }
-  // .where('isActive', '==', true)
-  // .where('pagoPendiente', '==', false)
-  // .where('actividad', '==', 'disponible')
-  // .where('vehiculo', '==', vehiculo)
 
   ordenarRiders(riders, lat, lng) {
-    const distanceMatrix = [];
+    this.distanceMatrix = [];
 
     riders.forEach(rider => {
       const distance = Math.sqrt((rider.lat - lat) * (rider.lat - lat) + (rider.lng - lng) * (rider.lng - lng));
-      distanceMatrix.push({
+      this.distanceMatrix.push({
         distance,
         id: rider.rider
       });
     });
 
     const ridersOrdenados = [];
+    let matrix_temp = [];
+    matrix_temp = JSON.parse(JSON.stringify(this.distanceMatrix));
 
     riders.forEach(rider => {
 
-      if (distanceMatrix.length != 0) {
-        let a = 0;
-        let b = distanceMatrix[0].distance;
-        let id = distanceMatrix[0].id;
+      const data: any = this.iterar(matrix_temp);
 
-        if (distanceMatrix.length != 1) {
-          distanceMatrix.forEach(data => {
-            a = data.distance;
-            if (a < b) {
-              b = a;
-              id = data.id;
-            }
-          });
-  
-          let i_delete = 0;
+      const id = data.id;
 
-          distanceMatrix.forEach((item, i) => {
-            if (item.rider == id) {
-              i_delete = i;
-            }
-          });
+      ridersOrdenados.push(id);
 
-          distanceMatrix.splice(i_delete, 1);
-        }
-
-        ridersOrdenados.push(id);  
-      }
+      matrix_temp = JSON.parse(JSON.stringify(data.matrix));
 
     });
 
     return ridersOrdenados;
   }
+
+  iterar(riders) {
+
+    if (riders.length != 0) {
+      let a = 0;
+      let b = riders[0].distance;
+      let id = riders[0].id;
+
+      if (riders.length != 1) {
+        riders.forEach(data => {
+          a = data.distance;
+          if (a < b) {
+            b = a;
+            id = data.id;
+          }
+        });
+
+        this.ids.push(id);
+
+        let riders_restantes = [];
+
+        this.distanceMatrix.forEach(item => {
+          this.ids.forEach(id => {
+            if (id != item.id) {
+              riders_restantes.push(item);
+            }
+          });
+        });
+
+        return { id, matrix: riders_restantes };
+
+      } else {
+
+        return { id: riders[0].id, matrix: [] };
+      }
+
+    }
+  }
+
 
 }

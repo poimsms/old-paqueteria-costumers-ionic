@@ -11,8 +11,6 @@ import { AlertController } from '@ionic/angular';
 export class PagarService {
 
   apiURL: string;
-  isBrowser: boolean;
-  transactionID: string;
 
   constructor(
     public http: HttpClient,
@@ -24,16 +22,20 @@ export class PagarService {
   }
 
 
-  pagarConFlow(token, transaccion) {
+  pagarConFlow(token, dataFLOW) {
 
     return new Promise((resolve, reject) => {
 
-      this.createTransaction('', transaccion)
-        .then((res: any) => {
+      this.createTransaction(token, dataFLOW)
+        .then((transaction: any) => {
 
-          this.transactionID = res._id;
+          const body = {
+            monto: dataFLOW.monto,
+            email: dataFLOW.email,
+            transaccionID: transaction._id
+          };
 
-          this.iniciarCompra(token, res).then((data) => {
+          this.iniciarPago(token, body).then((data) => {
             let respuesta = JSON.parse(JSON.stringify(data));
 
             if (respuesta.code != undefined && respuesta.code == 108) {
@@ -46,9 +48,8 @@ export class PagarService {
 
               const browser = this.iab.create(url + '?token=' + token, '_blank', 'location=yes');
 
-
               browser.on('exit').subscribe(event => {
-                this.getTransaction(token, this.transactionID)
+                this.getTransaction(token, transaction._id)
                   .then((result: any) => {
                     if (result.ok) {
                       resolve(true);
@@ -59,7 +60,7 @@ export class PagarService {
               });
 
               browser.on('loadstart').subscribe(event => {
-                if (event.url == 'hjhjk') {
+                if (event.url == 'https://joopiterweb.com/pago/compra-exitosa') {
                   browser.close();
                   resolve(true);
                 }
@@ -84,41 +85,27 @@ export class PagarService {
 
 
   createTransaction(token, body) {
-    const url = `${this.apiURL}/transacciones/pago-iniciar`;
+    const url = `${this.apiURL}/pago/transaction-create-one`;
     const headers = new HttpHeaders({
       Authorization: `JWT ${token}`
     });
     return this.http.post(url, body, { headers }).toPromise();
   }
 
-  getTransaction(token, body) {
-    const url = `${this.apiURL}/transacciones/pago-iniciar`;
+  getTransaction(token, id) {
+    const url = `${this.apiURL}/pago/transaction-get-one?id=${id}`;
+    const headers = new HttpHeaders({
+      Authorization: `JWT ${token}`
+    });
+    return this.http.get(url, { headers }).toPromise();
+  }
+
+  iniciarPago(token, body) {
+    const url = `${this.apiURL}/pago/pago-iniciar`;
     const headers = new HttpHeaders({
       Authorization: `JWT ${token}`
     });
     return this.http.post(url, body, { headers }).toPromise();
   }
 
-  iniciarCompra(token, body) {
-    const url = `${this.apiURL}/transacciones/pago-iniciar`;
-    const headers = new HttpHeaders({
-      Authorization: `JWT ${token}`
-    });
-    return this.http.post(url, body, { headers }).toPromise();
-  }
-
-  iniciarPagoUsuario(id, body) {
-    const url = `${this.apiURL}/pago/pagar-con-flow?${id}`;
-    return this.http.post(url, body).toPromise();
-  }
-
-  registrarPagoEmpresa(body) {
-    const url = `${this.apiURL}/pago/registrar-pago-empresa`;
-    return this.http.post(url, body).toPromise();
-  }
-
-  actualizarRegistroEmpresa(id, body) {
-    const url = `${this.apiURL}/pago/actualizar-pago-empresa?${id}`;
-    return this.http.post(url, body).toPromise();
-  }
 }

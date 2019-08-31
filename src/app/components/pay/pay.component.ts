@@ -14,6 +14,7 @@ import { ControlService } from 'src/app/services/control.service';
 export class PayComponent implements OnInit {
 
   mPago = 'Tarjeta';
+  token: string;
   usuario: any;
   rider: any;
   monto: number;
@@ -28,6 +29,7 @@ export class PayComponent implements OnInit {
     private _control: ControlService
   ) {
     this.usuario = navParams.get('pago').usuario;
+    this.token = navParams.get('pago').token;
     this.rider = navParams.get('pago').rider;
     this.monto = navParams.get('pago').monto;
     this.pedido = navParams.get('pago').pedido;
@@ -47,7 +49,9 @@ export class PayComponent implements OnInit {
 
     const dataFLOW = {
       monto: this.monto,
-      email: this.usuario.email
+      // monto: 350,
+      email: this.usuario.email,
+      usuario: this.usuario._id
     }
 
     const pedido = {
@@ -62,13 +66,13 @@ export class PayComponent implements OnInit {
     };
 
     if (this.mPago == 'Tarjeta' && this.usuario.rol != 'empresa') {
-      this._pagar.pagarConFlow(this.usuario._id, dataFLOW).then(pagoExitoso => {
+      this._pagar.pagarConFlow(this.token, dataFLOW).then(pagoExitoso => {
 
         if (pagoExitoso) {
           this._data.crearPedido(pedido).then((pedido: any) => {
 
             this.updateRiderEstadoOcupado(pedido._id);
-            this.modalCtrl.dismiss({ pagoExitoso: true });
+            this.modalCtrl.dismiss({ pagoExitoso: true, riderID: this.rider._id });
           });
         } else {
           this.modalCtrl.dismiss({ pagoExitoso: false });
@@ -81,7 +85,7 @@ export class PayComponent implements OnInit {
       this._data.crearPedido(pedido).then((pedido: any) => {
 
         this.updateRiderEstadoOcupado(pedido._id);
-        this.modalCtrl.dismiss({ pagoExitoso: true });
+        this.modalCtrl.dismiss({ pagoExitoso: true, riderID: this.rider._id });
       });
     }
 
@@ -90,7 +94,7 @@ export class PayComponent implements OnInit {
       this._data.crearPedido(pedido).then((pedido: any) => {
 
         this.updateRiderEstadoOcupado(pedido._id);
-        this.modalCtrl.dismiss({ pagoExitoso: true });
+        this.modalCtrl.dismiss({ pagoExitoso: true, riderID: this.rider._id });
       });
     }
   }

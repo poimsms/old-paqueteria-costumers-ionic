@@ -1,29 +1,29 @@
-<div style="z-index:990;position:fixed;top:10px;left:10px">
+<div style="z-index:990;position:fixed;top:15px;left:15px">
   <div (click)="openMenu()"
-    style="background:white;height:32px;width:32px;display:flex;align-items:center;justify-content:center;border-radius:50%">
-    <ion-icon name="menu" style="color:#777"></ion-icon>
+    style="background:white;height:35px;width:35px;display:flex;align-items:center;justify-content:center;border-radius:50%;box-shadow: 0 0 20px #eee;">
+    <ion-icon name="menu" style="color:#777;font-size:18px"></ion-icon>
   </div>
 </div>
-<div style="z-index:990;position:fixed;top:10px;right:10px">
+<div style="z-index:990;position:fixed;top:15px;right:15px">
   <div
-    style="background:white;height:32px;width:32px;display:flex;align-items:center;justify-content:center;border-radius:50%">
-    <ion-icon name="notifications" style="color:#777"></ion-icon>
+    style="background:white;height:35px;width:35px;display:flex;align-items:center;justify-content:center;border-radius:50%;box-shadow: 0 0 20px #eee;">
+    <ion-icon name="notifications" style="color:#777;font-size:18px"></ion-icon>
   </div>
 </div>
 
-<div style="z-index:990;position:fixed;top:60px;left:10px;width:90%">
+<div style="z-index:990;position:fixed;top:65px;left:15px;width:90%">
   <div (click)="openMapaPage('origen')"
-    style="border:1px solid #eee;width:100%;background:white;padding:10px;padding-left:20px;border-radius:20px;color:#777;font-size:18px;display:flex;align-items:center">
+    style="border:1px solid #eee;width:100%;background:white;padding:10px;padding-left:20px;border-radius:20px;font-size:17.5px;display:flex;align-items:center;box-shadow: 0 0 20px #eee">
     <div style="border-radius:50%;height:7px;width:7px;background:orange;margin-right:15px"></div>
-    <div>
+    <div [ngStyle]="{'color': texto_origen == '¿Dónde retirar?' ? '#999':'#333'}">
       {{texto_origen}}
     </div>
   </div>
 
   <div (click)="openMapaPage('destino')"
-    style="border:1px solid #eee;width:100%;margin-top:20px;background:white;padding:10px;padding-left:20px;border-radius:20px;color:#777;font-size:18px;display:flex;align-items:center">
+    style="border:1px solid #eee;width:100%;margin-top:20px;background:white;padding:10px;padding-left:20px;border-radius:20px;font-size:17.5px;display:flex;align-items:center;box-shadow: 0 0 20px #eee">
     <div style="border-radius:50%;height:7px;width:7px;background:orange;margin-right:15px"></div>
-    <div>
+    <div [ngStyle]="{'color': texto_destino == '¿Dónde lo entregamos?' ? '#999':'#333'}">
       {{texto_destino}}
     </div>
   </div>
@@ -99,13 +99,17 @@
           </div>
           <div style="display:flex;align-items:center">
             <ion-icon *ngIf="rider.stats.startsAvg >= 1" name="star" style="font-size:20px;color:gold"></ion-icon>
-            <ion-icon *ngIf="rider.stats.startsAvg == 1.5" name="star-half" style="font-size:20px;color:gold"></ion-icon>
+            <ion-icon *ngIf="rider.stats.startsAvg == 1.5" name="star-half" style="font-size:20px;color:gold">
+            </ion-icon>
             <ion-icon *ngIf="rider.stats.startsAvg >= 2" name="star" style="font-size:20px;color:gold"></ion-icon>
-            <ion-icon *ngIf="rider.stats.startsAvg == 2.5" name="star-half" style="font-size:20px;color:gold"></ion-icon>
+            <ion-icon *ngIf="rider.stats.startsAvg == 2.5" name="star-half" style="font-size:20px;color:gold">
+            </ion-icon>
             <ion-icon *ngIf="rider.stats.startsAvg >= 3" name="star" style="font-size:20px;color:gold"></ion-icon>
-            <ion-icon *ngIf="rider.stats.startsAvg == 3.5" name="star-half" style="font-size:20px;color:gold"></ion-icon>
+            <ion-icon *ngIf="rider.stats.startsAvg == 3.5" name="star-half" style="font-size:20px;color:gold">
+            </ion-icon>
             <ion-icon *ngIf="rider.stats.startsAvg >= 4" name="star" style="font-size:20px;color:gold"></ion-icon>
-            <ion-icon *ngIf="rider.stats.startsAvg == 4.5" name="star-half" style="font-size:20px;color:gold"></ion-icon>
+            <ion-icon *ngIf="rider.stats.startsAvg == 4.5" name="star-half" style="font-size:20px;color:gold">
+            </ion-icon>
             <ion-icon *ngIf="rider?.stats.startsAvg >= 5" name="star" style="font-size:20px;color:gold"></ion-icon>
             ({{rider?.stats.startsAvg}})
           </div>
@@ -117,7 +121,7 @@
 
 
       <div style="margin-left:30px">
-        <ion-button color="secondary">
+        <ion-button (click)="callPhone(rider.telefono)" color="secondary">
           <ion-icon slot="start" name="call"></ion-icon>
           Llamar
         </ion-button>

@@ -16,6 +16,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { FCM } from '@ionic-native/fcm/ngx';
+import { CallNumber } from '@ionic-native/call-number/ngx';
 
 export const firebaseConfig = {
   apiKey: "AIzaSyAmlXBSsNgsocMZ15dN8bc1D3ZD0gMAetQ",
@@ -63,6 +64,7 @@ import { BloqueadoComponent } from './components/bloqueado/bloqueado.component';
     StatusBar,
     SplashScreen,  
     FCM,
+    CallNumber,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     AppVersion,
     InAppBrowser    

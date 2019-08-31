@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { ConfigService } from './config.service';
-import { FCM } from '@ionic-native/fcm/ngx';
 import { Platform } from '@ionic/angular';
+import { FCM } from '@ionic-native/fcm/ngx';
+
 
 @Injectable({
   providedIn: 'root'
@@ -14,46 +15,65 @@ export class FcmService {
   constructor(
     public http: HttpClient,
     private _config: ConfigService,
-    private fcm: FCM,
-    private platform: Platform
-  ) { 
+    private platform: Platform,
+    private fcm: FCM
+  ) {
 
     this.apiURL = this._config.apiURL;
-
   }
 
-    // Get permission from the user
-    async getToken(uid) {
 
-      let token;
-    
-      if (this.platform.is('android')) {
-        token = await this.fcm.getToken()
-      } 
+  async getToken(uid) {
 
-      const body = {
-        token,
-        usuario: uid
+    if (!this.platform.is('cordova')) {
+      return;
+    }
+
+    const token = await this.fcm.getToken();
+    const body = { token, usuario: uid };
+    this.updateDevice(body);
+  }
+
+  async onTokenRefresh(uid) {
+
+    if (!this.platform.is('cordova')) {
+      return;
+    }
+
+    this.fcm.onTokenRefresh().subscribe(token => {
+      const body = { token, usuario: uid };
+      this.updateDevice(body);
+    });
+  }
+
+  listenToNotifications() {
+
+    if (!this.platform.is('android')) {
+      return;
+    }
+
+    this.fcm.onNotification().subscribe(data => {
+      if (data.wasTapped) {
+        console.log('Received in background');
+      } else {
+        console.log('Received in foreground');
       }
+    });
+  }
 
-      const url = `${this.apiURL}/riders/create-token-device`;
-      await this.http.put(url, body).toPromise();
-    
-   }
-  
-    // Listen to incoming FCM messages
-    listenToNotifications() {
-      this.fcm.onNotification().subscribe(data => {
-        console.log(data);
-        if (data.wasTapped) {
-          console.log('Received in background');
-          // this.router.navigate([data.landing_page, data.price]);
-        } else {
-          console.log('Received in foreground');
-          // this.router.navigate([data.landing_page, data.price]);
-        }
-      });    }
+  async sendPushNotification(id, topico) {
+    const device: any = await this.getDevice(id);
+    const pushURL = `https://us-central1-mapa-334c3.cloudfunctions.net/pushNotification?topico=${topico}&&token=${device.token}`;
+    this.http.get(pushURL, { responseType: 'text' }).toPromise();
+  }
 
+  updateDevice(body) {
+    const url = `${this.apiURL}/riders/device-update`;
+    return this.http.put(url, body).toPromise();
+  }
 
-    
+  getDevice(id) {
+    const url = `${this.apiURL}/riders/device-get-one?id=${id}`;
+    return this.http.get(url).toPromise();
+  }
 }

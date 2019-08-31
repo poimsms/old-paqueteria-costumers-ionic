@@ -1,5 +1,4 @@
-<div style="display:flex;flex-wrap:wrap">
-
+<ion-content>
 
   <div style="background:#0cd1e8;width:100%">
     <div style="width:100%;padding:20px;display:flex;align-items:center;justify-content:space-between">
@@ -9,8 +8,7 @@
       </div>
     </div>
     <div style="width:100%;display:flex;justify-content:center">
-      <img [src]="rating.rider.img.url"
-        style="width:60px;height:60px;border-radius:50%;object-fit:cover">
+      <img [src]="rating.rider.img.url" style="width:60px;height:60px;border-radius:50%;object-fit:cover">
     </div>
 
     <div
@@ -20,16 +18,26 @@
 
     <div style="margin-bottom:25%;margin-top:10%;width:100%;display:flex;justify-content:center">
       <div style="display:flex;justify-content:center">
-        <ion-icon (click)="starts = 1" *ngIf="starts >= 1" name="star" style="color:white;font-size:38px;margin-right:5px"></ion-icon>
-        <ion-icon (click)="starts = 1" *ngIf="starts < 1" name="star-outline" style="color:white;font-size:38px;margin-right:5px"></ion-icon>
-        <ion-icon (click)="starts = 2" *ngIf="starts >= 2" name="star" style="color:white;font-size:38px;margin-right:5px"></ion-icon>
-        <ion-icon (click)="starts = 2" *ngIf="starts < 2" name="star-outline" style="color:white;font-size:38px;margin-right:5px"></ion-icon>
-        <ion-icon (click)="starts = 3" *ngIf="starts >= 3" name="star" style="color:white;font-size:38px;margin-right:5px"></ion-icon>
-        <ion-icon (click)="starts = 3" *ngIf="starts < 3" name="star-outline" style="color:white;font-size:38px;margin-right:5px"></ion-icon>
-        <ion-icon (click)="starts = 4" *ngIf="starts >= 4" name="star" style="color:white;font-size:38px;margin-right:5px"></ion-icon>
-        <ion-icon (click)="starts = 4" *ngIf="starts < 4" name="star-outline" style="color:white;font-size:38px;margin-right:5px"></ion-icon>
-        <ion-icon (click)="starts = 5" *ngIf="starts >= 5" name="star" style="color:white;font-size:38px;margin-right:5px"></ion-icon>
-        <ion-icon (click)="starts = 5" *ngIf="starts < 5" name="star-outline" style="color:white;font-size:38px;margin-right:5px"></ion-icon>
+        <ion-icon (click)="starts = 1" *ngIf="starts >= 1" name="star"
+          style="color:white;font-size:38px;margin-right:5px"></ion-icon>
+        <ion-icon (click)="starts = 1" *ngIf="starts < 1" name="star-outline"
+          style="color:white;font-size:38px;margin-right:5px"></ion-icon>
+        <ion-icon (click)="starts = 2" *ngIf="starts >= 2" name="star"
+          style="color:white;font-size:38px;margin-right:5px"></ion-icon>
+        <ion-icon (click)="starts = 2" *ngIf="starts < 2" name="star-outline"
+          style="color:white;font-size:38px;margin-right:5px"></ion-icon>
+        <ion-icon (click)="starts = 3" *ngIf="starts >= 3" name="star"
+          style="color:white;font-size:38px;margin-right:5px"></ion-icon>
+        <ion-icon (click)="starts = 3" *ngIf="starts < 3" name="star-outline"
+          style="color:white;font-size:38px;margin-right:5px"></ion-icon>
+        <ion-icon (click)="starts = 4" *ngIf="starts >= 4" name="star"
+          style="color:white;font-size:38px;margin-right:5px"></ion-icon>
+        <ion-icon (click)="starts = 4" *ngIf="starts < 4" name="star-outline"
+          style="color:white;font-size:38px;margin-right:5px"></ion-icon>
+        <ion-icon (click)="starts = 5" *ngIf="starts >= 5" name="star"
+          style="color:white;font-size:38px;margin-right:5px"></ion-icon>
+        <ion-icon (click)="starts = 5" *ngIf="starts < 5" name="star-outline"
+          style="color:white;font-size:38px;margin-right:5px"></ion-icon>
       </div>
     </div>
 
@@ -38,11 +46,8 @@
     </div>
   </div>
 
+  <!-- <ion-item> -->
+    <ion-textarea rows="4" placeholder="Deja una reseña (Opcional)" [(ngModel)]="comentario"></ion-textarea>
+  <!-- </ion-item> -->
 
-  <div style="width:100%">
-    <ion-item>
-      <ion-textarea rows="4" placeholder="Deja una reseña (Opcional)" [(ngModel)]="comentario"></ion-textarea>
-    </ion-item>
-  </div>
-
-</div>
+</ion-content>

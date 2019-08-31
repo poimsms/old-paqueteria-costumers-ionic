@@ -20,7 +20,8 @@ export class AppComponent {
   usuario: any;
   token: string;
   isAuth: boolean;
-
+  oktodo = true;
+  entro = false;
   constructor(
     private platform: Platform,
     private splashScreen: SplashScreen,
@@ -54,17 +55,21 @@ export class AppComponent {
         } else {
           this._auth.authState.subscribe((data: any) => {
             if (data.isAuth) {
+
               this.usuario = data.usuario;
               this.token = data.token;
               this.isAuth = true;
 
+              this._fcm.getToken(this.usuario._id);
+              this._fcm.onTokenRefresh(this.usuario._id);
+
               if (!data.usuario.isActive) {
                 
                 this.openBloqueadoModal();
-                this._fcm.getToken(this.usuario._id)
 
               } else {
-                this.router.navigateByUrl('home');
+
+                this.router.navigateByUrl('home');                
               }
 
             } else {

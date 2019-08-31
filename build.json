@@ -1,0 +1,11 @@
+{
+    "android": {
+        "release": {
+            "keystore": "paqueteria-key.keystore",
+            "storePassword": "lospri133",
+            "alias": "paqueteria",
+            "password": "lospri133",
+            "keystoreType": ""
+        }
+    }
+}

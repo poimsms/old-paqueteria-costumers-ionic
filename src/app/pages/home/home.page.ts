@@ -10,6 +10,8 @@ import { Subscription } from 'rxjs';
 import { GlobalService } from 'src/app/services/global.service';
 import { RatingComponent } from 'src/app/components/rating/rating.component';
 import { PayComponent } from 'src/app/components/pay/pay.component';
+import { FcmService } from 'src/app/services/fcm.service';
+import { CallNumber } from '@ionic-native/call-number/ngx';
 
 declare var google: any;
 
@@ -70,6 +72,20 @@ export class HomePage implements OnInit, OnDestroy {
   graciasPorComprar = false;
   estaBuscandoRider = false;
 
+
+  imageURL = 'https://res.cloudinary.com/ddon9fx1n/image/upload/v1555014076/tools/bike-parking.svg';
+
+  image = {
+    url: this.imageURL,
+    // This marker is 20 pixels wide by 32 pixels high.
+    // size: new google.maps.Size(100, 100),
+    scaledSize: new google.maps.Size(40, 40),
+    // The origin for this image is (0, 0).
+    origin: new google.maps.Point(0, 0),
+    // The anchor for this image is the base of the flagpole at (0, 32).
+    anchor: new google.maps.Point(0, 32)
+  };
+
   constructor(
     private menu: MenuController,
     private _control: ControlService,
@@ -80,7 +96,9 @@ export class HomePage implements OnInit, OnDestroy {
     private _fire: FireService,
     private _global: GlobalService,
     public modalController: ModalController,
-    public loadingController: LoadingController
+    public loadingController: LoadingController,
+    private _fcm: FcmService,
+    private callNumber: CallNumber
   ) {
     this.usuario = _auth.usuario;
     this.token = _auth.token;
@@ -104,7 +122,7 @@ export class HomePage implements OnInit, OnDestroy {
 
   riderSub() {
     this.riderCoorsSub$ = this._fire.getRiderCoors(this.rider._id).subscribe((res: any) => {
-  
+
       if (res[0].cliente == this.usuario._id) {
         const coors = { lat: res[0].lat, lng: res[0].lng };
         this.graficarMarcador(coors);
@@ -209,6 +227,7 @@ export class HomePage implements OnInit, OnDestroy {
               this.rider = rider;
 
               const data = {
+                token: this.token,
                 monto: this.precio,
                 rider: this.rider,
                 usuario: this.usuario,
@@ -252,6 +271,9 @@ export class HomePage implements OnInit, OnDestroy {
               this._fire.updateRider(riderFire.rider, 'coors', {
                 pagoPendiente: true
               });
+
+
+              this._fcm.sendPushNotification(riderFire.rider, 'rider-nuevo-pedido');
 
             }
 
@@ -354,8 +376,11 @@ export class HomePage implements OnInit, OnDestroy {
     const { data } = await modal.onWillDismiss();
 
     if (data.pagoExitoso) {
+
       this.presentCompraExitosa();
       this.getPedido();
+      this._fcm.sendPushNotification(data.riderID, 'rider-confirmacion');
+
     } else {
       this.presentAlert_OrdenCancelada();
     }
@@ -436,7 +461,9 @@ export class HomePage implements OnInit, OnDestroy {
     if (!this.markerReady) {
       this.marker = new google.maps.Marker({
         position: coors,
-        map: this.map
+        map: this.map,
+        icon: this.image,
+        animation: google.maps.Animation.DROP
       });
       this.markerReady = true;
     } else {
@@ -483,7 +510,6 @@ export class HomePage implements OnInit, OnDestroy {
     });
 
     await alert.present();
-
   }
 
   async presentAlert_OrdenCancelada() {
@@ -527,6 +553,7 @@ export class HomePage implements OnInit, OnDestroy {
   resetMapa() {
     this.pedidoActivo = false;
     this.directionsDisplay.setMap(null);
+    this.marker.setMap(null);
     this.riderSub$.unsubscribe();
     this.rider = null;
     this.riderIndex = 0;
@@ -568,5 +595,11 @@ export class HomePage implements OnInit, OnDestroy {
   openMenu() {
     this.menu.enable(true, 'first');
     this.menu.open('first');
+  }
+
+  callPhone(telefono) {
+    this.callNumber.callNumber("9" + telefono, true)
+      .then(res => console.log('Launched dialer!', res))
+      .catch(err => console.log('Error launching dialer', err));
   }
 }

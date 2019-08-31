@@ -28,7 +28,7 @@ export class GlobalService {
 
       if (this.platform.is('cordova')) {
         this.appVersion.getVersionNumber().then(version => {
-          const url = `${this.apiURL}/global/app-version?version=${version}`;
+          const url = `${this.apiURL}/global/app-version?version=${version}&app=clientes`;
           this.http.get(url).toPromise().then(data => {
             resolve(data);
           });
@@ -36,7 +36,7 @@ export class GlobalService {
 
       } else {
         const version = this._config.version;
-        const url = `${this.apiURL}/global/app-version?version=${version}`;
+        const url = `${this.apiURL}/global/app-version?version=${version}&app=clientes`;
         this.http.get(url).toPromise().then(data => {
           resolve(data);
         });
