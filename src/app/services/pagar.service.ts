@@ -10,16 +10,12 @@ import { AlertController } from '@ionic/angular';
 })
 export class PagarService {
 
-  apiURL: string;
-
   constructor(
     public http: HttpClient,
     private _config: ConfigService,
     private iab: InAppBrowser,
     public alertController: AlertController
-  ) {
-    this.apiURL = this._config.apiURL;
-  }
+  ) { }
 
 
   pagarConFlow(token, dataFLOW) {
@@ -85,7 +81,7 @@ export class PagarService {
 
 
   createTransaction(token, body) {
-    const url = `${this.apiURL}/pago/transaction-create-one`;
+    const url = `${this._config.apiURL}/pago/transaction-create-one`;
     const headers = new HttpHeaders({
       Authorization: `JWT ${token}`
     });
@@ -93,7 +89,7 @@ export class PagarService {
   }
 
   getTransaction(token, id) {
-    const url = `${this.apiURL}/pago/transaction-get-one?id=${id}`;
+    const url = `${this._config.apiURL}/pago/transaction-get-one?id=${id}`;
     const headers = new HttpHeaders({
       Authorization: `JWT ${token}`
     });
@@ -101,7 +97,7 @@ export class PagarService {
   }
 
   iniciarPago(token, body) {
-    const url = `${this.apiURL}/pago/pago-iniciar`;
+    const url = `${this._config.apiURL}/pago/pago-iniciar`;
     const headers = new HttpHeaders({
       Authorization: `JWT ${token}`
     });

@@ -9,8 +9,7 @@ import { ConfigService } from './config.service';
   providedIn: 'root'
 })
 export class AuthService {
-
-  apiURL: string;
+  
   telefono: number;
   phone: number;
   idPhone: string;
@@ -24,30 +23,22 @@ export class AuthService {
     private platform: Platform,
     private storage: Storage,
     private _config: ConfigService
-  ) {
-
-    platform.ready().then(() => {
-      this.loadStorage();
-    });
-
-    this.apiURL = this._config.apiURL;
-
-  }
+  ) { }
 
   phoneNumberSendRequest(telefono) {
-    const url = `${this.apiURL}/nexmo/number`;
+    const url = `${this._config.apiURL}/nexmo/number`;
     const body = { telefono };
     return this.http.post(url, body).toPromise();
   }
 
   phoneCancelRequest(id) {
-    const url = `${this.apiURL}/nexmo/cancel`;
+    const url = `${this._config.apiURL}/nexmo/cancel`;
     const body = { id };
     return this.http.post(url, body).toPromise();
   }
 
   phoneVerifyCode(id, code) {
-    const url = `${this.apiURL}/nexmo/verify`;
+    const url = `${this._config.apiURL}/nexmo/verify`;
     const body = { id, code };
     return this.http.post(url, body).toPromise();
   }
@@ -83,33 +74,8 @@ export class AuthService {
     this.authState.next({ isAuth: false, usuario: null, token: null });
   }
 
-  updateUser(token, body, id) {
-    // return new Promise((resolve, reject) => {
-    //   const url = `${this.apiURL}/users/actualizar/${id}`;
-    //   this.http.post(url, body).toPromise()
-    //     .then(() => {
-    //       this.updateStorage(token)
-    //         .then(() => resolve());
-    //     });
-    // });
-  }
-
   saveFlowOrderStorage(order) {
     localStorage.setItem("order", JSON.stringify(order));
-  }
-
-  readFlowOrderStorage(token) {
-    // const res = localStorage.getItem('order');
-    // const order = JSON.parse(res);
-    // if (order) {
-    //   this.getUser(token)
-    //     .then((resUser: any) => {
-    //       const authData = { user: resUser.user, token };
-    //       localStorage.setItem("authData", JSON.stringify(authData));
-    //       localStorage.removeItem("order");
-    //       this.authState.next({ isAuth: true, authData });
-    //     });
-    // }
   }
 
   removeStorage() {
@@ -133,16 +99,6 @@ export class AuthService {
       localStorage.setItem("authData", JSON.stringify(authData));
       this.authState.next({ isAuth: true, usuario, token });
     }
-  }
-
-  updateStorage(token) {
-    // return new Promise((resolve, reject) => {
-    //   this.getUser(token)
-    //     .then((resUser: any) => {
-    //       this.saveStorage(token, resUser.user);
-    //       resolve();
-    //     });
-    // });
   }
 
   loadStorage() {
@@ -184,18 +140,18 @@ export class AuthService {
   }
 
   signIn(telefono, password) {
-    const url = `${this.apiURL}/usuarios/signin-phone`;
+    const url = `${this._config.apiURL}/usuarios/signin-phone`;
     const body = { telefono, password };
     return this.http.post(url, body).toPromise();
   }
 
   signUp(body) {
-    const url = `${this.apiURL}/usuarios/signup`;
+    const url = `${this._config.apiURL}/usuarios/signup`;
     return this.http.post(url, body).toPromise();
   }
 
   getUser(token, id) {
-    const url = `${this.apiURL}/usuarios/get-one?id=${id}`;
+    const url = `${this._config.apiURL}/usuarios/get-one?id=${id}`;
     const headers = new HttpHeaders({
       Authorization: `JWT ${token}`
     });

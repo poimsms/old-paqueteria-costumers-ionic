@@ -10,17 +10,12 @@ import { FCM } from '@ionic-native/fcm/ngx';
 })
 export class FcmService {
 
-  apiURL: string;
-
   constructor(
     public http: HttpClient,
     private _config: ConfigService,
     private platform: Platform,
     private fcm: FCM
-  ) {
-
-    this.apiURL = this._config.apiURL;
-  }
+  ) { }
 
 
   async getToken(uid) {
@@ -68,12 +63,12 @@ export class FcmService {
   }
 
   updateDevice(body) {
-    const url = `${this.apiURL}/riders/device-update`;
+    const url = `${this._config.apiURL}/core/device-update`;
     return this.http.put(url, body).toPromise();
   }
 
   getDevice(id) {
-    const url = `${this.apiURL}/riders/device-get-one?id=${id}`;
+    const url = `${this._config.apiURL}/core/device-get-one?id=${id}`;
     return this.http.get(url).toPromise();
   }
 }

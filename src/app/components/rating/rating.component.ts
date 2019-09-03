@@ -61,7 +61,8 @@ export class RatingComponent implements OnInit {
   async omitirToast() {
     const toast = await this.toastController.create({
       message: 'Tu calificación se ha omitido!',
-      duration: 2000
+      duration: 2000,
+      position: 'middle'
     });
     toast.present();
   }
@@ -69,7 +70,8 @@ export class RatingComponent implements OnInit {
   async calificacionToast() {
     const toast = await this.toastController.create({
       message: 'Gracias por calificar al rider!',
-      duration: 2000
+      duration: 2000,
+      position: 'middle'
     });
     toast.present();
   }

@@ -5,12 +5,21 @@ import { Injectable } from '@angular/core';
 })
 export class ConfigService {
 
-  apiURL: string;
-  version: string;
+  apiURL = '';
+  version = '1.0.1'
+  ENTORNO = 'DEV';
 
-  constructor() {
-    // this.apiURL = 'http://localhost:3000';
-    this.apiURL = 'https://joopiterweb.com';
-    this.version = '1.0.0';
+  constructor() { }
+
+  setApi(version) {
+
+    if (this.ENTORNO == 'DEV') {
+      this.apiURL = `http://localhost:3000/clients/v${version}`;
+    }
+
+    if (this.ENTORNO == 'PROD') {
+      this.apiURL = `https://joopiterweb.com/clients/v${version}`;
+    }
+    
   }
 }

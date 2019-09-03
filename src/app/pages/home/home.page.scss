@@ -3,18 +3,18 @@
 }
 
 .burbuja {
-    background:rgb(250, 250, 250);
+    // background:rgb(250, 250, 250);
     height:60px;
     width:60px;
     border-radius:50%;
-    border:1px solid #eee;
+    // border:1px solid #eee;
     display:flex;
     align-items:center;
     justify-content:center
 }
 
 .burbujaActiva {
-    background:lightyellow;
+    // background:lightyellow;
     border:0px solid #eee;
 }
 
@@ -35,7 +35,8 @@
 }
 
 .smallActivo {
-    color: #111; 
+    // color: #0bb8cc;
+    color:#111;
 }
 
 .large {
@@ -48,4 +49,9 @@
     color: #111;
     font-weight:500;
     font-size: 20px; 
+}
+
+.start {
+    font-size:20px;
+    color:gold;
 }

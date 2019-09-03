@@ -1,6 +1,6 @@
 <div style="z-index:990;position:fixed;top:15px;left:15px">
   <div (click)="openMenu()"
-    style="background:white;height:35px;width:35px;display:flex;align-items:center;justify-content:center;border-radius:50%;box-shadow: 0 0 20px #eee;">
+    style="background:white;height:35px;width:35px;display:flex;align-items:center;justify-content:center;border-radius:10px;box-shadow: 0 0 20px #eee;">
     <ion-icon name="menu" style="color:#777;font-size:18px"></ion-icon>
   </div>
 </div>
@@ -15,7 +15,7 @@
   <div (click)="openMapaPage('origen')"
     style="border:1px solid #eee;width:100%;background:white;padding:10px;padding-left:20px;border-radius:20px;font-size:17.5px;display:flex;align-items:center;box-shadow: 0 0 20px #eee">
     <div style="border-radius:50%;height:7px;width:7px;background:orange;margin-right:15px"></div>
-    <div [ngStyle]="{'color': texto_origen == '¿Dónde retirar?' ? '#999':'#333'}">
+    <div [ngStyle]="{'color': texto_origen == '¿Dónde retiramos?' ? '#999':'#333'}">
       {{texto_origen}}
     </div>
   </div>
@@ -23,7 +23,7 @@
   <div (click)="openMapaPage('destino')"
     style="border:1px solid #eee;width:100%;margin-top:20px;background:white;padding:10px;padding-left:20px;border-radius:20px;font-size:17.5px;display:flex;align-items:center;box-shadow: 0 0 20px #eee">
     <div style="border-radius:50%;height:7px;width:7px;background:orange;margin-right:15px"></div>
-    <div [ngStyle]="{'color': texto_destino == '¿Dónde lo entregamos?' ? '#999':'#333'}">
+    <div [ngStyle]="{'color': texto_destino == '¿Dónde entregamos?' ? '#999':'#333'}">
       {{texto_destino}}
     </div>
   </div>
@@ -39,7 +39,7 @@
 
   <div *ngIf="!pedidoActivo">
 
-    <div style="width:100%;display:flex;align-items:center;justify-content:space-around">
+    <div *ngIf="rutaReady" style="width:100%;display:flex;align-items:center;justify-content:space-around">
 
       <div (click)="vehiculoToggle('bicicleta')">
         <div class="burbuja" [ngClass]="{'burbujaActiva': isBicicleta}">
@@ -76,12 +76,12 @@
     <div padding>
       <ion-button *ngIf="!rutaReady" mode="ios" expand="block" color="medium">
         <div style="font-size:18px;font-weight:600">
-          Confirmar Órden
+          Pedir Rider
         </div>
       </ion-button>
       <ion-button *ngIf="rutaReady" mode="ios" (click)="iniciarPedido()" expand="block" color="secondary">
         <div style="font-size:18px;font-weight:600">
-          Confirmar Órden
+          Pedir Rider
         </div>
       </ion-button>
     </div>
@@ -92,39 +92,46 @@
 
     <div style="width:100%;padding-bottom:15px;display:flex;align-items:center;justify-content:space-between">
       <div style="display:flex;align-items:center;">
-        <img [src]="rider?.img.url" style="width:50px;height:50px;border-radius:50%;object-fit:cover">
-        <div style="margin-left:20px">
+        <div style="position:relative">
+          <img [src]="rider?.img.url" style="width:65px;height:65px;border-radius:50%;object-fit:cover">
+          <div class="burbuja burbujaActiva" style="position:absolute;bottom:-10px;right:-40px">
+            <img *ngIf="rider.vehiculo == 'Moto'" src="assets/moto.png" style="width:45px">
+            <img *ngIf="rider.vehiculo == 'Bicicleta'" src="assets/bici.png" style="width:45px">
+          </div>
+        </div>
+        <!-- <img [src]="rider?.img.url" style="width:50px;height:50px;border-radius:50%;object-fit:cover"> -->
+        <div style="margin-left:40px">
           <div>
             {{rider?.nombre}}
           </div>
           <div style="display:flex;align-items:center">
-            <ion-icon *ngIf="rider.stats.startsAvg >= 1" name="star" style="font-size:20px;color:gold"></ion-icon>
-            <ion-icon *ngIf="rider.stats.startsAvg == 1.5" name="star-half" style="font-size:20px;color:gold">
-            </ion-icon>
-            <ion-icon *ngIf="rider.stats.startsAvg >= 2" name="star" style="font-size:20px;color:gold"></ion-icon>
-            <ion-icon *ngIf="rider.stats.startsAvg == 2.5" name="star-half" style="font-size:20px;color:gold">
-            </ion-icon>
-            <ion-icon *ngIf="rider.stats.startsAvg >= 3" name="star" style="font-size:20px;color:gold"></ion-icon>
-            <ion-icon *ngIf="rider.stats.startsAvg == 3.5" name="star-half" style="font-size:20px;color:gold">
-            </ion-icon>
-            <ion-icon *ngIf="rider.stats.startsAvg >= 4" name="star" style="font-size:20px;color:gold"></ion-icon>
-            <ion-icon *ngIf="rider.stats.startsAvg == 4.5" name="star-half" style="font-size:20px;color:gold">
-            </ion-icon>
-            <ion-icon *ngIf="rider?.stats.startsAvg >= 5" name="star" style="font-size:20px;color:gold"></ion-icon>
+            <ion-icon *ngIf="rider.stats.startsAvg >= 1" name="star" class="start"></ion-icon>
+            <ion-icon *ngIf="rider.stats.startsAvg == 1.5" name="star-half" class="start"></ion-icon>
+            <ion-icon *ngIf="rider.stats.startsAvg >= 2" name="star" class="start"></ion-icon>
+            <ion-icon *ngIf="rider.stats.startsAvg == 2.5" name="star-half" class="start"></ion-icon>
+            <ion-icon *ngIf="rider.stats.startsAvg >= 3" name="star" class="start"></ion-icon>
+            <ion-icon *ngIf="rider.stats.startsAvg == 3.5" name="star-half" class="start"></ion-icon>
+            <ion-icon *ngIf="rider.stats.startsAvg >= 4" name="star" class="start"></ion-icon>
+            <ion-icon *ngIf="rider.stats.startsAvg == 4.5" name="star-half" class="start"></ion-icon>
+            <ion-icon *ngIf="rider?.stats.startsAvg >= 5" name="star" class="start"></ion-icon>
             ({{rider?.stats.startsAvg}})
           </div>
           <div style="font-size:14px;color:#999;text-transform:capitalize">
-            ({{rider?.vehiculo}})
+            Distancia: {{pedido.distancia}} km
           </div>
         </div>
       </div>
 
 
-      <div style="margin-left:30px">
+      <!-- <div style="margin-left:30px">
         <ion-button (click)="callPhone(rider.telefono)" color="secondary">
           <ion-icon slot="start" name="call"></ion-icon>
           Llamar
         </ion-button>
+      </div> -->
+      <div (click)="callPhone(cliente.telefono)"
+        style="width:45px;height:45px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:0px solid #eee;background:#24d6ea">
+        <ion-icon name="ios-call" style="font-size:28px;color:white"></ion-icon>
       </div>
 
       <!-- <div style="margin-left:20px;border:1px solid #bbb;border-radius:4px;">
@@ -139,14 +146,21 @@
 </ion-footer>
 
 
-
+<!-- loadingRider -->
 <div *ngIf="loadingRider"
   style="z-index:999;position:fixed;top:0px;left:0px;height:100%;width:100%;display:flex;align-items:center;justify-content:center;background:rgb(34, 34, 34, 0.5)">
   <div
-    style="box-shadow: 0 0 20px rgba(68, 68, 68, 0.75);padding:40px;border-radius:2px;background:white;display:flex;align-items:center;">
-    <ion-spinner color="secondary"></ion-spinner>
-    <div style="margin-left:20px">
-      Buscando Rider...
+    style="box-shadow: 0 0 20px rgba(68, 68, 68, 0.75);padding:40px;padding-bottom:20px;border-radius:3px;background:white;">
+
+    <div style="width:100%;display:flex;align-items:center">
+      <ion-spinner color="secondary"></ion-spinner>
+      <div style="margin-left:20px;font-size:17.5px">
+        Buscando Rider...
+      </div>
+    </div>
+
+    <div (click)="cancelarBusqueda()" style="margin-top:30px;width:100%;display:flex;justify-content:center">
+      <ion-icon name="close-circle" style="color:#444;font-size:40px"></ion-icon>
     </div>
   </div>
 </div>

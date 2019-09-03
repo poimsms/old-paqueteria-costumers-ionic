@@ -4,44 +4,62 @@
     <ion-icon (click)="closeModal()" name="close" style="color:#555;font-size:27px"></ion-icon>
   </div>
 
-
-  <ion-item lines="none" style="padding-left:20px">
-    <ion-label>Rider:</ion-label>
-  </ion-item>
+  <div style="margin-left:20px;color:#444;font-weight:550">
+    Un Rider ha aceptado tu pedido
+  </div>
 
   <div padding style="margin-left:15px;width:100%;display:flex;align-items:center;">
-    <img [src]="rider.img.url" style="width:60px;height:60px;border-radius:50%;object-fit:cover">
-    <div style="margin-left:10px;font-size:16px;font-weight:600">
+
+    <div style="position:relative">
+      <img [src]="rider.img.url" style="width:80px;height:80px;border-radius:50%;object-fit:cover">
+      <div class="burbuja burbujaActiva" style="position:absolute;bottom:0px;right:-30px">
+        <img *ngIf="rider.vehiculo == 'Moto'" src="assets/moto.png" class="transporte">
+        <img *ngIf="rider.vehiculo == 'Bicicleta'" src="assets/bici.png" class="transporte">
+      </div>
+    </div>
+
+    <div style="margin-left:40px;font-size:16px;font-weight:600">
       {{ rider.nombre }}
       <div style="display:flex;align-items:center">
-        <ion-icon name="star" style="color:gold;font-size:22px"></ion-icon>
-        <ion-icon name="star" style="color:gold;font-size:22px"></ion-icon>
-        <ion-icon name="star" style="color:gold;font-size:22px"></ion-icon>
-        <ion-icon name="star" style="color:gold;font-size:22px"></ion-icon>
+        <ion-icon *ngIf="rider.stats.startsAvg >= 1" name="star" class="start"></ion-icon>
+        <ion-icon *ngIf="rider.stats.startsAvg == 1.5" name="star-half" class="start"></ion-icon>
+        <ion-icon *ngIf="rider.stats.startsAvg >= 2" name="star" class="start"></ion-icon>
+        <ion-icon *ngIf="rider.stats.startsAvg == 2.5" name="star-half" class="start"></ion-icon>
+        <ion-icon *ngIf="rider.stats.startsAvg >= 3" name="star" class="start"></ion-icon>
+        <ion-icon *ngIf="rider.stats.startsAvg == 3.5" name="star-half" class="start"></ion-icon>
+        <ion-icon *ngIf="rider.stats.startsAvg >= 4" name="star" class="start"></ion-icon>
+        <ion-icon *ngIf="rider.stats.startsAvg == 4.5" name="star-half" class="start"></ion-icon>
+        <ion-icon *ngIf="rider?.stats.startsAvg >= 5" name="star" class="start"></ion-icon>
         ({{ rider?.stats.startsAvg }})
       </div>
     </div>
+
   </div>
 
 
   <div padding>
     <ion-item>
-      <ion-label>Vehículo:</ion-label>
-      <div slot="end" class="burbuja burbujaActiva">
-        <img *ngIf="rider.vehiculo == 'Moto'" src="assets/moto.png" class="transporte">
-        <img *ngIf="rider.vehiculo == 'Bicicleta'" src="assets/bici.png" class="transporte">
+      <div style="color:#444;font-size:16px">
+        Distancia:
+      </div>
+      <div slot="end" style="color:#444;font-size:16px">
+        {{pedido.distancia}} km
       </div>
     </ion-item>
 
     <ion-item>
-      <ion-label>Total:</ion-label>
-      <div slot="end" style="font-size:22px;color:#0cd1e8;font-weight:600">
-        ${{ monto }}
+      <div style="color:#444;font-size:16px">
+        Costo del servicio:
+      </div>
+      <div slot="end" style="font-size:18px;color:#0cd1e8;font-weight:600">
+        ${{ monto }} CLP
       </div>
     </ion-item>
 
     <ion-item lines="none">
-      <ion-label>Método de pago:</ion-label>
+      <div style="color:#444;font-size:16px">
+        Método de pago:
+      </div>
     </ion-item>
 
     <ion-item *ngIf="usuario.rol == 'usuario'" (click)="togglePay('Tarjeta')" lines="none">
@@ -76,6 +94,7 @@
       <div style="font-size:20px;font-weight:600">
         Continuar
       </div>
+      <ion-icon slot="end" name="ios-arrow-dropright-circle" style="color:#fff;font-size:30px"></ion-icon>
     </ion-button>
   </div>
 </ion-footer>

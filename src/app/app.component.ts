@@ -9,6 +9,7 @@ import { GlobalService } from './services/global.service';
 import { ForceUpgradeComponent } from './components/force-upgrade/force-upgrade.component';
 import { BloqueadoComponent } from './components/bloqueado/bloqueado.component';
 import { FcmService } from './services/fcm.service';
+import { ConfigService } from './services/config.service';
 
 
 @Component({
@@ -22,6 +23,7 @@ export class AppComponent {
   isAuth: boolean;
   oktodo = true;
   entro = false;
+
   constructor(
     private platform: Platform,
     private splashScreen: SplashScreen,
@@ -31,7 +33,8 @@ export class AppComponent {
     private _auth: AuthService,
     private _global: GlobalService,
     public modalController: ModalController,
-    private _fcm: FcmService
+    private _fcm: FcmService,
+    private _config: ConfigService
   ) {
     this.initializeApp();
   }
@@ -43,6 +46,10 @@ export class AppComponent {
 
 
       this._global.checkAppVersion().then((data: any) => {
+
+        this._config.setApi(data.version);
+        this._global.getTarifas();
+        this._auth.loadStorage();
 
         if (data.forceUpgrade) {
 

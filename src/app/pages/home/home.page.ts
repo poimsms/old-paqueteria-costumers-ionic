@@ -36,8 +36,8 @@ export class HomePage implements OnInit, OnDestroy {
   riderPrevio = '';
 
   transporte = 'moto';
-  texto_origen = '¿Dónde retirar?';
-  texto_destino = '¿Dónde lo entregamos?';
+  texto_origen = '¿Dónde retiramos?';
+  texto_destino = '¿Dónde entregamos?';
 
   distancia_excedida_moto = false;
   distancia_excedida_bici = false;
@@ -71,6 +71,7 @@ export class HomePage implements OnInit, OnDestroy {
 
   graciasPorComprar = false;
   estaBuscandoRider = false;
+  riderActivoEnBusqueda: string;
 
 
   imageURL = 'https://res.cloudinary.com/ddon9fx1n/image/upload/v1555014076/tools/bike-parking.svg';
@@ -120,7 +121,7 @@ export class HomePage implements OnInit, OnDestroy {
     clearInterval(this.timer);
   }
 
-  riderSub() {
+  riderSubCoors() {
     this.riderCoorsSub$ = this._fire.getRiderCoors(this.rider._id).subscribe((res: any) => {
 
       if (res[0].cliente == this.usuario._id) {
@@ -152,6 +153,7 @@ export class HomePage implements OnInit, OnDestroy {
         return;
       }
 
+      this.pedido = data.pedido;
       this.rider = data.pedido.rider;
       const origen = data.pedido.origen;
       const destino = data.pedido.destino;
@@ -161,14 +163,14 @@ export class HomePage implements OnInit, OnDestroy {
 
       // rastrear rider coors
       this.graficarRuta(origen, destino);
-      this.riderSub();
+      this.riderSubCoors();
     });
   }
 
 
   iniciarPedido() {
 
-    if (this.texto_origen == '¿Dónde retirar?' || this.texto_destino == '¿Dónde lo entregamos?') {
+    if (this.texto_origen == '¿Dónde retiramos?' || this.texto_destino == '¿Dónde entregamos?') {
       return;
     }
 
@@ -207,6 +209,7 @@ export class HomePage implements OnInit, OnDestroy {
 
         this.riderSub$ = this._fire.rider$.subscribe(riderFireArr => {
           const riderFire = riderFireArr[0];
+          this.riderActivoEnBusqueda = riderFire.rider;
 
           if (riderFire.rechazadoId == this.usuario._id) {
 
@@ -245,7 +248,7 @@ export class HomePage implements OnInit, OnDestroy {
 
             // Ver si rider aun está libre
             if (riderFire.actividad == 'disponible' && riderFire.isOnline &&
-              !riderFire.pagoPendiente && this.riderPrevio != riderFire.rider) {
+              !riderFire.pagoPendiente) {
 
               // Enviar solicitud
               this._fire.updateRider(riderFire.rider, 'rider', {
@@ -273,7 +276,7 @@ export class HomePage implements OnInit, OnDestroy {
               });
 
 
-              this._fcm.sendPushNotification(riderFire.rider, 'rider-nuevo-pedido');
+              this._fcm.sendPushNotification(riderFire.rider, 'nuevo-pedido');
 
             }
 
@@ -291,6 +294,16 @@ export class HomePage implements OnInit, OnDestroy {
       }
 
     });
+  }
+
+  cancelarBusqueda() {
+    this.riderSub$.unsubscribe();
+    this._fire.updateRider(this.riderActivoEnBusqueda, 'rider', { nuevaSolicitud: false, pagoPendiente: false });
+    this._fire.updateRider(this.riderActivoEnBusqueda, 'coors', { pagoPendiente: false });
+
+    clearInterval(this.timer);
+    this.loadingRider = false;
+    this.resetMapaFromBusquedaCancelada();
   }
 
   sendRiderSolicitude(riders, next) {
@@ -379,7 +392,7 @@ export class HomePage implements OnInit, OnDestroy {
 
       this.presentCompraExitosa();
       this.getPedido();
-      this._fcm.sendPushNotification(data.riderID, 'rider-confirmacion');
+      this._fcm.sendPushNotification(data.riderID, 'confirmacion-pedido');
 
     } else {
       this.presentAlert_OrdenCancelada();
@@ -514,11 +527,11 @@ export class HomePage implements OnInit, OnDestroy {
 
   async presentAlert_OrdenCancelada() {
     const alert = await this.alertController.create({
-      header: 'Órden cancelada',
+      header: 'Pedido cancelado',
       message: 'Defina un nuevo trayecto!',
       buttons: [
         {
-          text: 'Aceptar',
+          text: 'Ok',
           role: 'cancel',
           cssClass: 'secondary',
           handler: (blah) => {
@@ -537,7 +550,7 @@ export class HomePage implements OnInit, OnDestroy {
       message: 'Intenta más tarde :)',
       buttons: [
         {
-          text: 'Aceptar',
+          text: 'Ok',
           role: 'cancel',
           cssClass: 'secondary',
           handler: (blah) => {
@@ -550,6 +563,21 @@ export class HomePage implements OnInit, OnDestroy {
     await alert.present();
   }
 
+  resetMapaFromBusquedaCancelada() {
+    this.directionsDisplay.setMap(null);
+    this.pedidoActivo = false;
+    this.rider = null;
+    this.riderIndex = 0;
+    this.rutaReady = false;
+    this.texto_origen = '¿Dónde retiramos?';
+    this.texto_destino = '¿Dónde entregamos?';
+    this._control.origen = null;
+    this._control.destino = null;
+    this._control.origenReady = false;
+    this._control.destinoReady = false;
+    this._control.rutaReady = false;
+  }
+
   resetMapa() {
     this.pedidoActivo = false;
     this.directionsDisplay.setMap(null);
@@ -558,8 +586,8 @@ export class HomePage implements OnInit, OnDestroy {
     this.rider = null;
     this.riderIndex = 0;
     this.rutaReady = false;
-    this.texto_origen = '¿Dónde retirar?';
-    this.texto_destino = '¿Dónde lo entregamos?';
+    this.texto_origen = '¿Dónde retiramos?';
+    this.texto_destino = '¿Dónde entregamos?';
     this._control.origen = null;
     this._control.destino = null;
     this._control.origenReady = false;

@@ -9,8 +9,6 @@ import { Platform } from '@ionic/angular';
 })
 export class GlobalService {
 
-  apiURL: string;
-
   tarifas: any;
 
   constructor(
@@ -18,17 +16,22 @@ export class GlobalService {
     private platform: Platform,
     private http: HttpClient,
     private _config: ConfigService
-  ) {
-    this.apiURL = this._config.apiURL;
-    this.getTarifas();
-  }
+  ) { }
 
   checkAppVersion() {
     return new Promise((resolve, reject) => {
 
+      let serverURL: string;
+
+      if (this._config.ENTORNO == 'DEV') {
+        serverURL = 'http://localhost:3000';
+      } else {
+        serverURL = 'https://joopiterweb.com';
+      }
+
       if (this.platform.is('cordova')) {
         this.appVersion.getVersionNumber().then(version => {
-          const url = `${this.apiURL}/global/app-version?version=${version}&app=clientes`;
+          const url = `${serverURL}/api-version?version=${version}&app=clients`;
           this.http.get(url).toPromise().then(data => {
             resolve(data);
           });
@@ -36,7 +39,7 @@ export class GlobalService {
 
       } else {
         const version = this._config.version;
-        const url = `${this.apiURL}/global/app-version?version=${version}&app=clientes`;
+        const url = `${serverURL}/api-version?version=${version}&app=clients`;
         this.http.get(url).toPromise().then(data => {
           resolve(data);
         });
@@ -45,7 +48,7 @@ export class GlobalService {
   }
 
   getTarifas() {
-    const url = `${this.apiURL}/global/tarifas-get-active-one`;
+    const url = `${this._config.apiURL}/tarifas/tarifas-get-active-one`;
     this.http.get(url).toPromise().then(tarifas => this.tarifas = tarifas);
   }
 

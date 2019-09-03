@@ -6,48 +6,44 @@ import { ConfigService } from './config.service';
   providedIn: 'root'
 })
 export class DataService {
-
-  apiURL: string;
-
+  
   constructor(
     public http: HttpClient,
     private _config: ConfigService
-  ) {
-    this.apiURL = this._config.apiURL;
-  }
+  ) { }
 
   rateRider(rateId, riderId, body) {
-    const url = `${this.apiURL}/riders/rating-update?rate=${rateId}&rider=${riderId}`;
+    const url = `${this._config.apiURL}/core/rating-update?rate=${rateId}&rider=${riderId}`;
     return this.http.put(url, body).toPromise();
   }
 
   getActiveRating(id) {
-    const url = `${this.apiURL}/riders/rating-get-active-one?id=${id}`;
+    const url = `${this._config.apiURL}/core/rating-get-active-one?id=${id}`;
     return this.http.get(url).toPromise();
   }
 
   getOneRider(id) {
-    const url = `${this.apiURL}/riders/usuario-get-one?id=${id}`;
+    const url = `${this._config.apiURL}/core/usuario-get-one?id=${id}`;
     return this.http.get(url).toPromise();
   }
 
   crearPedido(body) {
-    const url = `${this.apiURL}/riders/pedidos-create`;
+    const url = `${this._config.apiURL}/core/pedidos-create`;
     return this.http.post(url, body).toPromise();
   }
 
   getPedidos(id) {
-    const url = `${this.apiURL}/riders/pedidos-get-by-client-id?id=${id}`;
+    const url = `${this._config.apiURL}/core/pedidos-get-by-client-id?id=${id}`;
     return this.http.get(url).toPromise();
   }
 
   getPedidoActivo(id) {
-    const url = `${this.apiURL}/riders/pedidos-get-active-one?id=${id}`;
+    const url = `${this._config.apiURL}/core/pedidos-get-active-one?id=${id}`;
     return this.http.get(url).toPromise();
   }
 
   getOnePedido(id) {
-    const url = `${this.apiURL}/riders/pedidos-get-one?id=${id}`;
+    const url = `${this._config.apiURL}/core/pedidos-get-one?id=${id}`;
     return this.http.get(url).toPromise();
   }
 
