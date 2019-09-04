@@ -9,7 +9,7 @@ import { ConfigService } from './config.service';
   providedIn: 'root'
 })
 export class AuthService {
-  
+
   telefono: number;
   phone: number;
   idPhone: string;
@@ -152,9 +152,7 @@ export class AuthService {
 
   getUser(token, id) {
     const url = `${this._config.apiURL}/usuarios/get-one?id=${id}`;
-    const headers = new HttpHeaders({
-      Authorization: `JWT ${token}`
-    });
+    const headers = new HttpHeaders({ token, version: this._config.version });
     return this.http.get(url, { headers }).toPromise();
   }
 

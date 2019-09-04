@@ -51,7 +51,6 @@ export class HomePage implements OnInit, OnDestroy {
   rider: any;
   riders = [];
 
-  token: string;
   usuario: any;
   isAuth: boolean;
 
@@ -102,7 +101,6 @@ export class HomePage implements OnInit, OnDestroy {
     private callNumber: CallNumber
   ) {
     this.usuario = _auth.usuario;
-    this.token = _auth.token;
     this.service = new google.maps.DistanceMatrixService();
     this.directionsDisplay = new google.maps.DirectionsRenderer();
     this.directionsService = new google.maps.DirectionsService();
@@ -230,7 +228,6 @@ export class HomePage implements OnInit, OnDestroy {
               this.rider = rider;
 
               const data = {
-                token: this.token,
                 monto: this.precio,
                 rider: this.rider,
                 usuario: this.usuario,

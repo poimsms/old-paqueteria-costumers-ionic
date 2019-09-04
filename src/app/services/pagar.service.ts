@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { ConfigService } from './config.service';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
 import { AlertController } from '@ionic/angular';
+import { AuthService } from './auth.service';
 
 
 @Injectable({
@@ -14,15 +15,16 @@ export class PagarService {
     public http: HttpClient,
     private _config: ConfigService,
     private iab: InAppBrowser,
-    public alertController: AlertController
+    public alertController: AlertController,
+    private _auth: AuthService
   ) { }
 
 
-  pagarConFlow(token, dataFLOW) {
+  pagarConFlow(dataFLOW) {
 
     return new Promise((resolve, reject) => {
 
-      this.createTransaction(token, dataFLOW)
+      this.createTransaction(dataFLOW)
         .then((transaction: any) => {
 
           const body = {
@@ -31,7 +33,7 @@ export class PagarService {
             transaccionID: transaction._id
           };
 
-          this.iniciarPago(token, body).then((data) => {
+          this.iniciarPago(body).then((data) => {
             let respuesta = JSON.parse(JSON.stringify(data));
 
             if (respuesta.code != undefined && respuesta.code == 108) {
@@ -45,7 +47,7 @@ export class PagarService {
               const browser = this.iab.create(url + '?token=' + token, '_blank', 'location=yes');
 
               browser.on('exit').subscribe(event => {
-                this.getTransaction(token, transaction._id)
+                this.getTransaction(transaction._id)
                   .then((result: any) => {
                     if (result.ok) {
                       resolve(true);
@@ -80,27 +82,21 @@ export class PagarService {
   }
 
 
-  createTransaction(token, body) {
+  createTransaction(body) {
     const url = `${this._config.apiURL}/pago/transaction-create-one`;
-    const headers = new HttpHeaders({
-      Authorization: `JWT ${token}`
-    });
+    const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
     return this.http.post(url, body, { headers }).toPromise();
   }
 
-  getTransaction(token, id) {
+  getTransaction(id) {
     const url = `${this._config.apiURL}/pago/transaction-get-one?id=${id}`;
-    const headers = new HttpHeaders({
-      Authorization: `JWT ${token}`
-    });
+    const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
     return this.http.get(url, { headers }).toPromise();
   }
 
-  iniciarPago(token, body) {
+  iniciarPago(body) {
     const url = `${this._config.apiURL}/pago/pago-iniciar`;
-    const headers = new HttpHeaders({
-      Authorization: `JWT ${token}`
-    });
+    const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
     return this.http.post(url, body, { headers }).toPromise();
   }
 

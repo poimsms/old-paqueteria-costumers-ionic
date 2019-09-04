@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { ConfigService } from './config.service';
 import { Platform } from '@ionic/angular';
 import { FCM } from '@ionic-native/fcm/ngx';
+import { AuthService } from './auth.service';
 
 
 @Injectable({
@@ -14,9 +15,9 @@ export class FcmService {
     public http: HttpClient,
     private _config: ConfigService,
     private platform: Platform,
-    private fcm: FCM
+    private fcm: FCM,
+    private _auth: AuthService
   ) { }
-
 
   async getToken(uid) {
 
@@ -64,11 +65,13 @@ export class FcmService {
 
   updateDevice(body) {
     const url = `${this._config.apiURL}/core/device-update`;
-    return this.http.put(url, body).toPromise();
+    const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
+    return this.http.put(url, body, { headers }).toPromise();
   }
 
   getDevice(id) {
     const url = `${this._config.apiURL}/core/device-get-one?id=${id}`;
-    return this.http.get(url).toPromise();
+    const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
+    return this.http.get(url, { headers }).toPromise();
   }
 }

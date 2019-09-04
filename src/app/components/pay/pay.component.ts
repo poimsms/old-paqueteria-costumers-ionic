@@ -14,7 +14,6 @@ import { ControlService } from 'src/app/services/control.service';
 export class PayComponent implements OnInit {
 
   mPago = 'Tarjeta';
-  token: string;
   usuario: any;
   rider: any;
   monto: number;
@@ -29,7 +28,6 @@ export class PayComponent implements OnInit {
     private _control: ControlService
   ) {
     this.usuario = navParams.get('pago').usuario;
-    this.token = navParams.get('pago').token;
     this.rider = navParams.get('pago').rider;
     this.monto = navParams.get('pago').monto;
     this.pedido = navParams.get('pago').pedido;
@@ -65,8 +63,8 @@ export class PayComponent implements OnInit {
       entregado: false
     };
 
-    if (this.mPago == 'Tarjeta' && this.usuario.rol != 'empresa') {
-      this._pagar.pagarConFlow(this.token, dataFLOW).then(pagoExitoso => {
+    if (this.mPago == 'Tarjeta' && this.usuario.role != 'EMPRESA_ROLE') {
+      this._pagar.pagarConFlow(dataFLOW).then(pagoExitoso => {
 
         if (pagoExitoso) {
           this._data.crearPedido(pedido).then((pedido: any) => {
@@ -81,7 +79,7 @@ export class PayComponent implements OnInit {
     }
 
 
-    if (this.mPago == 'Tarjeta' && this.usuario.rol == 'empresa') {
+    if (this.mPago == 'Tarjeta' && this.usuario.role == 'EMPRESA_ROLE') {
       this._data.crearPedido(pedido).then((pedido: any) => {
 
         this.updateRiderEstadoOcupado(pedido._id);
