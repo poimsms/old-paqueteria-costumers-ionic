@@ -47,8 +47,7 @@ export class AppComponent {
 
       this._global.checkAppVersion().then((data: any) => {
 
-        this._config.setApi(data.version);
-        this._global.getTarifas();
+        this._config.setApi(data.apiVersion);
         this._auth.loadStorage();
 
         if (data.forceUpgrade) {
@@ -69,6 +68,7 @@ export class AppComponent {
 
               this._fcm.getToken(this.usuario._id);
               this._fcm.onTokenRefresh(this.usuario._id);
+              this._global.getTarifas();
 
               if (!data.usuario.isActive) {
                 

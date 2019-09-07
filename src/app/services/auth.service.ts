@@ -56,9 +56,9 @@ export class AuthService {
     });
   }
 
-  loginIn(telefono, password) {
+  loginIn(body) {
     return new Promise((resolve, reject) => {
-      this.signIn(telefono, password).then((res: any) => {
+      this.signIn(body).then((res: any) => {
 
         if (res.ok) {
           this.saveStorage(res.token, res.usuario, res.usuario._id);
@@ -139,9 +139,8 @@ export class AuthService {
     }
   }
 
-  signIn(telefono, password) {
+  signIn(body) {
     const url = `${this._config.apiURL}/usuarios/signin-phone`;
-    const body = { telefono, password };
     return this.http.post(url, body).toPromise();
   }
 
@@ -154,6 +153,18 @@ export class AuthService {
     const url = `${this._config.apiURL}/usuarios/get-one?id=${id}`;
     const headers = new HttpHeaders({ token, version: this._config.version });
     return this.http.get(url, { headers }).toPromise();
+  }
+
+  updateUser(body) {
+    const url = `${this._config.apiURL}/usuarios/update?id=${this.usuario._id}`;
+    const headers = new HttpHeaders({ token: this.token, version: this._config.version });
+    return this.http.put(url, body, { headers }).toPromise();
+  }
+
+  updatePassword(body) {
+    const url = `${this._config.apiURL}/usuarios/update-password?id=${this.usuario._id}`;
+    const headers = new HttpHeaders({ token: this.token, version: this._config.version });
+    return this.http.put(url, body, { headers }).toPromise();
   }
 
 }

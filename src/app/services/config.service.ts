@@ -7,18 +7,18 @@ export class ConfigService {
 
   apiURL = '';
   version = '1.0.1'
-  ENTORNO = 'DEV';
+  ENTORNO = 'PROD';
 
   constructor() { }
 
   setApi(version) {
 
     if (this.ENTORNO == 'DEV') {
-      this.apiURL = `http://localhost:3000/clients/v${version}`;
+      this.apiURL = `http://localhost:3000/v${version}`;
     }
 
     if (this.ENTORNO == 'PROD') {
-      this.apiURL = `https://joopiterweb.com/clients/v${version}`;
+      this.apiURL = `https://joopiterweb.com/v${version}`;
     }
     
   }

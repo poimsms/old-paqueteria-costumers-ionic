@@ -17,6 +17,8 @@ import { AngularFireModule } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { FCM } from '@ionic-native/fcm/ngx';
 import { CallNumber } from '@ionic-native/call-number/ngx';
+import { Camera } from '@ionic-native/camera/ngx';
+import { FileTransfer } from '@ionic-native/file-transfer/ngx';
 
 export const firebaseConfig = {
   apiKey: "AIzaSyAmlXBSsNgsocMZ15dN8bc1D3ZD0gMAetQ",
@@ -35,6 +37,8 @@ import { ForceUpgradeComponent } from './components/force-upgrade/force-upgrade.
 import { RatingComponent } from './components/rating/rating.component';
 import { PayComponent } from './components/pay/pay.component';
 import { BloqueadoComponent } from './components/bloqueado/bloqueado.component';
+import { EditarCamposComponent } from './components/editar-campos/editar-campos.component';
+import { PoliticasComponent } from './components/politicas/politicas.component';
 
 @NgModule({
   declarations: [
@@ -42,13 +46,17 @@ import { BloqueadoComponent } from './components/bloqueado/bloqueado.component';
     ForceUpgradeComponent,
     RatingComponent,
     PayComponent,
-    BloqueadoComponent
+    BloqueadoComponent,
+    EditarCamposComponent,
+    PoliticasComponent
   ],
   entryComponents: [
     ForceUpgradeComponent,
     RatingComponent,
     PayComponent,
-    BloqueadoComponent
+    BloqueadoComponent,
+    EditarCamposComponent,
+    PoliticasComponent
   ],
   imports: [
     BrowserModule,
@@ -62,13 +70,15 @@ import { BloqueadoComponent } from './components/bloqueado/bloqueado.component';
   ],
   providers: [
     StatusBar,
-    SplashScreen,  
+    SplashScreen,
     FCM,
     CallNumber,
+    Camera,
+    FileTransfer,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     AppVersion,
-    InAppBrowser    
+    InAppBrowser
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule { }

@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { ToastController } from '@ionic/angular';
+import { ToastController, ModalController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
+import { PoliticasComponent } from 'src/app/components/politicas/politicas.component';
 
 @Component({
   selector: 'app-login',
@@ -25,15 +26,17 @@ export class LoginPage implements OnInit {
 
 
   passwordType = 'password';
+  politicas = false;
 
   constructor(
     private _auth: AuthService,
     public toastController: ToastController,
-    private router: Router
+    private router: Router,
+    public modalController: ModalController
   ) {
     this._auth.authState
   }
-  
+
   ngOnInit() {
   }
 
@@ -47,7 +50,7 @@ export class LoginPage implements OnInit {
   }
 
   showHidePassword() {
-    if (this.passwordType == 'password') {      
+    if (this.passwordType == 'password') {
       this.passwordType = 'text';
     } else {
       this.passwordType = 'password';
@@ -82,6 +85,10 @@ export class LoginPage implements OnInit {
 
   next() {
 
+    if (!this.politicas) {
+      return;
+    }
+
     this.resetErros();
 
     if (this.telefono.length != 8) {
@@ -94,7 +101,7 @@ export class LoginPage implements OnInit {
 
     this.isLoading = true;
 
-    this._auth.phoneNumberSendRequest(this.telefono).then((res:any) => {
+    this._auth.phoneNumberSendRequest(this.telefono).then((res: any) => {
 
       if (res.ok) {
         if (res.result.status == '0') {
@@ -111,7 +118,7 @@ export class LoginPage implements OnInit {
       }
 
       this.isLoading = false;
-    });    
+    });
   }
 
   loginUsuario() {
@@ -130,8 +137,14 @@ export class LoginPage implements OnInit {
 
     if (this.telefono && this.password) {
 
-      this._auth.loginIn(this.telefono, this.password).then((res: any) => {
-        
+      const authData = {
+        telefono: this.telefono,
+        password: this.password,
+        from: 'clients-app'
+      };
+
+      this._auth.loginIn(authData).then((res: any) => {
+
         if (!res.ok) {
 
           if (res.err.tipo == 'password') {
@@ -148,8 +161,26 @@ export class LoginPage implements OnInit {
         }
 
         this.isLoading = false;
-      });
+
+      }).catch(() => this.isLoading = false);
     }
+  }
+
+  togglePoliticas() {
+    if (this.politicas) {
+      this.politicas = false;
+    } else {
+      this.politicas = true;
+    }
+  }
+
+  async openPoliticasModal() {
+
+    const modal = await this.modalController.create({
+      component: PoliticasComponent
+    });
+
+    await modal.present();
   }
 
 

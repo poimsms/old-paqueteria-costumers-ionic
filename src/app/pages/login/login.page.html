@@ -7,7 +7,7 @@
     <div>
       <img src="assets/bicycle.png" style="width:110px">
       <div style="width:100%;text-align:center;color:#555;font-size:20px">
-        Beat Grow
+        Moviup
       </div>
     </div>
   </div>
@@ -38,14 +38,15 @@
       Te enviaremos un mensaje de texto para verificar
     </div>
 
-    <ion-item>
-      <ion-toggle color="secondary" slot="start"></ion-toggle>
+    <ion-item style="margin-top: 10px">
+      <ion-toggle (ionChange)="togglePoliticas()" color="secondary" slot="start"></ion-toggle>
       <div style="color:#666">
-        Acepto <span style="color:#24d6ea;font-weight:500">política de privacidad</span> de Beat Grow
+        Acepto <span style="color:#24d6ea;font-weight:500" (click)="openPoliticasModal()">política de privacidad</span>
+        de Moviup
       </div>
     </ion-item>
 
-    <div padding>
+    <div padding style="margin-top:20px">
       <ion-button [disabled]="isLoading" (click)="next()" mode="ios" expand="block" color="secondary">
         <div style="font-size:20px;font-weight:600">
           Continuar

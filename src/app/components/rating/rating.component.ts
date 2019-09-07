@@ -27,10 +27,11 @@ export class RatingComponent implements OnInit {
   }
 
   omitir() {
-    const data: any = {};
 
-    data.pendiente = false;
-    data.omitido = true;
+    const data: any = {
+      isActive: false,
+      omitido: true
+    };
 
     this._data.rateRider(this.rating._id, this.rating.rider, data).then(() => {
       this.closeModal();
@@ -40,15 +41,12 @@ export class RatingComponent implements OnInit {
 
   calificar() {
 
-    const data: any = {};
-
-    if (this.comentario.length > 5) {
-      data.comentario = this.comentario;
-    }
-
-    data.starts = this.starts;
-    data.pendiente = false;
-    data.omitido = false;
+    const data: any = {
+      comentario: this.comentario,
+      starts: this.starts,
+      isActive: false,
+      omitido: false
+    };
 
     this._data.rateRider(this.rating._id, this.rating.rider._id, data).then(() => {
       this.closeModal();
@@ -60,7 +58,7 @@ export class RatingComponent implements OnInit {
 
   async omitirToast() {
     const toast = await this.toastController.create({
-      message: 'Tu calificación se ha omitido!',
+      message: 'Tu calificación se ha omitido',
       duration: 2000,
       position: 'middle'
     });

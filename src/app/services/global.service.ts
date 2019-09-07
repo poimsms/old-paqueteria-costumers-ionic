@@ -48,7 +48,7 @@ export class GlobalService {
   }
 
   getTarifas() {
-    const url = `${this._config.apiURL}/tarifas/tarifas-get-active-one`;
+    const url = `${this._config.apiURL}/core/tarifas-get-active-one`;
     this.http.get(url).toPromise().then(tarifas => this.tarifas = tarifas);
   }
 

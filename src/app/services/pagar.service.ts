@@ -58,7 +58,7 @@ export class PagarService {
               });
 
               browser.on('loadstart').subscribe(event => {
-                if (event.url == 'https://joopiterweb.com/pago/compra-exitosa') {
+                if (event.url == `${this._config.apiURL}/pago/compra-exitosa`) {
                   browser.close();
                   resolve(true);
                 }

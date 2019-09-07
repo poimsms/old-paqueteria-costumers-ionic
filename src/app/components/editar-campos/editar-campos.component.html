@@ -1,0 +1,44 @@
+<ion-header no-border>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="closeModal()">
+        <ion-icon slot="icon-only" name="arrow-round-back" style="color:#444;font-size:27px"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title> {{tipo}} </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+
+  <ion-item *ngIf="tipo == 'Nombre'">
+    <ion-input [placeholder]="input" style="font-size:18px" [(ngModel)]="nombre"></ion-input>
+  </ion-item>
+
+  <ion-item *ngIf="tipo == 'Email'">
+    <ion-input [placeholder]="input" style="font-size:18px" [(ngModel)]="email"></ion-input>
+  </ion-item>
+
+  <ion-item *ngIf="tipo == 'Contraseña'">
+    <ion-input placeholder="Nueva contraseña" style="font-size:18px" [(ngModel)]="newPassword"></ion-input>
+  </ion-item>
+
+  <ion-item *ngIf="tipo == 'Contraseña'" style="margin-top:20px">
+    <ion-input placeholder="Clave actual" style="font-size:18px" [(ngModel)]="oldPassword"></ion-input>
+  </ion-item>
+
+  <div *ngIf="error_password" style="color:red;margin-top:10px">
+    Contraseña incorrecta
+  </div>
+
+</ion-content>
+
+<ion-footer no-border>
+  <ion-button *ngIf="!isLoading" (click)="guardarCambios()" color="secondary" expand="full">
+    Guardar cambios
+  </ion-button>
+
+  <ion-button *ngIf="isLoading" [disabled]="true" color="secondary" expand="full">
+    Actualizando...
+  </ion-button>
+</ion-footer>

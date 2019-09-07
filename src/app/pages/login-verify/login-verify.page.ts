@@ -24,7 +24,7 @@ export class LoginVerifyPage implements OnInit {
   isActive = [true, false, false, false, false, false];
 
   constructor(
-    private _auth: AuthService,
+    public _auth: AuthService,
     private router: Router,
     private toastCtrl: ToastController
   ) { }

@@ -130,6 +130,7 @@ export class HomePage implements OnInit, OnDestroy {
         setTimeout(() => {
           this.getRating();
           this.resetMapa();
+          this.marker.setMap(null);
         }, 6000);
       }
 
@@ -257,7 +258,7 @@ export class HomePage implements OnInit, OnDestroy {
                     _id: this.usuario._id,
                     nombre: this.usuario.nombre,
                     img: this.usuario.img.url,
-                    rol: this.usuario.rol
+                    role: this.usuario.role
                   },
                   pedido: {
                     distancia: this.distancia,
@@ -311,6 +312,12 @@ export class HomePage implements OnInit, OnDestroy {
       this._fire.rider_query$.next(id_init);
     }
 
+    if (this.riderIndex == riders.length - 1) {
+
+      let id_init = riders[this.riderIndex];
+      this._fire.rider_query$.next(id_init);
+    }
+
     if (next) {
 
       let id_next = riders[this.riderIndex];
@@ -326,16 +333,17 @@ export class HomePage implements OnInit, OnDestroy {
 
         this.riderPrevio = id_previo;
 
-        this._fire.updateRider(id_previo, 'rider', {
-          pagoPendiente: false,
-          nuevaSolicitud: false
-        });
-
-        this._fire.updateRider(id_previo, 'coors', {
-          pagoPendiente: false
-        });
 
         if (this.riderIndex < riders.length) {
+
+          this._fire.updateRider(id_previo, 'rider', {
+            pagoPendiente: false,
+            nuevaSolicitud: false
+          });
+
+          this._fire.updateRider(id_previo, 'coors', {
+            pagoPendiente: false
+          });
 
           let id_actual = riders[this.riderIndex];
           this._fire.rider_query$.next(id_actual);
@@ -343,6 +351,18 @@ export class HomePage implements OnInit, OnDestroy {
           this.sendRiderSolicitude(riders, false);
 
         } else {
+
+          this.riderSub$.unsubscribe();
+
+          this._fire.updateRider(id_previo, 'rider', {
+            pagoPendiente: false,
+            nuevaSolicitud: false
+          });
+
+          this._fire.updateRider(id_previo, 'coors', {
+            pagoPendiente: false
+          });
+
           clearInterval(this.timer);
           this.loadingRider = false;
           this.presentAlert_NoHayRiders();
@@ -387,8 +407,21 @@ export class HomePage implements OnInit, OnDestroy {
 
     if (data.pagoExitoso) {
 
-      this.presentCompraExitosa();
-      this.getPedido();
+      this.directionsDisplay.setMap(null);
+
+      this.service = new google.maps.DistanceMatrixService();
+      this.directionsDisplay = new google.maps.DirectionsRenderer();
+      this.directionsService = new google.maps.DirectionsService();
+
+      this.cargarMapa();
+
+      this.graciasPorComprar = true;
+
+      setTimeout(() => {
+        this.graciasPorComprar = false;
+        this.getPedido();
+      }, 2000);
+
       this._fcm.sendPushNotification(data.riderID, 'confirmacion-pedido');
 
     } else {
@@ -422,9 +455,12 @@ export class HomePage implements OnInit, OnDestroy {
           {
             origins: [data.origen.direccion],
             destinations: [data.destino.direccion],
-            travelMode: 'DRIVING',
+            travelMode: 'BICYCLING',
           }, function (response, status) {
             self.distancia = response.rows[0].elements[0].distance.value;
+            
+            console.log(self.distancia = response.rows[0].elements[0], 'OBJETO')
+
             self.graficarRuta(data.origen, data.destino);
             self.calcularPrecio(self.distancia, 'bicicleta');
             self.calcularPrecio(self.distancia, 'moto');
@@ -433,10 +469,12 @@ export class HomePage implements OnInit, OnDestroy {
       }
 
       if (data.accion == 'actualizar-origen') {
+        this.rutaReady = false;
         this.texto_origen = data.origen.direccion;
       }
 
       if (data.accion == 'actualizar-destino') {
+        this.rutaReady = false;
         this.texto_destino = data.destino.direccion;
       }
     });
@@ -578,8 +616,7 @@ export class HomePage implements OnInit, OnDestroy {
   resetMapa() {
     this.pedidoActivo = false;
     this.directionsDisplay.setMap(null);
-    this.marker.setMap(null);
-    this.riderSub$.unsubscribe();
+    // this.marker.setMap(null);
     this.rider = null;
     this.riderIndex = 0;
     this.rutaReady = false;
@@ -601,8 +638,8 @@ export class HomePage implements OnInit, OnDestroy {
     this.rider = null;
     this.riderIndex = 0;
     this.rutaReady = false;
-    this.texto_origen = '¿Dónde retirar?';
-    this.texto_destino = '¿Dónde lo entregamos?';
+    this.texto_origen = '¿Dónde retiramos?';
+    this.texto_destino = '¿Dónde entregamos?';
     this._control.origen = null;
     this._control.destino = null;
     this._control.origenReady = false;

@@ -31,8 +31,14 @@
     <span (click)="togglePass()">Mostrar</span>
   </div>
 
-  <div padding style="margin-top:20px;width:100%;display:flex;justify-content:flex-end">
-    <ion-icon (click)="createAccount()" name="ios-arrow-dropright-circle" style="color:#0cd1e8;font-size:55px"></ion-icon>
+  <div *ngIf="!isLoading" padding style="margin-top:20px;width:100%;display:flex;justify-content:flex-end">
+    <ion-icon (click)="createAccount()" name="ios-arrow-dropright-circle" style="color:#0cd1e8;font-size:55px">
+    </ion-icon>
+  </div>
+
+  <div *ngIf="isLoading" padding style="margin-top:20px;width:100%;display:flex;justify-content:flex-end">
+    <ion-icon name="ios-arrow-dropright-circle" style="color:#6ed7e2;font-size:55px">
+    </ion-icon>
   </div>
 
 </ion-content>

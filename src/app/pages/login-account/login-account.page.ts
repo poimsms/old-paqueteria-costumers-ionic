@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { ToastController } from '@ionic/angular';
 
@@ -9,16 +8,16 @@ import { ToastController } from '@ionic/angular';
   styleUrls: ['./login-account.page.scss'],
 })
 export class LoginAccountPage implements OnInit {
-  
+
   nombre: string;
   passwordType = "password";
   password: string;
   telefono: number;
   email: string;
+  isLoading = false;
 
   constructor(
     private _auth: AuthService,
-    private router: Router,
     private toastCtrl: ToastController
   ) {
     this.telefono = this._auth.telefono;
@@ -53,13 +52,18 @@ export class LoginAccountPage implements OnInit {
 
   createAccount() {
 
+    this.isLoading = true;
+
     if (!(this.nombre && this.password && this.email)) {
+      this.isLoading = false;
       return this.toastPresent('Favor completar todo los datos');
     }
 
     if (!this.validateEmail(this.email)) {
+      this.isLoading = false;
       return this.toastPresent('Email incorrecto');
     }
+
 
     const data = {
       nombre: this.nombre,
@@ -68,6 +72,6 @@ export class LoginAccountPage implements OnInit {
       password: this.password
     }
 
-    this._auth.loginUp(data);
+    this._auth.loginUp(data).then(() => this.isLoading = false);
   }
 }

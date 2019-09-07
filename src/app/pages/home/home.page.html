@@ -99,7 +99,7 @@
             <img *ngIf="rider.vehiculo == 'Bicicleta'" src="assets/bici.png" style="width:45px">
           </div>
         </div>
-        <!-- <img [src]="rider?.img.url" style="width:50px;height:50px;border-radius:50%;object-fit:cover"> -->
+
         <div style="margin-left:40px">
           <div>
             {{rider?.nombre}}
@@ -117,27 +117,15 @@
             ({{rider?.stats.startsAvg}})
           </div>
           <div style="font-size:14px;color:#999;text-transform:capitalize">
-            Distancia: {{pedido.distancia}} km
+            Distancia: {{pedido.distancia / 1000}} km
           </div>
         </div>
       </div>
 
-
-      <!-- <div style="margin-left:30px">
-        <ion-button (click)="callPhone(rider.telefono)" color="secondary">
-          <ion-icon slot="start" name="call"></ion-icon>
-          Llamar
-        </ion-button>
-      </div> -->
       <div (click)="callPhone(cliente.telefono)"
         style="width:45px;height:45px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:0px solid #eee;background:#24d6ea">
         <ion-icon name="ios-call" style="font-size:28px;color:white"></ion-icon>
       </div>
-
-      <!-- <div style="margin-left:20px;border:1px solid #bbb;border-radius:4px;">
-          <ion-icon name="call"></ion-icon>
-          Llamar
-      </div> -->
 
     </div>
 
@@ -168,11 +156,13 @@
 
 
 <div *ngIf="graciasPorComprar"
-  style="z-index:999;position:fixed;top:0px;left:0px;height:100%;width:100%;background:#0cd1e8">
-  <div style="width:100%;text-align:center;margin-top:45%">
-    <ion-icon name="checkmark-circle" style="font-size:100px;color:white"></ion-icon>
-  </div>
-  <div style="width:100%;text-align:center;color:white;font-size:20px;font-weight:550">
-    Gracias por su compra
+  style="z-index:999;position:fixed;top:0px;left:0px;height:100%;width:100%;background:#0cd1e8;display:flex;align-items:center;justify-content:center">
+  <div>
+    <div style="width:100%;text-align:center">
+      <ion-icon name="checkmark-circle" style="font-size:100px;color:white"></ion-icon>
+    </div>
+    <div style="width:100%;text-align:center;color:white;font-size:20px;font-weight:550">
+      Gracias por su compra
+    </div>
   </div>
 </div>

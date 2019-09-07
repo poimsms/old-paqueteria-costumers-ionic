@@ -1,69 +1,78 @@
-<ion-header>
+<ion-header no-border>
   <ion-toolbar color="white">
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
-    <ion-title>Configuración de cuenta</ion-title>
+    <ion-title>Configuraciones</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
 
-  <div style="background:whitesmoke;height:100%;width:100%">
-
-
-    <div style="background:white;width:100%;margin-top:50px;display:flex;align-items:center;justify-content:center">
-      <div>
-        <div style="width:100%;text-align:center">
-          <img src="assets/user.jpg" style="width:80px;height:80px;border-radius:50%;object-fit:cover">
-
-        </div>
-        <div style="width:100%;text-align:center;margin-top:5px;font-weight:500">
-          Oscar Garcia Fuentes
-        </div>
-
-        <div style="width:100%;text-align:center;margin-bottom:20px">
-          <div
-            style="margin-top:10px;display:inline-block;background:springgreen;border-radius:10px;padding:3px;padding-left:10px;padding-right:10px;font-size:13px;color:white;font-weight:600">
-            VIP
-          </div>
-        </div>
-
+  <div *ngIf="usuario" style="width:100%;margin-top:50px;display:flex;align-items:center;justify-content:center">
+    <div (click)="takePicture()" style="position:relative">
+      <img [src]="usuario.img.url" style="width:100px;height:100px;border-radius:50%;object-fit:cover">
+      <div
+        style="position:absolute;bottom:0px;right:0px;height:30px;width:30px;border-radius:50%;background:#bbb;display:flex;align-items:center;justify-content:center">
+        <ion-icon name="create" style="font-size:22px;color:#fff"></ion-icon>
       </div>
-
     </div>
-
-    <div style="height:10px;width:100%;"></div>
-
-    <ion-list>
-      <ion-item lines="none">
-        <ion-label style="color:#999">
-          Teléfono
-        </ion-label>
-        <div slot="end">
-          +56 9 76812202
-        </div>
-      </ion-item>
-      <ion-item lines="none">
-        <ion-label style="color:#999">
-          Email
-        </ion-label>
-        <div slot="end">
-          poimsm@gmail.com
-        </div>
-      </ion-item>
-    </ion-list>
-
-    <div style="height:10px;width:100%;"></div>
-
-    <ion-list>
-      <ion-item lines="none">
-        <ion-label style="color:#999">
-          Cerrar sesión
-        </ion-label>
-      </ion-item>
-    </ion-list>
   </div>
 
+  <div style="height:10px;width:100%"></div>
+
+  <ion-list>
+    <ion-item lines="none" (click)="openCampoModal('Nombre')">
+      <ion-label style="color:#555">
+        Nombre
+      </ion-label>
+      <div slot="end" style="color:dodgerblue">
+        {{usuario?.nombre}}
+      </div>
+    </ion-item>
+    <ion-item lines="none">
+      <ion-label style="color:#555">
+        Teléfono
+      </ion-label>
+      <div slot="end" style="color:dodgerblue">
+        +56 9 {{usuario?.telefono}}
+      </div>
+    </ion-item>
+    <ion-item lines="none" (click)="openCampoModal('Email')">
+      <ion-label style="color:#555">
+        Email
+      </ion-label>
+      <div slot="end" style="color:dodgerblue">
+        {{usuario?.email}}
+      </div>
+    </ion-item>
+    <ion-item lines="none" detail (click)="openCampoModal('Contraseña')">
+      <ion-label style="color:#555">
+        Cambiar contraseña
+      </ion-label>
+    </ion-item>
+  </ion-list>
 
 </ion-content>
+
+
+<ion-footer padding>
+  <div (click)="logout()" style="width:100%;display:flex;align-items:center;font-size:16px;color:#444">
+    <ion-icon name="log-out" style="font-size:20px;margin-right:5px"></ion-icon>
+    Cerrar sesión
+  </div>
+</ion-footer>
+
+
+
+<div *ngIf="isLoading"
+  style="z-index:999;position:fixed;top:0px;left:0px;height:100%;width:100%;display:flex;align-items:center;justify-content:center;background:rgb(34, 34, 34, 0.5)">
+  <div style="box-shadow: 0 0 20px rgba(68, 68, 68, 0.75);padding:40px;border-radius:3px;background:white;">
+    <div style="width:100%;display:flex;align-items:center">
+      <ion-spinner color="secondary"></ion-spinner>
+      <div style="margin-left:20px;font-size:17.5px;margin-right:10px">
+        Guardando...
+      </div>
+    </div>
+  </div>
+</div>

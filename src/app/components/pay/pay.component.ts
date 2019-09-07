@@ -18,6 +18,7 @@ export class PayComponent implements OnInit {
   rider: any;
   monto: number;
   pedido: any;
+  isLoading = false;
 
   constructor(
     public modalCtrl: ModalController,
@@ -64,7 +65,12 @@ export class PayComponent implements OnInit {
     };
 
     if (this.mPago == 'Tarjeta' && this.usuario.role != 'EMPRESA_ROLE') {
+
+      this.isLoading = true;
+
       this._pagar.pagarConFlow(dataFLOW).then(pagoExitoso => {
+
+        this.isLoading = false;
 
         if (pagoExitoso) {
           this._data.crearPedido(pedido).then((pedido: any) => {
