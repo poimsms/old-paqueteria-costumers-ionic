@@ -12,19 +12,19 @@
 </div>
 
 <div style="z-index:990;position:fixed;top:65px;left:15px;width:90%">
-  <div (click)="openMapaPage('origen')"
+  <div (click)="openMapaModal('origen')"
     style="border:1px solid #eee;width:100%;background:white;padding:10px;padding-left:20px;border-radius:20px;font-size:17.5px;display:flex;align-items:center;box-shadow: 0 0 20px #eee">
     <div style="border-radius:50%;height:7px;width:7px;background:orange;margin-right:15px"></div>
     <div [ngStyle]="{'color': texto_origen == '¿Dónde retiramos?' ? '#999':'#333'}">
-      {{texto_origen}}
+      {{ (texto_origen.length>25)? (texto_origen | slice:0:25)+'..':(texto_origen) }}
     </div>
   </div>
 
-  <div (click)="openMapaPage('destino')"
+  <div (click)="openMapaModal('destino')"
     style="border:1px solid #eee;width:100%;margin-top:20px;background:white;padding:10px;padding-left:20px;border-radius:20px;font-size:17.5px;display:flex;align-items:center;box-shadow: 0 0 20px #eee">
     <div style="border-radius:50%;height:7px;width:7px;background:orange;margin-right:15px"></div>
     <div [ngStyle]="{'color': texto_destino == '¿Dónde entregamos?' ? '#999':'#333'}">
-      {{texto_destino}}
+      {{ (texto_destino.length>25)? (texto_destino | slice:0:25)+'..':(texto_destino) }}
     </div>
   </div>
 </div>
@@ -35,7 +35,51 @@
 
 </ion-content>
 
-<ion-footer style="padding:15px;padding-bottom:0px;background:#fff">
+
+
+<ion-footer *ngIf="false" padding>
+
+  <div style="margin-bottom:5px;width:100%;display:flex;justify-content:space-between;align-items:center">
+    <div style="color:#222;font-size:17px">
+      Buenos días, Oscar...
+    </div>
+    <ion-icon name="star-outline" style="color:#fff;font-size:22px;"></ion-icon>
+  </div>
+
+  <!-- <div style="border-radius:10px;padding:5px;color:#999;width:100%">
+    
+  </div> -->
+  <!-- <ion-searchbar mode="ios" (ionInput)="updateSearchResults()" placeholder="Buscar un lugar">
+  </ion-searchbar> -->
+
+  <!-- <ion-toolbar color="white">
+      <ion-searchbar mode="ios" (ionInput)="updateSearchResults()" placeholder="Buscar un lugar" style="border:1px solid #eee">
+      </ion-searchbar>
+    </ion-toolbar>
+
+  <ion-button mode="ios" (click)="iniciarPedido()" expand="block" color="secondary">
+    <ion-icon name="pin" slot="start" style="color:#fff;font-size:18px"></ion-icon>
+
+    <div style="font-size:17px;font-weight:500">
+      Fijar inicio
+    </div>
+  </ion-button> -->
+
+
+
+  <!-- <div style="margin-top:10px;width:100%;display:flex;justify-content:space-between">
+    <ion-button color="medium" fill="outline" mode="ios" size="small">
+      <ion-icon name="create" slot="start" style="color:#bbb"></ion-icon>
+      Piso, puerta, etc..
+    </ion-button>
+    <ion-button color="medium" fill="outline" mode="ios" size="small">
+      Guardado
+    </ion-button>
+  </div> -->
+
+</ion-footer>
+
+<ion-footer *ngIf="true" style="padding:15px;padding-bottom:0px;background:#fff">
 
   <div *ngIf="!pedidoActivo">
 
@@ -74,12 +118,11 @@
     </div>
 
     <div padding>
-      <ion-button *ngIf="!rutaReady" mode="ios" expand="block" color="medium">
-        <div style="font-size:18px;font-weight:600">
-          Pedir Rider
-        </div>
-      </ion-button>
-      <ion-button *ngIf="rutaReady" mode="ios" (click)="iniciarPedido()" expand="block" color="secondary">
+      <div *ngIf="!rutaReady" style="color:#222;font-size:17px">
+        Buenos días, Oscar...
+      </div>
+      <ion-button *ngIf="rutaReady" [disabled]="!(isMoto || isBicicleta)" mode="ios" (click)="iniciarPedido()" expand="block"
+        color="secondary">
         <div style="font-size:18px;font-weight:600">
           Pedir Rider
         </div>

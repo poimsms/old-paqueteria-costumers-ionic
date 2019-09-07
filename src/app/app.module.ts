@@ -39,6 +39,7 @@ import { PayComponent } from './components/pay/pay.component';
 import { BloqueadoComponent } from './components/bloqueado/bloqueado.component';
 import { EditarCamposComponent } from './components/editar-campos/editar-campos.component';
 import { PoliticasComponent } from './components/politicas/politicas.component';
+import { MapaComponent } from './components/mapa/mapa.component';
 
 @NgModule({
   declarations: [
@@ -48,7 +49,8 @@ import { PoliticasComponent } from './components/politicas/politicas.component';
     PayComponent,
     BloqueadoComponent,
     EditarCamposComponent,
-    PoliticasComponent
+    PoliticasComponent,
+    MapaComponent
   ],
   entryComponents: [
     ForceUpgradeComponent,
@@ -56,7 +58,8 @@ import { PoliticasComponent } from './components/politicas/politicas.component';
     PayComponent,
     BloqueadoComponent,
     EditarCamposComponent,
-    PoliticasComponent
+    PoliticasComponent,
+    MapaComponent
   ],
   imports: [
     BrowserModule,

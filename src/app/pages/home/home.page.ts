@@ -12,6 +12,7 @@ import { RatingComponent } from 'src/app/components/rating/rating.component';
 import { PayComponent } from 'src/app/components/pay/pay.component';
 import { FcmService } from 'src/app/services/fcm.service';
 import { CallNumber } from '@ionic-native/call-number/ngx';
+import { MapaComponent } from 'src/app/components/mapa/mapa.component';
 
 declare var google: any;
 
@@ -43,7 +44,7 @@ export class HomePage implements OnInit, OnDestroy {
   distancia_excedida_bici = false;
 
   isBicicleta = false;
-  isMoto = true;
+  isMoto = false;
 
   pedidoActivo = false;
 
@@ -386,6 +387,21 @@ export class HomePage implements OnInit, OnDestroy {
     this.router.navigateByUrl('mapa');
   }
 
+
+  async openMapaModal(tipo) {
+
+    if (this.pedidoActivo) {
+      return;
+    }
+
+    this._control.coorsTipo = tipo;
+    const modal = await this.modalController.create({
+      component: MapaComponent
+    });
+
+    await modal.present();
+  }
+
   async openRatingModal(data) {
     const modal = await this.modalController.create({
       component: RatingComponent,
@@ -455,12 +471,9 @@ export class HomePage implements OnInit, OnDestroy {
           {
             origins: [data.origen.direccion],
             destinations: [data.destino.direccion],
-            travelMode: 'BICYCLING',
+            travelMode: 'DRIVING',
           }, function (response, status) {
             self.distancia = response.rows[0].elements[0].distance.value;
-            
-            console.log(self.distancia = response.rows[0].elements[0], 'OBJETO')
-
             self.graficarRuta(data.origen, data.destino);
             self.calcularPrecio(self.distancia, 'bicicleta');
             self.calcularPrecio(self.distancia, 'moto');
@@ -484,15 +497,15 @@ export class HomePage implements OnInit, OnDestroy {
     this.map = new google.maps.Map(document.getElementById('map'), {
       center: { lat: -33.444600, lng: -70.655585 },
       zoom: 14,
-      disableDefaultUI: true,
-      zoomControl: true
+      disableDefaultUI: true
+      // zoomControl: true
     });
     this.directionsDisplay.setMap(this.map);
   }
 
   graficarRuta(origen, destino) {
     var self = this;
-
+    
     const origenLatLng = new google.maps.LatLng(origen.lat, origen.lng);
     const destinoLatLng = new google.maps.LatLng(destino.lat, destino.lng);
 
