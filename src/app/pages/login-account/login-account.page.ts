@@ -67,7 +67,7 @@ export class LoginAccountPage implements OnInit {
 
     const data = {
       nombre: this.nombre,
-      email: this.email,
+      email: this.email.toLowerCase(),
       telefono: this.telefono,
       password: this.password
     }

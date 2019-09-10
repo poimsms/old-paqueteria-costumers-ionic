@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-
 import { Platform, MenuController, ModalController } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
@@ -10,7 +9,6 @@ import { ForceUpgradeComponent } from './components/force-upgrade/force-upgrade.
 import { BloqueadoComponent } from './components/bloqueado/bloqueado.component';
 import { FcmService } from './services/fcm.service';
 import { ConfigService } from './services/config.service';
-
 
 @Component({
   selector: 'app-root',
@@ -35,6 +33,7 @@ export class AppComponent {
     public modalController: ModalController,
     private _fcm: FcmService,
     private _config: ConfigService
+
   ) {
     this.initializeApp();
   }
@@ -118,4 +117,7 @@ export class AppComponent {
     this.menu.toggle();
     this.router.navigateByUrl('login');
   }
+
+
+  
 }

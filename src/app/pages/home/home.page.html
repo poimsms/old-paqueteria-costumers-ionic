@@ -41,7 +41,7 @@
 
   <div style="margin-bottom:5px;width:100%;display:flex;justify-content:space-between;align-items:center">
     <div style="color:#222;font-size:17px">
-      Buenos días, Oscar...
+      Hola de nuevo, {{usuario.nombre.split(' ')[0] }}
     </div>
     <ion-icon name="star-outline" style="color:#fff;font-size:22px;"></ion-icon>
   </div>
@@ -119,10 +119,10 @@
 
     <div padding>
       <div *ngIf="!rutaReady" style="color:#222;font-size:17px">
-        Buenos días, Oscar...
+        Hola de nuevo, {{usuario.nombre.split(' ')[0] }}
       </div>
-      <ion-button *ngIf="rutaReady" [disabled]="!(isMoto || isBicicleta)" mode="ios" (click)="iniciarPedido()" expand="block"
-        color="secondary">
+      <ion-button *ngIf="rutaReady" [disabled]="!(isMoto || isBicicleta)" mode="ios" (click)="iniciarPedido()"
+        expand="block" color="secondary">
         <div style="font-size:18px;font-weight:600">
           Pedir Rider
         </div>

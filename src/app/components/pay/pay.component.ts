@@ -48,7 +48,6 @@ export class PayComponent implements OnInit {
 
     const dataFLOW = {
       monto: this.monto,
-      // monto: 350,
       email: this.usuario.email,
       usuario: this.usuario._id
     }
@@ -109,6 +108,7 @@ export class PayComponent implements OnInit {
     this._control.estaBuscandoRider = false;
 
     this._fire.updateRider(this.rider._id, 'rider', {
+      fase: 'navegando-al-origen',
       pagoPendiente: false,
       actividad: 'ocupado',
       pedido: pedidoId,
