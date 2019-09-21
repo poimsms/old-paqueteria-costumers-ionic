@@ -107,6 +107,9 @@ export class HomePage implements OnInit, OnDestroy {
     this.directionsService = new google.maps.DirectionsService();
   }
 
+  // openMapaPage() {
+
+  // }
   ngOnInit() {
     this.cargarMapa();
     this.escucharCambiosDelMapa();
@@ -374,7 +377,7 @@ export class HomePage implements OnInit, OnDestroy {
         clearInterval(this.timer);
         this.presentAlert_NoHayRiders();
       }
-    }, 45000);
+    }, 25000);
   }
 
   openMapaPage(tipo) {

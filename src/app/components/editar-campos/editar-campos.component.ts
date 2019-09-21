@@ -88,7 +88,7 @@ export class EditarCamposComponent implements OnInit {
         if (res.ok) {
           this.modalCtrl.dismiss({ ok: true });
         } else {
-          this.error_password = false;
+          this.error_password = true;
           this.oldPassword = undefined;
           this.newPassword = undefined;
         }

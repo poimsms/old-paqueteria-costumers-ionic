@@ -1,32 +1,13 @@
 <ion-header no-border>
-  <ion-toolbar color="white">
-    <ion-searchbar mode="ios" [(ngModel)]="autocomplete.input" (ionInput)="updateSearchResults()" placeholder="Buscar un lugar">
-    </ion-searchbar>
-  </ion-toolbar>
-</ion-header>
-
-
-<ion-content>
-
-  <ion-list [hidden]="autocompleteItems.length == 0">
-    <ion-item *ngFor="let item of autocompleteItems" tappable (click)="selectSearchResult(item)">
-      {{ item.description }}
-    </ion-item>
-  </ion-list>
-
-  <div id='map2'></div>
-
-</ion-content>
-
-<ion-footer padding style="background:#fff">
-  <ion-item>
-    <ion-icon slot="start" name="home" style="color:#bbb"></ion-icon>
-    <ion-input [(ngModel)]="puerta" placeholder="Piso, puerta... (opcional)"></ion-input>
-  </ion-item>
-
-  <div style="margin-top:15px;width:100%;display:flex;justify-content:center">
-    <ion-button (click)="close()" color="secondary" mode="ios">
-      Hecho
-    </ion-button>
-  </div>
-</ion-footer>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button></ion-back-button>
+      </ion-buttons>
+      <ion-title>Historial</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  
+  
+  <ion-content >
+    <!-- <div #map id="map_canvas" style="height:100%;width:100%"></div> -->
+  </ion-content>
