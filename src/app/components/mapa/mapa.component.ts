@@ -21,11 +21,11 @@ export class MapaComponent implements OnInit {
   service: any;
   position: any = { ok: false };
 
-  puerta = 'Piso, puerta... (opcional)';
-
+  // puerta = 'Piso, puerta... (opcional)';
+  puerta: string;
   markerReady = false;
-  lastCenter: any;
-  center: any;
+  center = { lat: -33.444600, lng: -70.655585 };
+  lastCenter = { lat: -33.444600, lng: -70.655585 };
   address: string;
 
   image = {
@@ -50,10 +50,8 @@ export class MapaComponent implements OnInit {
 
 
   ngOnInit() {
-    this.clean();
+    // this.clean();
     this.cargarMapa();
-    this.center = { lat: -33.444600, lng: -70.655585 };
-    this.lastCenter = { lat: -33.444600, lng: -70.655585 };
     this.position = {
       coors: this.center,
       ok: false,
@@ -63,13 +61,31 @@ export class MapaComponent implements OnInit {
 
   cargarMapa() {
 
+    if (this._control.origenReady && this._control.coorsTipo == 'origen') {
+      this.center = { lat: this._control.origen.lat, lng: this._control.origen.lng }
+    }
+
+    if (this._control.destino && this._control.coorsTipo == 'destino') {
+      this.center = { lat: this._control.destino.lat, lng: this._control.destino.lng }
+    }
+
     this.map = new google.maps.Map(document.getElementById('map2'), {
-      center: { lat: -33.444600, lng: -70.655585 },
+      center: this.center,
       zoom: 15,
       disableDefaultUI: true
     });
 
-    this.graficarMarcador({ lat: -33.444600, lng: -70.655585 });
+    this.graficarMarcador(this.center);
+
+    if (this._control.origenReady && this._control.coorsTipo == 'origen') {
+      this.codeLatLng(this.center);
+      this.lastCenter = JSON.parse(JSON.stringify(this.center));
+    }
+
+    if (this._control.destinoReady && this._control.coorsTipo == 'destino') {
+      this.codeLatLng(this.center);
+      this.lastCenter = JSON.parse(JSON.stringify(this.center));
+    }
 
     setInterval(() => {
       if (this.lastCenter.lat != this.center.lat) {
@@ -111,9 +127,9 @@ export class MapaComponent implements OnInit {
 
   clean() {
     if (this._control.coorsTipo == 'origen') {
-      this._control.origen = {};
+      // this._control.origen = {};
     } else {
-      this._control.destino = {};
+      // this._control.destino = {};
     }
   }
 

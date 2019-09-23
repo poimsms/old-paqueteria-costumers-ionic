@@ -8,7 +8,7 @@ export class ControlService {
 
   coorsTipo: string;
 
-  origen: any;
+  origen: any = null;
   destino: any;
 
   origenReady = false;

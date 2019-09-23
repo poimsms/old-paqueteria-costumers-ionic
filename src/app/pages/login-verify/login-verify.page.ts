@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { ToastController } from '@ionic/angular';
+import { AlertController } from '@ionic/angular';
+
 
 @Component({
   selector: 'app-login-verify',
@@ -26,7 +28,8 @@ export class LoginVerifyPage implements OnInit {
   constructor(
     public _auth: AuthService,
     private router: Router,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
+    public alertController: AlertController
   ) { }
 
   ngOnInit() {
@@ -101,6 +104,7 @@ export class LoginVerifyPage implements OnInit {
     const code = `${this.n1}${this.n2}${this.n3}${this.n4}`;
 
     this._auth.phoneVerifyCode(this._auth.idPhone, code).then((res: any) => {
+
       if (res.ok) {
         if (res.result.status == 0) {
           this.router.navigateByUrl('login-account');
@@ -116,9 +120,9 @@ export class LoginVerifyPage implements OnInit {
           this.toastPresent();
         }
       } else {
-        console.log('error');
+        this.presentAlert(res.message);
       }
-      console.log(res);
+
     });
   }
 
@@ -126,5 +130,15 @@ export class LoginVerifyPage implements OnInit {
     this._auth.phoneCancelRequest(this._auth.idPhone).then(res => {
       console.log(res);
     });
+  }
+
+  async presentAlert(message) {
+    const alert = await this.alertController.create({
+      header: 'Algo salio mal..',
+      subHeader: message,
+      buttons: ['OK']
+    });
+
+    await alert.present();
   }
 }

@@ -22,19 +22,21 @@
 
 
 <ion-footer padding style="background:#fff">
-
-  <div (click)="presentAlertPrompt()" style="padding:10px;border-bottom:1px solid #eee">
-    <div style="color:#999;display:flex;align-items:center">
-      <ion-icon slot="start" name="home" style="font-size:22px;color:#bbb;margin-right:20px"></ion-icon>
-      <div [ngStyle]="{color: puerta == 'Piso, puerta... (opcional)' ? '#999':'#333'}">
-        {{this.puerta}}
-      </div>
-    </div>
-  </div>
+  <ion-item style="margin-top:0px">
+    <ion-icon slot="start" name="home" style="color:#bbb"></ion-icon>
+    <ion-input placeholder="Piso, puerta... (opcional)" [(ngModel)]="puerta"></ion-input>
+  </ion-item>
 
   <div style="margin-top:15px;width:100%;display:flex;justify-content:center">
     <ion-button (click)="closeModal()" color="secondary" mode="ios">
-      Hecho
+      <ion-icon slot="start" name="pin"></ion-icon>
+
+      <div *ngIf="_control.coorsTipo == 'origen'" style="font-weight:600">
+        Fijar inicio
+      </div>
+      <div *ngIf="_control.coorsTipo == 'destino'" style="font-weight:600">
+        Fijar destino
+      </div>
     </ion-button>
   </div>
 </ion-footer>

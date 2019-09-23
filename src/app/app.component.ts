@@ -60,7 +60,7 @@ export class AppComponent {
 
         } else {
           this._auth.authState.subscribe((data: any) => {
-            if (data.isAuth) {
+            if (data.isAuth && data.readyState) {
 
               this.usuario = data.usuario;
               this.token = data.token;
@@ -79,7 +79,7 @@ export class AppComponent {
                 this.router.navigateByUrl('home');                
               }
 
-            } else {
+            } else if(data.readyState) {
               this.router.navigateByUrl('login');
             }
           });

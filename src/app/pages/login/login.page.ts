@@ -3,6 +3,7 @@ import { ToastController, ModalController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
 import { PoliticasComponent } from 'src/app/components/politicas/politicas.component';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-login',
@@ -18,12 +19,9 @@ export class LoginPage implements OnInit {
   signUpUsuario = true;
   isLoading = false;
 
-  err_password = false;
   err_telefono_en_uso = false;
-  err_cuenta_desactivada = false;
   err_8_digitos_telefono = false;
   err_num_telefono = false;
-
 
   passwordType = 'password';
   politicas = false;
@@ -32,7 +30,8 @@ export class LoginPage implements OnInit {
     private _auth: AuthService,
     public toastController: ToastController,
     private router: Router,
-    public modalController: ModalController
+    public modalController: ModalController,
+    public alertController: AlertController
   ) {
     this._auth.authState
   }
@@ -77,9 +76,7 @@ export class LoginPage implements OnInit {
 
   resetErros() {
     this.err_8_digitos_telefono = false;
-    this.err_cuenta_desactivada = false;
     this.err_num_telefono = false;
-    this.err_password = false;
     this.err_telefono_en_uso = false;
   }
 
@@ -112,9 +109,8 @@ export class LoginPage implements OnInit {
           this.presentToast();
         }
       }
-
-      if (!res.ok && res.err.tipo == 'telefono') {
-        this.err_telefono_en_uso = true;
+      if (!res.ok) {
+        this.presentAlert(res.message);
       }
 
       this.isLoading = false;
@@ -146,17 +142,12 @@ export class LoginPage implements OnInit {
       this._auth.loginIn(authData).then((res: any) => {
 
         if (!res.ok) {
-
-          if (res.err.tipo == 'password') {
-            this.err_password = true;
-          }
-
-          if (res.err.tipo == 'desactivado') {
-            this.err_cuenta_desactivada = true;
-          }
+          this.presentAlert(res.message);
         }
 
         if (res.ok) {
+          this.telefono = null;
+          this.password = null;          
           // Todo normal.. el observable cambiará la vista.
         }
 
@@ -183,6 +174,15 @@ export class LoginPage implements OnInit {
     await modal.present();
   }
 
+  async presentAlert(message) {
+    const alert = await this.alertController.create({
+      header: 'Algo salio mal..',
+      subHeader: message,
+      buttons: ['OK']
+    });
+
+    await alert.present();
+  }
 
 }
 

@@ -55,3 +55,18 @@
     font-size:20px;
     color:gold;
 }
+
+.holder {
+    margin:15px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding-left:10px;
+    padding-right:10px;
+    border-radius:10px;
+    border: 1px solid #eee;
+}
+
+.holderActivo {
+    border: 1px solid #777;
+}

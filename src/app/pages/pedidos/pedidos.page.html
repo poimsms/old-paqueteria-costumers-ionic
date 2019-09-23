@@ -24,24 +24,24 @@
             {{pedido.rider.vehiculo}}
           </div>
           <div style="color:#555;font-size:14px;display:flex;align-items:center">
-            <div *ngIf="pedido.entregado" style="margin-right:5px;width:10px;height:10px;background:lightblue">
-            </div>
-            <div *ngIf="!pedido.entregado" style="margin-right:5px;width:10px;height:10px;background:lightgreen">
+            <!-- <div *ngIf="pedido.entregado" style="margin-right:5px;width:10px;height:10px;background:lightblue">
+            </div> -->
+            <div *ngIf="!pedido.entregado" style="margin-right:5px;width:10px;height:10px;border-radius:50%;background:lightgreen">
             </div>
             <div *ngIf="pedido.entregado">
-              ENTREGADO
+              Entregado
             </div>
             <div *ngIf="!pedido.entregado">
-              PENDIENTE
+              Pendiente
             </div>
           </div>
         </div>
         <div style="margin-top:5px;display:flex;justify-content:space-between">
-          <div style="color:#777">
+          <div style="color:#777;font-size:14px">
             <!-- 15 de diciembre - 07:00 PM -->
             {{pedido.fecha}}
           </div>
-          <div style="color:#555">
+          <div style="color:#555;font-size:16px">
             ${{pedido.costo}}
           </div>
         </div>
@@ -51,14 +51,14 @@
     <div
       style="padding:15px;padding-bottom:0px;padding-left:30px;width:100%;display:flex;justify-content:space-between">
       <div style="display:flex">
-        <div style="height:18px;width:18px">
+        <div style="height:18px;width:18px;margin-top:3px">
           <ion-icon name="radio-button-on" style="font-size:16px;color:#bbb"></ion-icon>
         </div>
         <div style="margin-left:20px">
           <div style="color:#bbb">
             Origen
           </div>
-          <div style="color:#555;">
+          <div style="color:#555;font-size:14.5px">
             {{pedido.origen.direccion}}
           </div>
         </div>
@@ -82,7 +82,7 @@
         <div style="color:#bbb">
           Destino
         </div>
-        <div style="color:#555">
+        <div style="color:#555;font-size:14.5px">
           {{pedido.destino.direccion}}
         </div>
       </div>

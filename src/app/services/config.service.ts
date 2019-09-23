@@ -7,7 +7,7 @@ export class ConfigService {
 
   apiURL = '';
   version = '1.0.1'
-  ENTORNO = 'PROD';
+  ENTORNO = 'DEV';
 
   constructor() { }
 

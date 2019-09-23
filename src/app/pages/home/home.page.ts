@@ -45,6 +45,8 @@ export class HomePage implements OnInit, OnDestroy {
 
   isBicicleta = false;
   isMoto = false;
+  tiempoMoto = '';
+  tiempoBici = '';
 
   pedidoActivo = false;
 
@@ -477,6 +479,9 @@ export class HomePage implements OnInit, OnDestroy {
             travelMode: 'DRIVING',
           }, function (response, status) {
             self.distancia = response.rows[0].elements[0].distance.value;
+            let seconds =  response.rows[0].elements[0].duration.value;
+            self.tiempoMoto = `${Math.round(seconds/60)} min`;
+            self.tiempoBici = `${(Math.round(seconds/60))*4} min`;
             self.graficarRuta(data.origen, data.destino);
             self.calcularPrecio(self.distancia, 'bicicleta');
             self.calcularPrecio(self.distancia, 'moto');

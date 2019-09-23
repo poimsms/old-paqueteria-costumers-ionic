@@ -13,7 +13,7 @@ export class AuthService {
   telefono: number;
   phone: number;
   idPhone: string;
-  authState = new BehaviorSubject({ isAuth: false, usuario: {}, token: null });
+  authState = new BehaviorSubject({ isAuth: false, usuario: {}, token: null, readyState: false });
 
   usuario: any;
   token: string;
@@ -71,7 +71,7 @@ export class AuthService {
 
   logout() {
     this.removeStorage();
-    this.authState.next({ isAuth: false, usuario: null, token: null });
+    this.authState.next({ isAuth: false, usuario: null, token: null, readyState: true });
   }
 
   saveFlowOrderStorage(order) {
@@ -94,10 +94,10 @@ export class AuthService {
 
     if (this.platform.is("cordova")) {
       this.storage.set("authData", JSON.stringify(authData));
-      this.authState.next({ isAuth: true, usuario, token });
+      this.authState.next({ isAuth: true, usuario, token, readyState: true });
     } else {
       localStorage.setItem("authData", JSON.stringify(authData));
-      this.authState.next({ isAuth: true, usuario, token });
+      this.authState.next({ isAuth: true, usuario, token, readyState: true  });
     }
   }
 
@@ -113,11 +113,11 @@ export class AuthService {
           this.getUser(token, uid).then(usuario => {
             this.usuario = usuario;
             this.token = token;
-            this.authState.next({ isAuth: true, usuario, token });
+            this.authState.next({ isAuth: true, usuario, token, readyState: true  });
           });
 
         } else {
-          this.authState.next({ isAuth: false, usuario: null, token: null });
+          this.authState.next({ isAuth: false, usuario: null, token: null, readyState: true  });
         }
       });
     } else {
@@ -130,11 +130,11 @@ export class AuthService {
         this.getUser(token, uid).then(usuario => {
           this.usuario = usuario;
           this.token = token;
-          this.authState.next({ isAuth: true, usuario, token });
+          this.authState.next({ isAuth: true, usuario, token, readyState: true  });
         });
 
       } else {
-        this.authState.next({ isAuth: false, usuario: null, token: null });
+        this.authState.next({ isAuth: false, usuario: null, token: null, readyState: true  });
       }
     }
   }

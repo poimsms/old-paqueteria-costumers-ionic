@@ -5,7 +5,7 @@
   </div>
 
   <div style="margin-left:20px;color:#444;font-weight:550">
-    Un Rider ha aceptado tu pedido
+    Un rider ha aceptado tu pedido!
   </div>
 
   <div padding style="margin-left:15px;width:100%;display:flex;align-items:center;">
@@ -38,23 +38,26 @@
 
 
   <div padding>
-    <ion-item>
-      <div style="color:#444;font-size:16px">
-        Distancia:
-      </div>
-      <div slot="end" style="color:#444;font-size:16px">
-        {{pedido.distancia / 1000}} km
-      </div>
-    </ion-item>
+    <div style="border:1px solid #eee">
+      <ion-item lines="none">
+        <div style="color:#444;font-size:16px">
+          Distancia:
+        </div>
+        <div slot="end" style="color:#444;font-size:16px">
+          {{pedido.distancia / 1000}} km
+        </div>
+      </ion-item>
 
-    <ion-item>
-      <div style="color:#444;font-size:16px">
-        Costo del servicio:
-      </div>
-      <div slot="end" style="font-size:18px;color:#0cd1e8;font-weight:600">
-        ${{ monto }} CLP
-      </div>
-    </ion-item>
+      <ion-item lines="none">
+        <div style="color:#444;font-size:16px">
+          Costo del servicio:
+        </div>
+        <div slot="end" style="font-size:18px;color:#0cd1e8;font-weight:600">
+          ${{ monto }} CLP
+        </div>
+      </ion-item>
+    </div>
+
 
     <ion-item lines="none">
       <div style="color:#444;font-size:16px">
@@ -102,8 +105,7 @@
 
 <div *ngIf="isLoading"
   style="z-index:999;position:fixed;top:0px;left:0px;height:100%;width:100%;display:flex;align-items:center;justify-content:center;background:rgb(34, 34, 34, 0.5)">
-  <div
-    style="box-shadow: 0 0 20px rgba(68, 68, 68, 0.75);padding:40px;border-radius:3px;background:white;">
+  <div style="box-shadow: 0 0 20px rgba(68, 68, 68, 0.75);padding:40px;border-radius:3px;background:white;">
     <div style="width:100%;display:flex;align-items:center">
       <ion-spinner color="secondary"></ion-spinner>
       <div style="margin-left:20px;font-size:17.5px;margin-right:10px">
