@@ -1,19 +1,37 @@
-<div style="z-index:990;position:fixed;top:15px;left:15px">
+<div *ngIf="!rutaReady" style="z-index:990;position:fixed;top:15px;left:15px">
   <div (click)="openMenu()"
     style="background:white;height:35px;width:35px;display:flex;align-items:center;justify-content:center;border-radius:10px;box-shadow: 0 0 20px #eee;">
     <ion-icon name="menu" style="color:#777;font-size:18px"></ion-icon>
   </div>
 </div>
+<div *ngIf="rutaReady" style="z-index:990;position:fixed;top:15px;left:15px">
+  <div (click)="resetMapa()"
+    style="background:white;height:35px;width:35px;display:flex;align-items:center;justify-content:center;border-radius:50%;box-shadow: 0 0 20px #eee;">
+    <ion-icon name="arrow-round-back" style="color:#555;font-size:18px"></ion-icon>
+  </div>
+</div>
 <div style="z-index:990;position:fixed;top:15px;right:15px">
+  <div
+    style="background:white;height:35px;padding-left:10px;padding-right:10px;display:flex;align-items:center;justify-content:center;border-radius:10px;box-shadow: 0 0 20px #eee;">
+    <div style="color:#444">
+      ¡40% de desc.! Te quedan 6 días
+      <ion-icon name="gift" style="color:#777;font-size:18px"></ion-icon>
+    </div>
+  </div>
+</div>
+<!-- <div *ngIf="!rutaReady" style="z-index:990;position:fixed;top:15px;right:15px">
   <div
     style="background:white;height:35px;width:35px;display:flex;align-items:center;justify-content:center;border-radius:50%;box-shadow: 0 0 20px #eee;">
     <ion-icon name="notifications" style="color:#777;font-size:18px"></ion-icon>
   </div>
-</div>
+</div> -->
 
-<div *ngIf="true" style="z-index:990;position:fixed;top:65px;left:15px;width:90%">
+<div *ngIf="!rutaReady" style="z-index:990;position:fixed;top:10%;left:15px;width:90%">
+  <!-- <div style="background:palegreen;padding:5px;width:100%;border-radius:10px;margin-bottom:5px">
+  ¡40% de desc.! Máximo $3.000. 
+  </div> -->
   <div (click)="openMapaModal('origen')"
-    style="border:1px solid #eee;width:100%;background:white;padding:12px;padding-left:20px;border-radius:20px;font-size:17.5px;display:flex;align-items:center;box-shadow: 0 0 20px #eee">
+    style="border:1px solid #eee;width:100%;background:white;padding:12px;padding-left:20px;border-radius:20px;font-size:17.5px;display:flex;align-items:center;box-shadow: 0 0 20px #d3d3d3">
     <div style="border-radius:50%;height:7px;width:7px;background:orange;margin-right:15px"></div>
     <div [ngStyle]="{'color': texto_origen == '¿Dónde retiramos?' ? '#999':'#333'}">
       {{ (texto_origen.length>25)? (texto_origen | slice:0:30)+'..':(texto_origen) }}
@@ -21,7 +39,7 @@
   </div>
 
   <div (click)="openMapaModal('destino')"
-    style="border:1px solid #eee;width:100%;margin-top:20px;background:white;padding:12px;padding-left:20px;border-radius:20px;font-size:17.5px;display:flex;align-items:center;box-shadow: 0 0 20px #eee">
+    style="border:1px solid #eee;width:100%;margin-top:20px;background:white;padding:12px;padding-left:20px;border-radius:20px;font-size:17.5px;display:flex;align-items:center;box-shadow: 0 0 20px #d3d3d3">
     <div style="border-radius:50%;height:7px;width:7px;background:orange;margin-right:15px"></div>
     <div [ngStyle]="{'color': texto_destino == '¿Dónde entregamos?' ? '#999':'#333'}">
       {{ (texto_destino.length>25)? (texto_destino | slice:0:30)+'..':(texto_destino) }}
@@ -29,24 +47,19 @@
   </div>
 </div>
 
-
-<div *ngIf="false" style="z-index:990;position:fixed;top:65px;left:15px;width:90%;background:white">
-  <div (click)="openMapaModal('origen')"
-    style="padding:10px;padding-left:20px;border-radius:20px;font-size:17.5px;display:flex;align-items:center">
-    <div style="border-radius:50%;height:7px;width:7px;background:orange;margin-right:15px"></div>
-    <div style="color:#333">
-      Simon bolivar 802 valdivia
+<div *ngIf="rutaReady" style="z-index:990;position:fixed;top:65px;left:15px;width:90%">
+  <div
+    style="border:1px solid #eee;width:100%;background:white;padding:12px;padding-right:5px;padding-left:5px;border-radius:5px;font-size:17.5px;display:flex;align-items:center;justify-content:space-between;box-shadow: 0 0 20px #d3d3d3">
+    <div style="font-size:15px;height:15px;width:45%;text-align:center;overflow:hidden">
+      {{texto_origen.split(',')[0]}}
     </div>
-  </div>
-
-  <div (click)="openMapaModal('destino')"
-    style="padding:10px;padding-left:20px;border-radius:20px;font-size:17.5px;display:flex;align-items:center">
-    <div style="border-radius:50%;height:7px;width:7px;background:orange;margin-right:15px"></div>
-    <div style="color:#333">
-      Simon bolivar 802 valdivia
+    <ion-icon name="arrow-round-forward" style="font-size:18px;color:#555"></ion-icon>
+    <div style="font-size:15px;height:15px;width:45%;text-align:center;overflow:hidden">
+      {{texto_destino.split(',')[0]}}
     </div>
   </div>
 </div>
+
 
 <ion-content>
 
@@ -56,75 +69,21 @@
 
 
 
-<ion-footer *ngIf="false" padding>
-
-  <div style="margin-bottom:5px;width:100%;display:flex;justify-content:space-between;align-items:center">
-    <div style="color:#222;font-size:17px">
-      Hola de nuevo, {{usuario.nombre.split(' ')[0] }}
-    </div>
-    <ion-icon name="star-outline" style="color:#fff;font-size:22px;"></ion-icon>
-  </div>
-
-  <!-- <div style="border-radius:10px;padding:5px;color:#999;width:100%">
-    
-  </div> -->
-  <!-- <ion-searchbar mode="ios" (ionInput)="updateSearchResults()" placeholder="Buscar un lugar">
-  </ion-searchbar> -->
-
-  <!-- <ion-toolbar color="white">
-      <ion-searchbar mode="ios" (ionInput)="updateSearchResults()" placeholder="Buscar un lugar" style="border:1px solid #eee">
-      </ion-searchbar>
-    </ion-toolbar>
-
-  <ion-button mode="ios" (click)="iniciarPedido()" expand="block" color="secondary">
-    <ion-icon name="pin" slot="start" style="color:#fff;font-size:18px"></ion-icon>
-
-    <div style="font-size:17px;font-weight:500">
-      Fijar inicio
-    </div>
-  </ion-button> -->
-
-
-
-  <!-- <div style="margin-top:10px;width:100%;display:flex;justify-content:space-between">
-    <ion-button color="medium" fill="outline" mode="ios" size="small">
-      <ion-icon name="create" slot="start" style="color:#bbb"></ion-icon>
-      Piso, puerta, etc..
-    </ion-button>
-    <ion-button color="medium" fill="outline" mode="ios" size="small">
-      Guardado
-    </ion-button>
-  </div> -->
-
-</ion-footer>
-
-
-
-
-
-
-
-
-
-
-
-<ion-footer *ngIf="true" style="background:#fff">
-
-
+<ion-footer style="background:#fff">
+  <!-- <div style="background:palegreen;padding:5px;width:100%;border-radius:10px;margin-bottom:5px">
+    ¡40% de desc.! Máximo $3.000. 
+    </div> -->
+ 
   <div *ngIf="!pedidoActivo">
 
-
-    <div *ngIf="rutaReady" padding
-      style="border-bottom: 1px solid #eee;display:flex;align-items:center;justify-content:space-between">
-      <div style="color:#444">
-        Seleccione un servicio
-      </div>
-      <ion-icon name="ios-arrow-down" style="font-size:18px;color:#777"></ion-icon>
+    <div *ngIf="rutaReady" style="padding:15px;padding-bottom:5px;color:#444">
+      Seleccione un servicio
     </div>
 
     <div *ngIf="rutaReady" style="width:100%;">
 
-      <div (click)="vehiculoToggle('bicicleta')" class="holder" [ngClass]="{'holderActivo': isBicicleta}">
+      <div *ngIf="!distancia_excedida_bici" (click)="vehiculoToggle('bicicleta')" class="holder"
+        [ngClass]="{'holderActivo': isBicicleta}">
         <div style="display:flex;align-items:center;">
           <div class="burbuja" [ngClass]="{'burbujaActiva': isBicicleta}">
             <img src="assets/bici.png" class="transporte" [ngClass]="{'transporteActivo': isBicicleta}">
@@ -134,7 +93,7 @@
           </div>
         </div>
         <div>
-          <div *ngIf="rutaReady && !distancia_excedida_bici" class="large" [ngClass]="{'largeActivo': isBicicleta}">
+          <div *ngIf="!distancia_excedida_bici" class="large" [ngClass]="{'largeActivo': isBicicleta}">
             ${{precioBici}}
           </div>
           <div *ngIf="distancia_excedida_bici" class="large" [ngClass]="{'largeActivo': isBicicleta}">
@@ -157,7 +116,7 @@
           </div>
         </div>
         <div>
-          <div *ngIf="rutaReady && !distancia_excedida_moto" class="large" [ngClass]="{'largeActivo': isMoto}">
+          <div *ngIf="!distancia_excedida_moto" class="large" [ngClass]="{'largeActivo': isMoto}">
             ${{precioMoto}}
           </div>
           <div *ngIf="distancia_excedida_moto" class="large" [ngClass]="{'largeActivo': isMoto}">
@@ -233,117 +192,6 @@
 
 
 
-
-
-<ion-footer *ngIf="false" style="background:#fff">
-
-
-  <div *ngIf="!pedidoActivo">
-
-    <div *ngIf="rutaReady" padding style="border-bottom: 1px solid #eee; width:100%">
-      Seleccione un servicio
-    </div>
-
-    <div *ngIf="rutaReady" style="width:100%;display:flex;align-items:center;justify-content:space-around">
-
-      <div (click)="vehiculoToggle('bicicleta')">
-        <div class="burbuja" [ngClass]="{'burbujaActiva': isBicicleta}">
-          <img src="assets/bici.png" class="transporte" [ngClass]="{'transporteActivo': isBicicleta}">
-        </div>
-        <div class="small" [ngClass]="{'smallActivo': isBicicleta}">
-          Bicicleta
-        </div>
-        <div *ngIf="rutaReady && !distancia_excedida_bici" class="large" [ngClass]="{'largeActivo': isBicicleta}">
-          ${{precioBici}}
-        </div>
-        <div *ngIf="distancia_excedida_bici" class="large" [ngClass]="{'largeActivo': isBicicleta}">
-          --
-        </div>
-      </div>
-
-      <div (click)="vehiculoToggle('moto')">
-        <div class="burbuja" [ngClass]="{'burbujaActiva': isMoto}">
-          <img src="assets/moto.png" class="transporte" [ngClass]="{'transporteActivo': isMoto}">
-        </div>
-        <div class="small" [ngClass]="{'smallActivo': isMoto}">
-          Moto
-        </div>
-        <div *ngIf="rutaReady && !distancia_excedida_moto" class="large" [ngClass]="{'largeActivo': isMoto}">
-          ${{precioMoto}}
-        </div>
-        <div *ngIf="distancia_excedida_moto" class="large" [ngClass]="{'largeActivo': isMoto}">
-          --
-        </div>
-      </div>
-
-    </div>
-
-    <div *ngIf="!rutaReady" style="margin:15px;color:#222;font-size:17px">
-      Hola de nuevo, {{usuario.nombre.split(' ')[0] }}
-    </div>
-
-    <ion-button *ngIf="rutaReady" [disabled]="!(isMoto || isBicicleta)" mode="ios" (click)="iniciarPedido()"
-      expand="block" color="secondary" style="margin:15px">
-      <div style="font-size:18px;font-weight:600">
-        Pedir Rider
-      </div>
-    </ion-button>
-
-  </div>
-
-  <div *ngIf="pedidoActivo" style="padding:15px">
-
-    <div style="width:100%;padding-bottom:15px;display:flex;align-items:center;justify-content:space-between">
-      <div style="display:flex;align-items:center;">
-        <div style="position:relative">
-          <img [src]="rider?.img.url" style="width:65px;height:65px;border-radius:50%;object-fit:cover">
-          <div class="burbuja burbujaActiva" style="position:absolute;bottom:-10px;right:-40px">
-            <img *ngIf="rider.vehiculo == 'Moto'" src="assets/moto.png" style="width:45px">
-            <img *ngIf="rider.vehiculo == 'Bicicleta'" src="assets/bici.png" style="width:45px">
-          </div>
-        </div>
-
-        <div style="margin-left:40px">
-          <div>
-            {{rider?.nombre}}
-          </div>
-          <div style="display:flex;align-items:center">
-            <ion-icon *ngIf="rider.stats.startsAvg >= 1" name="star" class="start"></ion-icon>
-            <ion-icon *ngIf="rider.stats.startsAvg == 1.5" name="star-half" class="start"></ion-icon>
-            <ion-icon *ngIf="rider.stats.startsAvg >= 2" name="star" class="start"></ion-icon>
-            <ion-icon *ngIf="rider.stats.startsAvg == 2.5" name="star-half" class="start"></ion-icon>
-            <ion-icon *ngIf="rider.stats.startsAvg >= 3" name="star" class="start"></ion-icon>
-            <ion-icon *ngIf="rider.stats.startsAvg == 3.5" name="star-half" class="start"></ion-icon>
-            <ion-icon *ngIf="rider.stats.startsAvg >= 4" name="star" class="start"></ion-icon>
-            <ion-icon *ngIf="rider.stats.startsAvg == 4.5" name="star-half" class="start"></ion-icon>
-            <ion-icon *ngIf="rider?.stats.startsAvg >= 5" name="star" class="start"></ion-icon>
-            ({{rider?.stats.startsAvg}})
-          </div>
-          <div style="font-size:14px;color:#999;text-transform:capitalize">
-            Distancia: {{pedido.distancia / 1000}} km
-          </div>
-        </div>
-      </div>
-
-      <div (click)="callPhone(cliente.telefono)"
-        style="width:45px;height:45px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:0px solid #eee;background:#24d6ea">
-        <ion-icon name="ios-call" style="font-size:28px;color:white"></ion-icon>
-      </div>
-
-    </div>
-
-  </div>
-
-</ion-footer>
-
-
-
-
-
-
-
-
-<!-- loadingRider -->
 <div *ngIf="loadingRider"
   style="z-index:999;position:fixed;top:0px;left:0px;height:100%;width:100%;display:flex;align-items:center;justify-content:center;background:rgb(34, 34, 34, 0.5)">
   <div

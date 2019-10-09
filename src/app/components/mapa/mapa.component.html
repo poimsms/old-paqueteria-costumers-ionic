@@ -15,22 +15,73 @@
     </ion-item>
   </ion-list>
 
-  <div id='map2'></div>
+  <div style="width:100%;height:100%;position:relative;">
+    <div id='map2'></div>
+    <div style="position:absolute;top:45%;left:51%">
+      <img src="https://res.cloudinary.com/ddon9fx1n/image/upload/v1565228910/tools/pin.png" style="width:40px">
+    </div>
+  </div>
+
+  <!-- <div id='map2'></div> -->
 
 </ion-content>
 
-
+<div style="z-index:990;position:fixed;bottom:170px;right:20px">
+  <div
+    style="background:white;border-radius:50%;box-shadow: 0 0 20px #eee;height:50px;width:50px;display:flex;align-items:center;justify-content:center">
+    <ion-icon name="locate" style="font-size:24px;color:#777"></ion-icon>
+  </div>
+</div>
 
 <ion-footer padding style="background:#fff">
-  <ion-item style="margin-top:0px">
+
+  <!-- <div style="display:flex;align-items:center;margin-top:10px;margin-bottom:10px">
+    <div *ngIf="vista !='nota'" (click)="vista='nota'" style="color:#999;border-radius:50%;border:1px solid #eee;margin-right:30px;height:32px;width:32px;display:flex;justify-content:center;align-items:center">
+      <ion-icon slot="start" name="arrow-round-back" style="font-size:20px;color:#bbb"></ion-icon>
+    </div>
+    <div (click)="vista='favoritos'" style="color:#999;width:100px;display:flex;padding:3px;border-radius:10px;border:1px solid #eee;text-align:center;margin-right:30px">
+      <ion-icon slot="start" name="star-outline" style="font-size:20px;color:#bbb"></ion-icon>
+      Favoritos
+    </div>
+  </div> -->
+
+
+  <ion-item *ngIf="vista=='nota'" style="margin-top:0px">
     <ion-icon slot="start" name="home" style="color:#bbb"></ion-icon>
     <ion-input placeholder="Piso, puerta... (opcional)" [(ngModel)]="puerta"></ion-input>
   </ion-item>
 
-  <div style="margin-top:15px;width:100%;display:flex;justify-content:center">
+  <ion-item *ngIf="vista !='nota'" lines="none" style="margin-top:0px">
+    <ion-icon slot="start" name="home" style="color:#bbb"></ion-icon>
+    <div style="color:#777">
+      Casa
+      <div style="color:#0cd1e8;font-weight:300">
+        Establecer dirección
+      </div>
+    </div>
+  </ion-item>
+
+  <ion-item *ngIf="vista !='nota'" lines="none" style="margin-bottom:20px">
+
+    <ion-icon slot="start" name="briefcase" style="color:#bbb"></ion-icon>
+    <div style="color:#777">
+      Oficina
+      <div style="color:#0cd1e8;font-weight:300">
+        Establecer dirección
+      </div>
+    </div>
+    <ion-ripple-effect type="bounded"></ion-ripple-effect>
+
+  </ion-item>
+
+  <!-- <ion-item style="margin-top:0px">
+    <ion-icon slot="start" name="create" style="color:#bbb"></ion-icon>
+    <ion-input placeholder="Piso, puerta... (opcional)" [(ngModel)]="puerta"></ion-input>
+  </ion-item> -->
+
+  <div *ngIf="vista=='nota'" style="margin-top:15px;width:100%;display:flex;justify-content:center">
     <ion-button (click)="closeModal()" color="secondary" mode="ios">
       <ion-icon slot="start" name="pin"></ion-icon>
-
       <div *ngIf="_control.coorsTipo == 'origen'" style="font-weight:600">
         Fijar inicio
       </div>

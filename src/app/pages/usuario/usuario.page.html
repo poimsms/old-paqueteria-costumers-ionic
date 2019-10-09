@@ -22,7 +22,7 @@
   <div style="height:10px;width:100%"></div>
 
   <ion-list>
-    <ion-item lines="none" (click)="openCampoModal('Nombre')">
+    <ion-item lines="none" detail (click)="openCampoModal('Nombre')">
       <ion-label style="color:#555">
         Nombre
       </ion-label>
@@ -30,7 +30,7 @@
         {{usuario?.nombre}}
       </div>
     </ion-item>
-    <ion-item lines="none">
+    <ion-item  detail lines="none">
       <ion-label style="color:#555">
         Teléfono
       </ion-label>
@@ -38,7 +38,7 @@
         +56 9 {{usuario?.telefono}}
       </div>
     </ion-item>
-    <ion-item lines="none" (click)="openCampoModal('Email')">
+    <ion-item lines="none" detail (click)="openCampoModal('Email')">
       <ion-label style="color:#555">
         Email
       </ion-label>

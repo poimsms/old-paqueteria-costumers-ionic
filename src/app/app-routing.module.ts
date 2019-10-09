@@ -8,9 +8,19 @@ const routes: Routes = [
   { path: 'usuario', loadChildren: './pages/usuario/usuario.module#UsuarioPageModule', canActivate: [AuthGuard] },
   { path: 'home', loadChildren: './pages/home/home.module#HomePageModule', canActivate: [AuthGuard] },
   { path: 'pedidos', loadChildren: './pages/pedidos/pedidos.module#PedidosPageModule', canActivate: [AuthGuard] },
+  { path: 'historial', loadChildren: './pages/historial/historial.module#HistorialPageModule', canActivate: [AuthGuard] },
+  { path: 'codigo', loadChildren: './pages/codigo/codigo.module#CodigoPageModule', canActivate: [AuthGuard] },
+  { path: 'cupones', loadChildren: './pages/cupones/cupones.module#CuponesPageModule', canActivate: [AuthGuard] },
+
   { path: 'login', loadChildren: './pages/login/login.module#LoginPageModule' },
   { path: 'login-account', loadChildren: './pages/login-account/login-account.module#LoginAccountPageModule' },
-  { path: 'login-verify', loadChildren: './pages/login-verify/login-verify.module#LoginVerifyPageModule' }
+  { path: 'login-verify', loadChildren: './pages/login-verify/login-verify.module#LoginVerifyPageModule' },
+  { path: 'historial', loadChildren: './pages/historial/historial.module#HistorialPageModule' },
+  { path: 'codigo', loadChildren: './pages/codigo/codigo.module#CodigoPageModule' },
+  { path: 'cupones', loadChildren: './pages/cupones/cupones.module#CuponesPageModule' }
+
+
+
 ];
 
 @NgModule({

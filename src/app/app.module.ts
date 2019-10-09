@@ -20,6 +20,7 @@ import { CallNumber } from '@ionic-native/call-number/ngx';
 import { Camera } from '@ionic-native/camera/ngx';
 import { FileTransfer } from '@ionic-native/file-transfer/ngx';
 import { Keyboard } from '@ionic-native/keyboard/ngx';
+import { Geolocation } from '@ionic-native/geolocation/ngx';
 
 export const firebaseConfig = {
   apiKey: "AIzaSyAmlXBSsNgsocMZ15dN8bc1D3ZD0gMAetQ",
@@ -80,6 +81,7 @@ import { MapaComponent } from './components/mapa/mapa.component';
     Camera,
     FileTransfer,
     Keyboard,
+    Geolocation,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     AppVersion,
     InAppBrowser

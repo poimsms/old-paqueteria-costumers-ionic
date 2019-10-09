@@ -68,15 +68,15 @@
     <ion-item *ngIf="usuario.role == 'USUARIO_ROLE'" (click)="togglePay('Tarjeta')" lines="none">
       <ion-icon slot="start" name="card" style="color:#666"></ion-icon>
       <ion-label>Tarjeta</ion-label>
-      <ion-icon *ngIf="mPago == 'Tarjeta'" slot="end" name="checkmark-circle" style="color:darkorange"></ion-icon>
-      <ion-icon *ngIf="mPago != 'Tarjeta'" slot="end" name="radio-button-off" style="color:darkorange"></ion-icon>
+      <ion-icon *ngIf="metodoPago == 'Tarjeta'" slot="end" name="checkmark-circle" style="color:darkorange"></ion-icon>
+      <ion-icon *ngIf="metodoPago != 'Tarjeta'" slot="end" name="radio-button-off" style="color:darkorange"></ion-icon>
     </ion-item>
 
     <ion-item *ngIf="usuario.role == 'USUARIO_ROLE'" (click)="togglePay('Efectivo')" lines="none">
       <ion-icon slot="start" name="cash" style="color:#666"></ion-icon>
       <ion-label>Efectivo</ion-label>
-      <ion-icon *ngIf="mPago == 'Efectivo'" slot="end" name="checkmark-circle" style="color:darkorange"></ion-icon>
-      <ion-icon *ngIf="mPago != 'Efectivo'" slot="end" name="radio-button-off" style="color:darkorange"></ion-icon>
+      <ion-icon *ngIf="metodoPago == 'Efectivo'" slot="end" name="checkmark-circle" style="color:darkorange"></ion-icon>
+      <ion-icon *ngIf="metodoPago != 'Efectivo'" slot="end" name="radio-button-off" style="color:darkorange"></ion-icon>
     </ion-item>
 
     <ion-item *ngIf="usuario.role == 'EMPRESA_ROLE'" lines="none">

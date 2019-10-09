@@ -1,6 +1,7 @@
-import { Component, NgZone, OnInit } from '@angular/core';
+import { Component, NgZone, OnInit, OnDestroy } from '@angular/core';
 import { ControlService } from 'src/app/services/control.service';
 import { ModalController, AlertController } from '@ionic/angular';
+import { Geolocation } from '@ionic-native/geolocation/ngx';
 declare var google: any;
 
 @Component({
@@ -8,7 +9,7 @@ declare var google: any;
   templateUrl: './mapa.component.html',
   styleUrls: ['./mapa.component.scss'],
 })
-export class MapaComponent implements OnInit {
+export class MapaComponent implements OnInit, OnDestroy {
 
   map: any;
   GoogleAutocomplete: any;
@@ -28,6 +29,12 @@ export class MapaComponent implements OnInit {
   lastCenter = { lat: -33.444600, lng: -70.655585 };
   address: string;
 
+  vista = 'nota';
+  isBarraDeBusqueda = false;
+  isCambiandoCentroPorBarra = false;
+
+  interval: any;
+
   image = {
     url: 'https://res.cloudinary.com/ddon9fx1n/image/upload/v1565228910/tools/pin.png',
     scaledSize: new google.maps.Size(40, 40),
@@ -39,7 +46,8 @@ export class MapaComponent implements OnInit {
     private _control: ControlService,
     private zone: NgZone,
     public modalCtrl: ModalController,
-    public alertController: AlertController
+    public alertController: AlertController,
+    private geolocation: Geolocation
   ) {
     this.service = new google.maps.DistanceMatrixService();
     this.GoogleAutocomplete = new google.maps.places.AutocompleteService();
@@ -50,13 +58,16 @@ export class MapaComponent implements OnInit {
 
 
   ngOnInit() {
-    // this.clean();
     this.cargarMapa();
     this.position = {
       coors: this.center,
       ok: false,
       address: 'hoola'
     }
+  }
+
+  ngOnDestroy() {
+    clearInterval(this.interval);
   }
 
   cargarMapa() {
@@ -87,14 +98,20 @@ export class MapaComponent implements OnInit {
       this.lastCenter = JSON.parse(JSON.stringify(this.center));
     }
 
-    setInterval(() => {
-      if (this.lastCenter.lat != this.center.lat) {
+    this.interval = setInterval(() => {
+      if ((this.lastCenter.lat != this.center.lat) && !this.isBarraDeBusqueda) {
         this.codeLatLng(this.center);
         this.lastCenter = JSON.parse(JSON.stringify(this.center));
       }
     }, 1800);
 
     google.maps.event.addListener(this.map, 'center_changed', () => {
+
+      if (this.isCambiandoCentroPorBarra) {
+        this.isCambiandoCentroPorBarra = false;
+      } else {
+        this.isBarraDeBusqueda = false;
+      }
 
       this.center.lat = this.map.getCenter().lat();
       this.center.lng = this.map.getCenter().lng();
@@ -134,16 +151,16 @@ export class MapaComponent implements OnInit {
   }
 
   graficarMarcador(coors) {
-    if (!this.markerReady) {
-      this.marker = new google.maps.Marker({
-        position: coors,
-        map: this.map,
-        icon: this.image
-      });
-      this.markerReady = true;
-    } else {
-      this.marker.setPosition(coors);
-    }
+    // if (!this.markerReady) {
+    //   this.marker = new google.maps.Marker({
+    //     position: coors,
+    //     map: this.map,
+    //     icon: this.image
+    //   });
+    //   this.markerReady = true;
+    // } else {
+    //   this.marker.setPosition(coors);
+    // }
   }
 
   closeModal() {
@@ -198,6 +215,9 @@ export class MapaComponent implements OnInit {
     this.autocompleteItems = [];
     this.autocomplete.input = item.description;
 
+    this.isBarraDeBusqueda = true;
+    this.isCambiandoCentroPorBarra = true;
+
     this.geocoder.geocode({ 'placeId': item.place_id }, (results, status) => {
       if (status === 'OK' && results[0]) {
         this.position = {
@@ -215,6 +235,15 @@ export class MapaComponent implements OnInit {
           ok: false
         };
       }
+    });
+  }
+
+  getMyLocation() {
+    this.geolocation.getCurrentPosition().then((resp) => {
+      // resp.coords.latitude
+      // resp.coords.longitude
+    }).catch((error) => {
+      console.log('Error getting location', error);
     });
   }
 

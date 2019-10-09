@@ -29,6 +29,9 @@ export class HomePage implements OnInit, OnDestroy {
   directionsService: any;
   markerReady: boolean;
   marker: any;
+  riderMarker: any;
+  origenMarker: any;
+  destinoMarker: any;
 
   distancia: number;
   precioBici = 0;
@@ -77,16 +80,28 @@ export class HomePage implements OnInit, OnDestroy {
 
 
   imageURL = 'https://res.cloudinary.com/ddon9fx1n/image/upload/v1555014076/tools/bike-parking.svg';
+  origenImg = 'https://res.cloudinary.com/ddon9fx1n/image/upload/v1570429346/tools/maps-and-flags_1.png';
+  destinoImg = 'https://res.cloudinary.com/ddon9fx1n/image/upload/v1570434430/tools/flag_3.png';
 
-  image = {
+  riderIcon = {
     url: this.imageURL,
-    // This marker is 20 pixels wide by 32 pixels high.
-    // size: new google.maps.Size(100, 100),
     scaledSize: new google.maps.Size(40, 40),
-    // The origin for this image is (0, 0).
     origin: new google.maps.Point(0, 0),
-    // The anchor for this image is the base of the flagpole at (0, 32).
     anchor: new google.maps.Point(0, 32)
+  };
+
+  origenIcon = {
+    url: this.origenImg,
+    scaledSize: new google.maps.Size(30, 30),
+    origin: new google.maps.Point(0, 0),
+    anchor: new google.maps.Point(15, 30)
+  };
+
+  destinoIcon = {
+    url: this.destinoImg,
+    scaledSize: new google.maps.Size(30, 30),
+    origin: new google.maps.Point(0, 0),
+    anchor: new google.maps.Point(4, 30)
   };
 
   constructor(
@@ -105,7 +120,7 @@ export class HomePage implements OnInit, OnDestroy {
   ) {
     this.usuario = _auth.usuario;
     this.service = new google.maps.DistanceMatrixService();
-    this.directionsDisplay = new google.maps.DirectionsRenderer();
+    this.directionsDisplay = new google.maps.DirectionsRenderer({ suppressMarkers: true });
     this.directionsService = new google.maps.DirectionsService();
   }
 
@@ -130,13 +145,12 @@ export class HomePage implements OnInit, OnDestroy {
 
       if (res[0].cliente == this.usuario._id) {
         const coors = { lat: res[0].lat, lng: res[0].lng };
-        this.graficarMarcador(coors);
+        this.graficarMarcador(coors, 'rider');
       } else {
         this.riderCoorsSub$.unsubscribe();
         setTimeout(() => {
           this.getRating();
           this.resetMapa();
-          this.marker.setMap(null);
         }, 6000);
       }
 
@@ -431,7 +445,7 @@ export class HomePage implements OnInit, OnDestroy {
       this.directionsDisplay.setMap(null);
 
       this.service = new google.maps.DistanceMatrixService();
-      this.directionsDisplay = new google.maps.DirectionsRenderer();
+      this.directionsDisplay = new google.maps.DirectionsRenderer({ suppressMarkers: true });
       this.directionsService = new google.maps.DirectionsService();
 
       this.cargarMapa();
@@ -479,13 +493,13 @@ export class HomePage implements OnInit, OnDestroy {
             travelMode: 'DRIVING',
           }, function (response, status) {
             self.distancia = response.rows[0].elements[0].distance.value;
-            let seconds =  response.rows[0].elements[0].duration.value;
-            self.tiempoMoto = `${Math.round(seconds/60)} min`;
-            self.tiempoBici = `${(Math.round(seconds/60))*4} min`;
+            let seconds = response.rows[0].elements[0].duration.value;
+            self.tiempoMoto = `${Math.round(seconds / 60)} min`;
+            self.tiempoBici = `${(Math.round(seconds / 60)) * 4} min`;
             self.graficarRuta(data.origen, data.destino);
             self.calcularPrecio(self.distancia, 'bicicleta');
             self.calcularPrecio(self.distancia, 'moto');
-            self.rutaReady = true;
+            // self.rutaReady = true;
           });
       }
 
@@ -513,7 +527,7 @@ export class HomePage implements OnInit, OnDestroy {
 
   graficarRuta(origen, destino) {
     var self = this;
-    
+    this.directionsDisplay.setMap(this.map);
     const origenLatLng = new google.maps.LatLng(origen.lat, origen.lng);
     const destinoLatLng = new google.maps.LatLng(destino.lat, destino.lng);
 
@@ -523,20 +537,49 @@ export class HomePage implements OnInit, OnDestroy {
       travelMode: 'DRIVING',
     }, function (response, status) {
       self.directionsDisplay.setDirections(response);
+      let leg = response.routes[0].legs[0];
+      self.graficarMarcador(leg.start_location, 'origen');
+      self.graficarMarcador(leg.end_location, 'destino');
+      self.rutaReady = true;
     });
   }
 
-  graficarMarcador(coors) {
-    if (!this.markerReady) {
-      this.marker = new google.maps.Marker({
-        position: coors,
-        map: this.map,
-        icon: this.image,
-        animation: google.maps.Animation.DROP
-      });
-      this.markerReady = true;
-    } else {
-      this.marker.setPosition(coors);
+
+  graficarMarcador(coors, tipo) {
+    let data: any = {};
+
+    data.position = coors;
+    data.map = this.map;
+    data.animation = google.maps.Animation.DROP
+
+    if (tipo == 'rider') {
+      data.icon = this.riderIcon;
+      this.riderMarker = new google.maps.Marker(data);
+    }
+
+    if (tipo == 'origen') {
+      data.icon = this.origenIcon;
+      this.origenMarker = new google.maps.Marker(data);
+    }
+
+    if (tipo == 'destino') {
+      data.icon = this.destinoIcon;
+      this.destinoMarker = new google.maps.Marker(data);
+    }
+  }
+
+  borrarMarcadores() {
+
+    if (this.riderMarker) {
+      this.riderMarker.setMap(null);
+    }
+
+    if (this.origenMarker) {
+      this.origenMarker.setMap(null);
+    }
+
+    if (this.destinoMarker) {
+      this.destinoMarker.setMap(null);
     }
   }
 
@@ -648,6 +691,7 @@ export class HomePage implements OnInit, OnDestroy {
     this._control.origenReady = false;
     this._control.destinoReady = false;
     this._control.rutaReady = false;
+    this.borrarMarcadores();
   }
 
   resetMapaAndRider() {

@@ -34,11 +34,12 @@
 </ion-content>
 
 <ion-footer no-border>
-  <ion-button *ngIf="!isLoading" (click)="guardarCambios()" color="secondary" expand="full">
+  <div *ngIf="!isLoading" (click)="guardarCambios()"
+    style="width:100%;background:#0cd1e8;text-align:center;padding:12px;font-weight:500;text-transform:uppercase;font-size:15px;color:white">
     Guardar cambios
-  </ion-button>
-
-  <ion-button *ngIf="isLoading" [disabled]="true" color="secondary" expand="full">
+  </div>
+  <div *ngIf="isLoading"
+    style="width:100%;background:#0cd1e87a;text-align:center;padding:12px;font-weight:500;text-transform:uppercase;font-size:15px;color:white">
     Actualizando...
-  </ion-button>
+  </div>
 </ion-footer>

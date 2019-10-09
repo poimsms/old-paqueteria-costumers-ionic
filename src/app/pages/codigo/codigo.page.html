@@ -1,0 +1,78 @@
+<ion-header no-border>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>Código promocional</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+  <!-- <ion-item>
+    <ion-input placeholder="Ingresa tu código" style="font-size:18px" [(ngModel)]="codigo"></ion-input>
+  </ion-item> -->
+  <!-- <div style="margin:15px;border:1px solid #eee;border-radius:6px;padding:5px;display:flex;align-items:center;">
+    <ion-input type="text" [(ngModel)]="nombre" placeholder="Nombre"></ion-input>
+  </div> -->
+
+  <div style="color:#888;margin-left:15px;margin-top:0px;font-size:18px">
+    Ingresa tu código
+  </div>
+
+  <div
+    style="margin:15px;margin-top:5px;border:1px solid #eee;border-radius:6px;padding:5px;">
+    <ion-input type="text" [(ngModel)]="password" placeholder=""></ion-input>
+  </div>
+  <div style="padding:0px;padding-bottom:0px;width:100%;text-align:center;color:#888">
+    <!-- Ingresa tu codigo promocional y comienza a ahorrar -->
+    <!-- Haz el pedido aprovechando la promoción. ¡Haz tu pedido ahora! -->
+    Empieza a hacer el pedido, sin olvidarte de utilizar el código promocional. ¡Aprovecha!
+  </div>
+
+  <div padding>
+    <ion-button [disabled]="isLoading" (click)="loginUsuario()" mode="ios" expand="block" color="secondary">
+      <div style="font-size:18px">
+        Añadir código
+      </div>
+    </ion-button>
+  </div>
+
+  <ion-list>
+
+  <ion-item lines="none" detail (click)="openPage('cupones')">
+    <ion-icon slot="start" name="gift" style="color:lightsalmon"></ion-icon>
+    <div style="color:#555">
+      Mis cupones
+    </div>
+  </ion-item>
+</ion-list>
+
+
+
+</ion-content>
+<!-- <ion-footer>
+    <ion-item detail (click)="openPage('cupones')">
+        <ion-icon slot="start" name="gift" style="color:lightsalmon"></ion-icon>
+        <div style="color:#555">
+          Mis cupones
+        </div>
+      </ion-item>
+    <div padding>
+        <ion-button [disabled]="isLoading" (click)="loginUsuario()" mode="ios" expand="block" color="secondary">
+          <div style="font-size:18px">
+            Añadir código
+          </div>
+        </ion-button>
+      </div>
+</ion-footer> -->
+
+<!-- <ion-footer no-border>
+  <div *ngIf="!isLoading" (click)="guardarCambios()"
+    style="width:100%;background:#0cd1e8;text-align:center;padding:12px;font-weight:500;text-transform:uppercase;font-size:15px;color:white">
+    Añadir
+  </div>
+  <div *ngIf="isLoading"
+    style="width:100%;background:#0cd1e87a;text-align:center;padding:12px;font-weight:500;text-transform:uppercase;font-size:15px;color:white">
+    Actualizando...
+  </div>
+</ion-footer> -->

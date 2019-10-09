@@ -49,7 +49,7 @@ export class PagarService {
               browser.on('exit').subscribe(event => {
                 this.getTransaction(transaction._id)
                   .then((result: any) => {
-                    if (result.ok) {
+                    if (result.pago_exitoso) {
                       resolve(true);
                     } else {
                       resolve(false);
@@ -80,7 +80,6 @@ export class PagarService {
 
     await alert.present();
   }
-
 
   createTransaction(body) {
     const url = `${this._config.apiURL}/pago/transaction-create-one`;

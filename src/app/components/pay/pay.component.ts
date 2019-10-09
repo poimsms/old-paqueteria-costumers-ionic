@@ -13,7 +13,7 @@ import { ControlService } from 'src/app/services/control.service';
 
 export class PayComponent implements OnInit {
 
-  mPago = 'Tarjeta';
+  metodoPago = 'Tarjeta';
   usuario: any;
   rider: any;
   monto: number;
@@ -37,7 +37,7 @@ export class PayComponent implements OnInit {
   ngOnInit() { }
 
   togglePay(tipo) {
-    this.mPago = tipo;
+    this.metodoPago = tipo;
   }
 
   closeModal() {
@@ -54,7 +54,7 @@ export class PayComponent implements OnInit {
 
     const pedido = {
       costo: this.monto,
-      metodoPago: this.mPago,
+      metodo_de_pago: this.metodoPago,
       distancia: this.pedido.distancia,
       origen: this.pedido.origen,
       destino: this.pedido.destino,
@@ -63,7 +63,7 @@ export class PayComponent implements OnInit {
       entregado: false
     };
 
-    if (this.mPago == 'Tarjeta' && this.usuario.role != 'EMPRESA_ROLE') {
+    if (this.metodoPago == 'Tarjeta' && this.usuario.role != 'EMPRESA_ROLE') {
 
       this.isLoading = true;
 
@@ -84,7 +84,7 @@ export class PayComponent implements OnInit {
     }
 
 
-    if (this.mPago == 'Tarjeta' && this.usuario.role == 'EMPRESA_ROLE') {
+    if (this.metodoPago == 'Tarjeta' && this.usuario.role == 'EMPRESA_ROLE') {
       this._data.crearPedido(pedido).then((pedido: any) => {
 
         this.updateRiderEstadoOcupado(pedido._id);
@@ -92,7 +92,7 @@ export class PayComponent implements OnInit {
       });
     }
 
-    if (this.mPago == 'Efectivo') {
+    if (this.metodoPago == 'Efectivo') {
 
       this._data.crearPedido(pedido).then((pedido: any) => {
 

@@ -1,0 +1,110 @@
+<ion-header no-border>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>Historial</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <div *ngFor="let pedido of pedidos">
+
+    <div style="width:100%;border-top:10px solid #eee;padding:15px;display:flex;align-items:center">
+
+      <div style="margin-left:10px;width:100%">
+        <div style="width:100%;display:flex;justify-content:space-between">
+          <div style="color:#777">
+            Costo del servicio:
+          </div>
+          <div style="color:#555;font-size:16px">
+            ${{pedido.costo}}
+          </div>          
+        </div>
+        <div style="margin-top:5px;display:flex;justify-content:space-between">
+          <div style="color:#777;font-size:14px">
+            {{pedido.fecha}}
+          </div>
+          <div style="color:#555;font-size:14px;display:flex;align-items:center">
+            <div *ngIf="!pedido.entregado"
+              style="margin-right:5px;width:10px;height:10px;border-radius:50%;background:lightgreen">
+            </div>
+            <div *ngIf="pedido.entregado">
+              Entregado
+            </div>
+            <div *ngIf="!pedido.entregado">
+              Pendiente
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      style="padding:15px;padding-bottom:0px;padding-left:30px;width:100%;display:flex;justify-content:space-between">
+      <div style="display:flex">
+        <div style="height:18px;width:18px;margin-top:3px">
+          <ion-icon name="radio-button-on" style="font-size:18px;color:#bbb"></ion-icon>
+        </div>
+        <div style="margin-left:20px">
+          <div style="color:slategray">
+            Origen
+          </div>
+          <div style="color:#555;font-size:14.5px;height:20px;overflow:hidden">
+            {{pedido.origen.direccion}}
+          </div>
+        </div>
+        <!-- <div style="margin-left:20px;margin-bottom:20px;display:flex;align-items:flex-start">
+          <div style="width:45px;height:45px;position:relative">
+            <img [src]="pedido.rider.img.url" style="width:45px;height:45px;border-radius:50%;object-fit:cover">
+            <div style="position:absolute;right:-20px;bottom:-10px;background:white;border-radius:50%">
+              <img *ngIf="pedido.rider.vehiculo == 'Moto'" src="assets/moto.png"
+                style="height:35px;width:35px;object-fit:cover">
+              <img *ngIf="pedido.rider.vehiculo == 'Bicicleta'" src="assets/bici.png"
+                style="height:35px;width:35px;object-fit:cover">
+            </div>
+          </div>
+          <div style="margin-left:30px;color:#666;width:55px;height:20px;flex:1">
+            <div style="font-size:14px;margin-top:5px">Rider</div>
+            <div>{{pedido.rider.nombre}}</div>
+          </div>
+        </div> -->
+      </div>
+    </div>
+
+    <div style="margin-top:10px;padding:15px;padding-left:30px;padding-top:0px;width:100%;display:flex;">
+      <div style="height:18px;width:18px">
+        <ion-icon name="pin" style="font-size:18px;color:#bbb"></ion-icon>
+      </div>
+      <div style="margin-left:20px">
+        <div style="color:slategray">
+          Destino
+        </div>
+        <div style="color:#555;font-size:14.5px;height:20px;overflow:hidden">
+          {{pedido.destino.direccion}}
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-left:20px;margin-bottom:20px;display:flex;align-items:flex-start">
+      <div style="width:45px;height:45px;position:relative">
+        <img [src]="pedido.rider.img.url" style="width:45px;height:45px;border-radius:50%;object-fit:cover">
+        <div style="position:absolute;right:-20px;bottom:-10px;background:white;border-radius:50%">
+          <img *ngIf="pedido.rider.vehiculo == 'Moto'" src="assets/moto.png"
+            style="height:35px;width:35px;object-fit:cover">
+          <img *ngIf="pedido.rider.vehiculo == 'Bicicleta'" src="assets/bici.png"
+            style="height:35px;width:35px;object-fit:cover">
+        </div>
+      </div>
+      <div style="margin-left:30px;color:#666;width:55px;height:20px;flex:1">
+        <div style="font-size:14px;margin-top:5px">Rider</div>
+        <div>{{pedido.rider.nombre}}</div>
+      </div>
+    </div>
+
+  </div>
+
+
+
+</ion-content>
