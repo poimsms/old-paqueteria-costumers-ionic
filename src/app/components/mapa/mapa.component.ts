@@ -200,7 +200,7 @@ export class MapaComponent implements OnInit, OnDestroy {
       this.autocompleteItems = [];
       return;
     }
-    this.GoogleAutocomplete.getPlacePredictions({ input: this.autocomplete.input },
+    this.GoogleAutocomplete.getPlacePredictions({ input: this.autocomplete.input, componentRestrictions: { country: 'cl' } },
       (predictions, status) => {
         this.autocompleteItems = [];
         this.zone.run(() => {

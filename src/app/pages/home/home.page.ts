@@ -547,14 +547,22 @@ export class HomePage implements OnInit, OnDestroy {
 
   graficarMarcador(coors, tipo) {
     let data: any = {};
-
+    // actualizar marcador!
     data.position = coors;
     data.map = this.map;
     data.animation = google.maps.Animation.DROP
 
     if (tipo == 'rider') {
-      data.icon = this.riderIcon;
-      this.riderMarker = new google.maps.Marker(data);
+      if (!this.markerReady) {
+
+        data.icon = this.riderIcon;
+        this.riderMarker = new google.maps.Marker(data);
+
+        this.markerReady = true;
+      } else {
+        this.marker.setPosition(coors);
+      }
+    
     }
 
     if (tipo == 'origen') {
@@ -571,6 +579,7 @@ export class HomePage implements OnInit, OnDestroy {
   borrarMarcadores() {
 
     if (this.riderMarker) {
+      this.markerReady = false;
       this.riderMarker.setMap(null);
     }
 

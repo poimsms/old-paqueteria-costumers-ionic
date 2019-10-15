@@ -39,15 +39,6 @@ export class LoginPage implements OnInit {
   ngOnInit() {
   }
 
-  async presentToast() {
-    const toast = await this.toastController.create({
-      message: 'Ya fue enviado un SMS',
-      duration: 2000,
-      position: 'middle'
-    });
-    toast.present();
-  }
-
   showHidePassword() {
     if (this.passwordType == 'password') {
       this.passwordType = 'text';
@@ -142,15 +133,11 @@ export class LoginPage implements OnInit {
       this._auth.loginIn(authData).then((res: any) => {
 
         if (!res.ok) {
-          this.presentAlert(res.message);
+          return this.presentAlert(res.message);
         }
 
-        if (res.ok) {
-          this.telefono = null;
-          this.password = null;          
-          // Todo normal.. el observable cambiará la vista.
-        }
-
+        this.telefono = null;
+        this.password = null;
         this.isLoading = false;
 
       }).catch(() => this.isLoading = false);
@@ -182,6 +169,15 @@ export class LoginPage implements OnInit {
     });
 
     await alert.present();
+  }
+
+  async presentToast() {
+    const toast = await this.toastController.create({
+      message: 'Ya fue enviado un SMS',
+      duration: 2000,
+      position: 'middle'
+    });
+    toast.present();
   }
 
 }

@@ -14,7 +14,13 @@
   <div
     style="background:white;height:35px;padding-left:10px;padding-right:10px;display:flex;align-items:center;justify-content:center;border-radius:10px;box-shadow: 0 0 20px #eee;">
     <div style="color:#444">
-      ¡40% de desc.! Te quedan 6 días
+      <!-- ¡40% de desc.! Te quedan 26 días -->
+      <!-- ¡Tienes 40% desc.! Te quedan 26 días -->
+      ¡Tienes 40% desc.!
+
+      <!-- ¡40% desc.!  -->
+      <!-- Delivery Express Halloween -->
+
       <ion-icon name="gift" style="color:#777;font-size:18px"></ion-icon>
     </div>
   </div>
@@ -30,7 +36,7 @@
   <!-- <div style="background:palegreen;padding:5px;width:100%;border-radius:10px;margin-bottom:5px">
   ¡40% de desc.! Máximo $3.000. 
   </div> -->
-  <div (click)="openMapaModal('origen')"
+  <div (click)="openMapaPage('origen')"
     style="border:1px solid #eee;width:100%;background:white;padding:12px;padding-left:20px;border-radius:20px;font-size:17.5px;display:flex;align-items:center;box-shadow: 0 0 20px #d3d3d3">
     <div style="border-radius:50%;height:7px;width:7px;background:orange;margin-right:15px"></div>
     <div [ngStyle]="{'color': texto_origen == '¿Dónde retiramos?' ? '#999':'#333'}">
@@ -38,7 +44,7 @@
     </div>
   </div>
 
-  <div (click)="openMapaModal('destino')"
+  <div (click)="openMapaPage('destino')"
     style="border:1px solid #eee;width:100%;margin-top:20px;background:white;padding:12px;padding-left:20px;border-radius:20px;font-size:17.5px;display:flex;align-items:center;box-shadow: 0 0 20px #d3d3d3">
     <div style="border-radius:50%;height:7px;width:7px;background:orange;margin-right:15px"></div>
     <div [ngStyle]="{'color': texto_destino == '¿Dónde entregamos?' ? '#999':'#333'}">
@@ -73,12 +79,21 @@
   <!-- <div style="background:palegreen;padding:5px;width:100%;border-radius:10px;margin-bottom:5px">
     ¡40% de desc.! Máximo $3.000. 
     </div> -->
- 
+
   <div *ngIf="!pedidoActivo">
 
-    <div *ngIf="rutaReady" style="padding:15px;padding-bottom:5px;color:#444">
-      Seleccione un servicio
+    <div *ngIf="rutaReady"
+      style="padding:15px;padding-bottom:5px;width:100%;display:flex;align-items:center;justify-content:space-between">
+      <div style="color:#444">
+        Seleccione un servicio:
+      </div>
+      <div
+        style="padding:5px;padding-left:10px;padding-right:10px;border-radius:15px;background:orange;font-size:14px;color:white;font-weight:500">
+        15% descuento
+      </div>
     </div>
+
+
 
     <div *ngIf="rutaReady" style="width:100%;">
 

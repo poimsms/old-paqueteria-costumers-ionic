@@ -1,13 +1,65 @@
 <ion-header no-border>
-    <ion-toolbar>
-      <ion-buttons slot="start">
-        <ion-back-button></ion-back-button>
-      </ion-buttons>
-      <ion-title>Historial</ion-title>
-    </ion-toolbar>
-  </ion-header>
-  
-  
-  <ion-content >
-    <!-- <div #map id="map_canvas" style="height:100%;width:100%"></div> -->
-  </ion-content>
+  <ion-toolbar color="white">
+    <ion-searchbar mode="ios" [(ngModel)]="autocomplete.input" (ionInput)="updateSearchResults()"
+      placeholder="Buscar un lugar">
+    </ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content>
+
+  <ion-list [hidden]="autocompleteItems.length == 0">
+    <ion-item *ngFor="let item of autocompleteItems" tappable (click)="selectSearchResult(item)">
+      {{ item.description }}
+    </ion-item>
+  </ion-list>
+
+  <div style="width:100%;height:100%;position:relative;">
+    <div id='map2'></div>
+    <div style="position:absolute;top:40%;left:44%">
+      <img src="https://res.cloudinary.com/ddon9fx1n/image/upload/v1565228910/tools/pin.png" style="width:40px">
+    </div>
+  </div>
+
+</ion-content>
+
+<div
+  style="z-index:990;position:fixed;bottom:160px;left:0;width:100%;padding:10px;display:flex;align-items:center;justify-content:space-between">
+  <div style="display:flex;align-items:center">
+    <div (click)="ubicacionHandler('casa')"
+      style="background:white;border-radius:15px;box-shadow: 0 0 20px #ccc;padding:10px;padding-left:20px;padding-right:20px;text-align:center">
+      Casa
+    </div>
+    <div (click)="ubicacionHandler('oficina')"
+      style="margin-left:30px;background:white;border-radius:15px;box-shadow: 0 0 20px #ccc;padding:10px;padding-left:15px;padding-right:15px;text-align:center">
+      Oficina
+    </div>
+  </div>
+  <div (click)="getMyLocation()"
+    style="background:white;border-radius:50%;box-shadow: 0 0 20px #eee;height:50px;width:50px;display:flex;align-items:center;justify-content:center">
+    <ion-icon name="locate" style="font-size:24px;color:#777"></ion-icon>
+  </div>
+</div>
+
+
+<ion-footer padding style="background:#fff">
+
+  <ion-item style="margin-top:0px">
+    <ion-icon slot="start" name="home" style="color:#bbb"></ion-icon>
+    <ion-input placeholder="Piso, puerta... (opcional)" [(ngModel)]="puerta"></ion-input>
+  </ion-item>
+
+  <div style="margin-top:15px;width:100%;display:flex;justify-content:center">
+    <ion-button (click)="closeModal()" color="secondary" mode="ios">
+      <ion-icon slot="start" name="pin"></ion-icon>
+      <div *ngIf="_control.coorsTipo == 'origen'" style="font-weight:600">
+        Fijar inicio
+      </div>
+      <div *ngIf="_control.coorsTipo == 'destino'" style="font-weight:600">
+        Fijar destino
+      </div>
+    </ion-button>
+  </div>
+
+</ion-footer>

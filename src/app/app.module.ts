@@ -42,6 +42,8 @@ import { BloqueadoComponent } from './components/bloqueado/bloqueado.component';
 import { EditarCamposComponent } from './components/editar-campos/editar-campos.component';
 import { PoliticasComponent } from './components/politicas/politicas.component';
 import { MapaComponent } from './components/mapa/mapa.component';
+import { UbicacionComponent } from './components/ubicacion/ubicacion.component';
+
 
 @NgModule({
   declarations: [
@@ -52,7 +54,8 @@ import { MapaComponent } from './components/mapa/mapa.component';
     BloqueadoComponent,
     EditarCamposComponent,
     PoliticasComponent,
-    MapaComponent
+    MapaComponent,
+    UbicacionComponent
   ],
   entryComponents: [
     ForceUpgradeComponent,
@@ -61,7 +64,8 @@ import { MapaComponent } from './components/mapa/mapa.component';
     BloqueadoComponent,
     EditarCamposComponent,
     PoliticasComponent,
-    MapaComponent
+    MapaComponent,
+    UbicacionComponent
   ],
   imports: [
     BrowserModule,

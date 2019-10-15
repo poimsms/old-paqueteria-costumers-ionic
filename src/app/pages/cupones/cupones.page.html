@@ -7,14 +7,14 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content >
-    <!-- F5F6F8 -->
-  <div style="background:#fff;padding:20px;height:100%">
+<ion-content>
+  <!-- F5F6F8 -->
+  <div style="background:whitesmoke;padding:20px;height:100%">
 
-    <img src="https://res.cloudinary.com/ddon9fx1n/image/upload/v1570496975/tools/halloween-voucher-template-vector-illustration-600w-1198032913.jpg" alt="">
-   
-    <img src="https://res.cloudinary.com/ddon9fx1n/image/upload/v1570497267/tools/set-banners-compras-estilo-origami_23-2148157817.jpg" alt="">
-    <div  *ngFor="let item of list" style="margin-bottom:20px;width:100%;background:white;display:flex;box-shadow: 0 0 20px #eee;border-radius:5px">
+    <!-- <img src="https://res.cloudinary.com/ddon9fx1n/image/upload/v1570496975/tools/halloween-voucher-template-vector-illustration-600w-1198032913.jpg" alt="">
+    <img src="https://res.cloudinary.com/ddon9fx1n/image/upload/v1570497267/tools/set-banners-compras-estilo-origami_23-2148157817.jpg" alt=""> -->
+
+    <!-- <div  *ngFor="let item of list" style="margin-bottom:20px;width:100%;background:white;display:flex;box-shadow: 0 0 20px #eee;border-radius:5px">
       <div style="width:70%;padding:10px">
         <div style="width:100%;text-align:right;color:#777;font-size:14px">
           Código: <span style="color:dodgerblue">AS4BS7</span>
@@ -32,25 +32,25 @@
       <div style="width:30%;border-left:3px dashed #ccc;background:white;display:flex;align-items:center;justify-content:center;border-radius:0 5px 5px 0">
         <ion-icon name="happy" style="color:#999;font-size:40px"></ion-icon>
       </div>
-    </div>
+    </div> -->
 
     <!-- <div  *ngFor="let item of list" style="margin-bottom:20px;width:100%;background:white;display:flex;box-shadow: 0 0 20px #d3d3d3;border-radius:5px">
-      <div style="width:70%;padding:10px">
+      <div style="width:80%;padding:10px">
         <div style="width:100%;text-align:right;color:#777;font-size:14px">
-          Código: <span style="color:dodgerblue">AS4BS7</span>
+          Quedan 6 días
         </div>
-        <div style="color:darkorange;font-size:28px">
+        <div style="margin-top:-10px;color:#444;font-size:28px">
           40.0% <span style="font-size:18px">Dcto.</span>
         </div>
-        <div style="color:#555;font-size:15px;margin-right:15px">
-          Descubre el mundo con este cupón
+        <div style="margin-bottom:4px;color:#666;font-size:15px;margin-right:15px">
+          Promoción de lanzamiento. Tope de $3000. Distrutalo.
         </div>
         <div style="font-size:12px;color:#888">
           Vence: 07 Oct 2019 - 31 Oct 2019
         </div>
       </div>
-      <div style="width:30%;border-left:3px dashed #fff;background:orange;display:flex;align-items:center;justify-content:center;border-radius:0 5px 5px 0">
-        <ion-icon name="gift" style="color:white;font-size:40px"></ion-icon>
+      <div style="width:20%;border-left:3px dashed #fff;background:dodgerblue;display:flex;align-items:center;justify-content:center;border-radius:0 5px 5px 0">
+        <ion-icon name="rocket" style="color:white;font-size:40px"></ion-icon>
       </div>
     </div> -->
 
@@ -60,8 +60,11 @@
         <div style="width:100%;text-align:right;color:#777;font-size:14px">
           Código: <span style="color:dodgerblue">AS4BS7</span>
         </div>
-        <div style="color:#555;font-size:18px;font-weight:500">
-          Tienes 40% de descuento en todos tus viajes
+        <div style="width:100%;display:flex;justify-content:space-between">
+          <div style="color:#555;font-size:18px;font-weight:500;width:70%">
+            Tienes 40% de descuento en todos tus viajes
+          </div>
+          <img src="https://res.cloudinary.com/ddon9fx1n/image/upload/v1570724741/tools/discount.png" style="width:35px">
         </div>
         <div style="color:#555;font-size:15px;margin-right:15px">
           Descubre el mundo con este cupón y gana millas
@@ -78,6 +81,39 @@
     </div> -->
 
 
+
+
+
+    <div *ngFor="let cupon of cupones"
+      style="margin-bottom:20px;width:100%;background:white;display:flex;box-shadow: 0 0 20px #e2e2e2;border-radius:5px">
+      <div style="width:100%;padding:10px">
+        <div style="width:100%;text-align:right;color:#777;font-size:14px">
+            <!-- Quedan {{cupon.cupon.dias_restantes}} días -->
+          </div>
+        <div style="display:flex;align-items:flex-start">
+          <div style="border:1px solid #eee;width:43px;height:43px;padding:3px">
+            <img src="https://res.cloudinary.com/ddon9fx1n/image/upload/v1570726792/tools/placeholder_1.png"
+              style="width:40px;height:40px;object-fit:cover">
+          </div>
+          <div style="margin-left:20px;">
+            <div style="color:#999">
+              {{cupon.cupon.titulo}}
+            </div>
+            <div style="margin-top:10px;color:#666;font-size:15px;">
+              {{cupon.cupon.descripcion}}
+            </div>
+          </div>
+         
+        </div>
+
+        <div style="margin-left:5px;margin-top:20px;font-size:12px;color:#888;">
+          Vence: {{cupon.cupon.valido_hasta}}
+        </div>
+      </div>
+
+    </div>
+
+
   </div>
-  
+
 </ion-content>

@@ -56,5 +56,47 @@ export class DataService {
     return this.http.get(url, { headers }).toPromise();
   }
 
+  getCupones(id) {
+    const url = `${this._config.apiURL}/core/cupones-get-all?id=${id}`;
+    const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
+    return this.http.get(url, { headers }).toPromise();
+  }
+
+  getCuponActivo(id) {
+    const url = `${this._config.apiURL}/core/cupones-get-active-one?id=${id}`;
+    const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
+    return this.http.get(url, { headers }).toPromise();
+  }
+
+  addCupon(body) {
+    const url = `${this._config.apiURL}/core/cupones-add-one`;
+    const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
+    return this.http.post(url, body, { headers }).toPromise();
+  }
+
+  useCupon() {
+    const url = `${this._config.apiURL}/core/cupones-use-one`;
+    const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
+    return this.http.put(url, {}, { headers }).toPromise();
+  }
+
+  getUbicaciones(id) {
+    const url = `${this._config.apiURL}/core/ubicacion-get?id=${id}`;
+    const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
+    return this.http.get(url, { headers }).toPromise();
+  }
+
+  guardarUbicacion(body) {
+    const url = `${this._config.apiURL}/core/ubicacion-create`;
+    const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
+    return this.http.post(url, body, { headers }).toPromise();
+  }
+
+  editarUbicacion(id, body) {
+    const url = `${this._config.apiURL}/core/ubicacion-update?id=${id}`;
+    const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
+    return this.http.put(url, body, { headers }).toPromise();
+  }
+
 }
 
