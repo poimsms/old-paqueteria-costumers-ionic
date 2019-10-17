@@ -1,8 +1,14 @@
-<ion-content>
+<ion-header no-border>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="closeModal('pago_no_efectuado')">
+        <ion-icon slot="icon-only" name="close" style="color:#444"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
 
-  <div style="width:100%;padding:20px;padding-bottom:0px;text-align:right">
-    <ion-icon (click)="closeModal()" name="close" style="color:#555;font-size:27px"></ion-icon>
-  </div>
+<ion-content>
 
   <div style="margin-left:20px;color:#444;font-weight:550">
     Un rider ha aceptado tu pedido!
@@ -18,7 +24,7 @@
       </div>
     </div>
 
-    <div style="margin-left:40px;font-size:16px;font-weight:600">
+    <div style="margin-left:40px;font-size:16px;font-weight:600;text-transform:capitalize">
       {{ rider.nombre }}
       <div style="display:flex;align-items:center">
         <ion-icon *ngIf="rider.stats.startsAvg >= 1" name="star" class="start"></ion-icon>
@@ -52,14 +58,20 @@
         <div style="color:#444;font-size:16px">
           Costo del servicio:
         </div>
-        <div slot="end" style="font-size:18px;color:#0cd1e8;font-weight:600">
+        <div *ngIf="!cuponData.ok" slot="end" style="font-size:18px;color:#0cd1e8;font-weight:600">
           ${{ monto }} CLP
+        </div>
+        <div *ngIf="cuponData.ok" slot="end" style="font-size:18px;color:#0cd1e8;font-weight:600">
+          <span style="font-size:14px;text-decoration: line-through;color:#999">
+            ${{monto}}
+          </span>
+          ${{ precio_descuento }} CLP
         </div>
       </ion-item>
     </div>
 
 
-    <ion-item lines="none">
+    <ion-item *ngIf="usuario.role == 'USUARIO_ROLE'" lines="none">
       <div style="color:#444;font-size:16px">
         Método de pago:
       </div>
@@ -68,22 +80,49 @@
     <ion-item *ngIf="usuario.role == 'USUARIO_ROLE'" (click)="togglePay('Tarjeta')" lines="none">
       <ion-icon slot="start" name="card" style="color:#666"></ion-icon>
       <ion-label>Tarjeta</ion-label>
-      <ion-icon *ngIf="metodoPago == 'Tarjeta'" slot="end" name="checkmark-circle" style="color:darkorange"></ion-icon>
-      <ion-icon *ngIf="metodoPago != 'Tarjeta'" slot="end" name="radio-button-off" style="color:darkorange"></ion-icon>
+      <ion-icon *ngIf="metodoPago == 'Tarjeta'" slot="end" name="checkmark" style="color:limegreen"></ion-icon>
+      <ion-icon *ngIf="metodoPago != 'Tarjeta'" slot="end" name="checkmark" style="color:white"></ion-icon>
     </ion-item>
 
     <ion-item *ngIf="usuario.role == 'USUARIO_ROLE'" (click)="togglePay('Efectivo')" lines="none">
       <ion-icon slot="start" name="cash" style="color:#666"></ion-icon>
       <ion-label>Efectivo</ion-label>
-      <ion-icon *ngIf="metodoPago == 'Efectivo'" slot="end" name="checkmark-circle" style="color:darkorange"></ion-icon>
-      <ion-icon *ngIf="metodoPago != 'Efectivo'" slot="end" name="radio-button-off" style="color:darkorange"></ion-icon>
+      <ion-icon *ngIf="metodoPago == 'Efectivo'" slot="end" name="checkmark" style="color:limegreen"></ion-icon>
+      <ion-icon *ngIf="metodoPago != 'Efectivo'" slot="end" name="checkmark" style="color:white"></ion-icon>
     </ion-item>
 
-    <ion-item *ngIf="usuario.role == 'EMPRESA_ROLE'" lines="none">
+    <!-- <ion-item *ngIf="usuario.role == 'EMPRESA_ROLE'" lines="none">
       <ion-icon slot="start" name="card" style="color:#666"></ion-icon>
       <ion-label>Tarjeta</ion-label>
       <ion-icon slot="end" name="checkmark-circle" style="color:darkorange"></ion-icon>
+    </ion-item> -->
+
+    <ion-item *ngIf="cuponData.ok" lines="none">
+      <div style="color:#444;font-size:16px">
+        Promociones:
+      </div>
     </ion-item>
+
+    <div *ngIf="cuponData.ok"
+      style="padding:10px;background:orange;width:100%;border-radius:5px;display:flex;align-items:center;justify-content:space-between">
+
+      <div>
+        <div style="font-size:17px;font-weight:600;color:white">
+          {{cuponData.cupon.descuento}}% de descuento
+        </div>
+        <div style="color:#eee;font-size:14px">
+          <div>
+            Valido por 1 pedido
+          </div>
+          <div>
+            Vence: {{cuponData.cupon.valido_hasta}}
+          </div>
+        </div>
+      </div>
+
+      <ion-icon name="checkmark" style="color:white;font-size:22px"></ion-icon>
+
+    </div>
 
   </div>
 

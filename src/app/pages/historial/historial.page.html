@@ -24,16 +24,19 @@
         </div>
         <div style="margin-top:5px;display:flex;justify-content:space-between">
           <div style="color:#777;font-size:14px">
-            {{pedido.fecha}}
+            {{pedido.fecha_creacion}}
           </div>
           <div style="color:#555;font-size:14px;display:flex;align-items:center">
-            <div *ngIf="!pedido.entregado"
+            <div *ngIf="!pedido.entregado && !pedido.cancelado"
               style="margin-right:5px;width:10px;height:10px;border-radius:50%;background:lightgreen">
             </div>
-            <div *ngIf="pedido.entregado">
+            <div *ngIf="!pedido.entregado && pedido.cancelado">
+                Cancelado
+              </div>
+            <div *ngIf="pedido.entregado && !pedido.cancelado">
               Entregado
             </div>
-            <div *ngIf="!pedido.entregado">
+            <div *ngIf="!pedido.entregado && !pedido.cancelado">
               Pendiente
             </div>
           </div>
@@ -99,7 +102,7 @@
       </div>
       <div style="margin-left:30px;color:#666;width:55px;height:20px;flex:1">
         <div style="font-size:14px;margin-top:5px">Rider</div>
-        <div>{{pedido.rider.nombre}}</div>
+        <div style="text-transform:capitalize">{{pedido.rider.nombre}}</div>
       </div>
     </div>
 

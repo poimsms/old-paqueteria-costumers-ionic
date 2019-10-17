@@ -4,6 +4,7 @@ import { DataService } from 'src/app/services/data.service';
 import { PagarService } from 'src/app/services/pagar.service';
 import { FireService } from 'src/app/services/fire.service';
 import { ControlService } from 'src/app/services/control.service';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-pay',
@@ -19,6 +20,8 @@ export class PayComponent implements OnInit {
   monto: number;
   pedido: any;
   isLoading = false;
+  cuponData: any;
+  precio_descuento: number;
 
   constructor(
     public modalCtrl: ModalController,
@@ -26,31 +29,29 @@ export class PayComponent implements OnInit {
     private _data: DataService,
     private _pagar: PagarService,
     private _fire: FireService,
-    private _control: ControlService
+    private _control: ControlService,
+    private _auth: AuthService
   ) {
     this.usuario = navParams.get('pago').usuario;
     this.rider = navParams.get('pago').rider;
     this.monto = navParams.get('pago').monto;
     this.pedido = navParams.get('pago').pedido;
+    this.cuponData = navParams.get('cuponData');
+
+    if (this.cuponData.ok) {
+      this.precio_descuento = Math.round((this.monto - this.monto * this.cuponData.cupon.descuento / 100) / 10) * 10;
+    }
   }
 
   ngOnInit() { }
 
-  togglePay(tipo) {
-    this.metodoPago = tipo;
-  }
-
-  closeModal() {
-    this.modalCtrl.dismiss({ pagoExitoso: false });
-  }
-
   pagar() {
 
-    const dataFLOW = {
+    const flow = {
       monto: this.monto,
       email: this.usuario.email,
       usuario: this.usuario._id
-    }
+    };
 
     const pedido = {
       costo: this.monto,
@@ -63,19 +64,22 @@ export class PayComponent implements OnInit {
       entregado: false
     };
 
-    if (this.metodoPago == 'Tarjeta' && this.usuario.role != 'EMPRESA_ROLE') {
+    if (this.cuponData.ok) {
+      flow.monto = this.precio_descuento;
+      pedido.costo = this.precio_descuento;
+    }
+
+    if (this.metodoPago == 'Tarjeta' && this.usuario.role == 'USUARIO_ROLE') {
 
       this.isLoading = true;
 
-      this._pagar.pagarConFlow(dataFLOW).then(pagoExitoso => {
+      this._pagar.pagarConFlow(flow).then(pagoExitoso => {
 
         this.isLoading = false;
 
         if (pagoExitoso) {
           this._data.crearPedido(pedido).then((pedido: any) => {
-
-            this.updateRiderEstadoOcupado(pedido._id);
-            this.modalCtrl.dismiss({ pagoExitoso: true, riderID: this.rider._id });
+            this.closeModal('pago_efectuado', pedido);
           });
         } else {
           this.modalCtrl.dismiss({ pagoExitoso: false });
@@ -83,25 +87,48 @@ export class PayComponent implements OnInit {
       });
     }
 
+    if (this.metodoPago == 'Efectivo' && this.usuario.role == 'USUARIO_ROLE') {
 
-    if (this.metodoPago == 'Tarjeta' && this.usuario.role == 'EMPRESA_ROLE') {
       this._data.crearPedido(pedido).then((pedido: any) => {
-
-        this.updateRiderEstadoOcupado(pedido._id);
-        this.modalCtrl.dismiss({ pagoExitoso: true, riderID: this.rider._id });
+        this.closeModal('pago_efectuado', pedido);
       });
     }
 
-    if (this.metodoPago == 'Efectivo') {
 
+    if (this.usuario.role == 'EMPRESA_ROLE') {
       this._data.crearPedido(pedido).then((pedido: any) => {
-
-        this.updateRiderEstadoOcupado(pedido._id);
-        this.modalCtrl.dismiss({ pagoExitoso: true, riderID: this.rider._id });
+        this.closeModal('pago_efectuado', pedido);
       });
     }
   }
 
+
+  closeModal(tipo, pedido?) {
+
+    if (tipo == 'pago_no_efectuado') {
+      return this.modalCtrl.dismiss({ pagoExitoso: false });
+    }
+
+    this.updateRiderEstadoOcupado(pedido._id);
+
+    if (this.cuponData.ok) {
+
+      this.isLoading = true;
+
+      const cuponBody = {
+        id: this.cuponData.id,
+        codigo: this.cuponData.cupon.codigo
+      };
+
+      this._data.useCupon(cuponBody).then(() => {
+        this.isLoading = false;
+        this.modalCtrl.dismiss({ pagoExitoso: true, riderID: this.rider._id });
+      });
+
+    } else {
+      this.modalCtrl.dismiss({ pagoExitoso: true, riderID: this.rider._id });
+    }
+  }
 
   updateRiderEstadoOcupado(pedidoId) {
 
@@ -121,6 +148,10 @@ export class PayComponent implements OnInit {
       pedido: pedidoId,
       cliente: this.usuario._id
     });
+  }
+
+  togglePay(tipo) {
+    this.metodoPago = tipo;
   }
 
 }

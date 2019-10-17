@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Platform, MenuController, ModalController } from '@ionic/angular';
+import { Platform, MenuController, ModalController, AlertController } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { Router } from '@angular/router';
@@ -32,8 +32,8 @@ export class AppComponent {
     private _global: GlobalService,
     public modalController: ModalController,
     private _fcm: FcmService,
-    private _config: ConfigService
-
+    private _config: ConfigService,
+    public alertController: AlertController
   ) {
     this.initializeApp();
   }
@@ -52,11 +52,14 @@ export class AppComponent {
 
         if (data.forceUpgrade) {
 
-          this.openForceModal();
+          // this.openForceModal();
+          this.nuevaVersionAlert();
+
 
         } else if (data.recommendUpgrade) {
 
-          this.openForceModal();
+          // this.openForceModal();
+          this.nuevaVersionAlert();
 
         } else {
           this._auth.authState.subscribe((data: any) => {
@@ -117,6 +120,16 @@ export class AppComponent {
     this._auth.logout();
     this.menu.toggle();
     this.router.navigateByUrl('login');
+  }
+
+  async nuevaVersionAlert() {
+    const alert = await this.alertController.create({
+      header: 'Nueva versión disponible',
+      subHeader: 'Por favor actualiza la app para poder seguir usandola',
+      buttons: ['Actualizar']
+    });
+
+    await alert.present();
   }
 
 

@@ -43,7 +43,7 @@ export class EditarCamposComponent implements OnInit {
       }
 
       this.isLoading = true;
-      this._auth.updateUser({ nombre: this.nombre }).then(() => {
+      this._auth.updateUser({ nombre: this.nombre.toLowerCase() }).then(() => {
         this.isLoading = false;
         this.modalCtrl.dismiss({ ok: true });
       });
@@ -59,7 +59,7 @@ export class EditarCamposComponent implements OnInit {
 
       this.isLoading = true;
 
-      this._auth.updateUser({ email: this.email }).then(() => {
+      this._auth.updateUser({ email: this.email.toLowerCase() }).then(() => {
         this.isLoading = false;
         this.modalCtrl.dismiss({ ok: true });
       });

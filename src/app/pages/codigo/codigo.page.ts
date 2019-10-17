@@ -42,6 +42,7 @@ export class CodigoPage implements OnInit {
 
       this.presentToast('¡Cupón añadido!');
       this.codigo = null;
+      this._data.getCuponActivo(this._auth.usuario._id);
     });
   }
 

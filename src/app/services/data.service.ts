@@ -2,11 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { ConfigService } from './config.service';
 import { AuthService } from './auth.service';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataService {
+
+  cuponData = new BehaviorSubject({ ok: false, cupon: null, id: null });
 
   constructor(
     public http: HttpClient,
@@ -65,7 +68,9 @@ export class DataService {
   getCuponActivo(id) {
     const url = `${this._config.apiURL}/core/cupones-get-active-one?id=${id}`;
     const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
-    return this.http.get(url, { headers }).toPromise();
+    this.http.get(url, { headers }).toPromise().then((data: any) => {
+      this.cuponData.next({ ok: data.ok, cupon: data.cupon, id: data.id });
+    });
   }
 
   addCupon(body) {
@@ -74,10 +79,10 @@ export class DataService {
     return this.http.post(url, body, { headers }).toPromise();
   }
 
-  useCupon() {
+  useCupon(body) {
     const url = `${this._config.apiURL}/core/cupones-use-one`;
     const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
-    return this.http.put(url, {}, { headers }).toPromise();
+    return this.http.put(url, body, { headers }).toPromise();
   }
 
   getUbicaciones(id) {

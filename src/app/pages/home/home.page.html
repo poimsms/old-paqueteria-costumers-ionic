@@ -1,41 +1,40 @@
+<div *ngIf="rutaReady && pedidoActivo" style="z-index:990;position:fixed;top:15px;left:15px">
+  <div (click)="openMenu()"
+    style="background:white;height:35px;width:35px;display:flex;align-items:center;justify-content:center;border-radius:10px;box-shadow: 0 0 20px #eee;">
+    <ion-icon name="menu" style="color:#777;font-size:18px"></ion-icon>
+  </div>
+</div>
 <div *ngIf="!rutaReady" style="z-index:990;position:fixed;top:15px;left:15px">
   <div (click)="openMenu()"
     style="background:white;height:35px;width:35px;display:flex;align-items:center;justify-content:center;border-radius:10px;box-shadow: 0 0 20px #eee;">
     <ion-icon name="menu" style="color:#777;font-size:18px"></ion-icon>
   </div>
 </div>
-<div *ngIf="rutaReady" style="z-index:990;position:fixed;top:15px;left:15px">
+<div *ngIf="rutaReady && !pedidoActivo" style="z-index:990;position:fixed;top:15px;left:15px">
   <div (click)="resetMapa()"
     style="background:white;height:35px;width:35px;display:flex;align-items:center;justify-content:center;border-radius:50%;box-shadow: 0 0 20px #eee;">
     <ion-icon name="arrow-round-back" style="color:#555;font-size:18px"></ion-icon>
   </div>
 </div>
-<div style="z-index:990;position:fixed;top:15px;right:15px">
+<div *ngIf="cuponData.ok" style="z-index:990;position:fixed;top:15px;right:15px">
   <div
     style="background:white;height:35px;padding-left:10px;padding-right:10px;display:flex;align-items:center;justify-content:center;border-radius:10px;box-shadow: 0 0 20px #eee;">
     <div style="color:#444">
-      <!-- ¡40% de desc.! Te quedan 26 días -->
-      <!-- ¡Tienes 40% desc.! Te quedan 26 días -->
-      ¡Tienes 40% desc.!
-
-      <!-- ¡40% desc.!  -->
-      <!-- Delivery Express Halloween -->
-
+      ¡Tienes {{cuponData.cupon.descuento}}% desc.!
       <ion-icon name="gift" style="color:#777;font-size:18px"></ion-icon>
     </div>
   </div>
 </div>
-<!-- <div *ngIf="!rutaReady" style="z-index:990;position:fixed;top:15px;right:15px">
-  <div
-    style="background:white;height:35px;width:35px;display:flex;align-items:center;justify-content:center;border-radius:50%;box-shadow: 0 0 20px #eee;">
-    <ion-icon name="notifications" style="color:#777;font-size:18px"></ion-icon>
+<div *ngIf="pedidoActivo && isEmpresa" style="z-index:990;position:fixed;bottom:150px;left:15px">
+  <div (click)="crearNuevoPedido()"
+    style="background:white;color:#444;height:35px;padding-left:10px;padding-right:10px;display:flex;align-items:center;justify-content:center;border-radius:15px;box-shadow: 0 0 20px #ccc;">
+    Crear nuevo pedido
+    <ion-icon name="add" style="margin-left:5px;color:#777;font-size:18px"></ion-icon>
   </div>
-</div> -->
+</div>
 
 <div *ngIf="!rutaReady" style="z-index:990;position:fixed;top:10%;left:15px;width:90%">
-  <!-- <div style="background:palegreen;padding:5px;width:100%;border-radius:10px;margin-bottom:5px">
-  ¡40% de desc.! Máximo $3.000. 
-  </div> -->
+
   <div (click)="openMapaPage('origen')"
     style="border:1px solid #eee;width:100%;background:white;padding:12px;padding-left:20px;border-radius:20px;font-size:17.5px;display:flex;align-items:center;box-shadow: 0 0 20px #d3d3d3">
     <div style="border-radius:50%;height:7px;width:7px;background:orange;margin-right:15px"></div>
@@ -76,9 +75,6 @@
 
 
 <ion-footer style="background:#fff">
-  <!-- <div style="background:palegreen;padding:5px;width:100%;border-radius:10px;margin-bottom:5px">
-    ¡40% de desc.! Máximo $3.000. 
-    </div> -->
 
   <div *ngIf="!pedidoActivo">
 
@@ -87,12 +83,11 @@
       <div style="color:#444">
         Seleccione un servicio:
       </div>
-      <div
+      <div *ngIf="cuponData.ok"
         style="padding:5px;padding-left:10px;padding-right:10px;border-radius:15px;background:orange;font-size:14px;color:white;font-weight:500">
-        15% descuento
+        {{cuponData.cupon.descuento}} % descuento
       </div>
     </div>
-
 
 
     <div *ngIf="rutaReady" style="width:100%;">
@@ -171,7 +166,7 @@
         </div>
 
         <div style="margin-left:40px">
-          <div>
+          <div style="text-transform:capitalize">
             {{rider?.nombre}}
           </div>
           <div style="display:flex;align-items:center">

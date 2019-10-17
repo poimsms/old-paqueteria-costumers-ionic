@@ -69,6 +69,7 @@ export class HomePage implements OnInit, OnDestroy {
   precio: number;
 
   rutaReady = false;
+  isEmpresa = false;
   loadingRider = false;
 
   timer: any;
@@ -78,10 +79,13 @@ export class HomePage implements OnInit, OnDestroy {
   estaBuscandoRider = false;
   riderActivoEnBusqueda: string;
 
+  cuponData: any;
+
 
   imageURL = 'https://res.cloudinary.com/ddon9fx1n/image/upload/v1555014076/tools/bike-parking.svg';
-  origenImg = 'https://res.cloudinary.com/ddon9fx1n/image/upload/v1570429346/tools/maps-and-flags_1.png';
-  destinoImg = 'https://res.cloudinary.com/ddon9fx1n/image/upload/v1570434430/tools/flag_3.png';
+  origenImg = 'https://res.cloudinary.com/ddon9fx1n/image/upload/v1570429346/tools/pin_origen.png';
+  destinoImg = 'https://res.cloudinary.com/ddon9fx1n/image/upload/v1571242743/tools/pin_destino.png';
+
 
   riderIcon = {
     url: this.imageURL,
@@ -92,17 +96,24 @@ export class HomePage implements OnInit, OnDestroy {
 
   origenIcon = {
     url: this.origenImg,
-    scaledSize: new google.maps.Size(30, 30),
+    scaledSize: new google.maps.Size(34, 34),
     origin: new google.maps.Point(0, 0),
-    anchor: new google.maps.Point(15, 30)
+    anchor: new google.maps.Point(16, 34)
   };
 
   destinoIcon = {
     url: this.destinoImg,
-    scaledSize: new google.maps.Size(30, 30),
+    scaledSize: new google.maps.Size(36, 36),
     origin: new google.maps.Point(0, 0),
-    anchor: new google.maps.Point(4, 30)
+    anchor: new google.maps.Point(4, 36)
   };
+
+  // destinoIcon = {
+  //   url: this.destinoImg,
+  //   scaledSize: new google.maps.Size(30, 30),
+  //   origin: new google.maps.Point(0, 0),
+  //   anchor: new google.maps.Point(4, 30)
+  // };
 
   constructor(
     private menu: MenuController,
@@ -124,14 +135,12 @@ export class HomePage implements OnInit, OnDestroy {
     this.directionsService = new google.maps.DirectionsService();
   }
 
-  // openMapaPage() {
-
-  // }
   ngOnInit() {
     this.cargarMapa();
     this.escucharCambiosDelMapa();
     this.getPedido();
     this.getRating();
+    this.getCupon();
   }
 
   ngOnDestroy() {
@@ -142,7 +151,7 @@ export class HomePage implements OnInit, OnDestroy {
 
   riderSubCoors() {
     this.riderCoorsSub$ = this._fire.getRiderCoors(this.rider._id).subscribe((res: any) => {
-
+      console.log(res,'ressss')
       if (res[0].cliente == this.usuario._id) {
         const coors = { lat: res[0].lat, lng: res[0].lng };
         this.graficarMarcador(coors, 'rider');
@@ -165,6 +174,11 @@ export class HomePage implements OnInit, OnDestroy {
     });
   }
 
+  getCupon() {
+    this._data.cuponData.subscribe(data => this.cuponData = data)
+    this._data.getCuponActivo(this._auth.usuario._id);
+  }
+
   getPedido() {
     this._data.getPedidoActivo(this.usuario._id).then((data: any) => {
 
@@ -180,10 +194,18 @@ export class HomePage implements OnInit, OnDestroy {
       this.texto_destino = data.pedido.destino.direccion;
       this.pedidoActivo = true;
 
-      // rastrear rider coors
+      if (this._auth.usuario.role == 'EMPRESA_ROLE') {
+        this.isEmpresa = true;
+      }
+
       this.graficarRuta(origen, destino);
       this.riderSubCoors();
     });
+  }
+
+  crearNuevoPedido() {
+    this.riderCoorsSub$.unsubscribe();
+    this.resetMapa();
   }
 
 
@@ -293,9 +315,7 @@ export class HomePage implements OnInit, OnDestroy {
                 pagoPendiente: true
               });
 
-
               this._fcm.sendPushNotification(riderFire.rider, 'nuevo-pedido');
-
             }
 
             // Agregar cancelacion del pedido por parte del rider/cliente
@@ -433,7 +453,7 @@ export class HomePage implements OnInit, OnDestroy {
   async openPayModal(pago) {
     const modal = await this.modalController.create({
       component: PayComponent,
-      componentProps: { pago }
+      componentProps: { pago, cuponData: this.cuponData }
     });
 
     await modal.present();
@@ -456,6 +476,8 @@ export class HomePage implements OnInit, OnDestroy {
         this.graciasPorComprar = false;
         this.getPedido();
       }, 2000);
+
+      this.getCupon();
 
       this._fcm.sendPushNotification(data.riderID, 'confirmacion-pedido');
 
@@ -496,9 +518,9 @@ export class HomePage implements OnInit, OnDestroy {
             let seconds = response.rows[0].elements[0].duration.value;
             self.tiempoMoto = `${Math.round(seconds / 60)} min`;
             self.tiempoBici = `${(Math.round(seconds / 60)) * 4} min`;
-            self.graficarRuta(data.origen, data.destino);
             self.calcularPrecio(self.distancia, 'bicicleta');
             self.calcularPrecio(self.distancia, 'moto');
+            self.graficarRuta(data.origen, data.destino);
             // self.rutaReady = true;
           });
       }
@@ -527,6 +549,7 @@ export class HomePage implements OnInit, OnDestroy {
 
   graficarRuta(origen, destino) {
     var self = this;
+    this.rutaReady = true;
     this.directionsDisplay.setMap(this.map);
     const origenLatLng = new google.maps.LatLng(origen.lat, origen.lng);
     const destinoLatLng = new google.maps.LatLng(destino.lat, destino.lng);
@@ -540,7 +563,7 @@ export class HomePage implements OnInit, OnDestroy {
       let leg = response.routes[0].legs[0];
       self.graficarMarcador(leg.start_location, 'origen');
       self.graficarMarcador(leg.end_location, 'destino');
-      self.rutaReady = true;
+      // self.rutaReady = true;
     });
   }
 
@@ -562,7 +585,7 @@ export class HomePage implements OnInit, OnDestroy {
       } else {
         this.marker.setPosition(coors);
       }
-    
+
     }
 
     if (tipo == 'origen') {
@@ -688,8 +711,8 @@ export class HomePage implements OnInit, OnDestroy {
 
   resetMapa() {
     this.pedidoActivo = false;
+    this.isEmpresa = false;
     this.directionsDisplay.setMap(null);
-    // this.marker.setMap(null);
     this.rider = null;
     this.riderIndex = 0;
     this.rutaReady = false;
@@ -719,6 +742,7 @@ export class HomePage implements OnInit, OnDestroy {
     this._control.origenReady = false;
     this._control.destinoReady = false;
     this._control.rutaReady = false;
+    this.borrarMarcadores();
   }
 
   presentCompraExitosa() {

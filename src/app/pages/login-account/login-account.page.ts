@@ -64,9 +64,8 @@ export class LoginAccountPage implements OnInit {
       return this.toastPresent('Email incorrecto');
     }
 
-
     const data = {
-      nombre: this.nombre,
+      nombre: this.nombre.toLowerCase(),
       email: this.email.toLowerCase(),
       telefono: this.telefono,
       password: this.password
