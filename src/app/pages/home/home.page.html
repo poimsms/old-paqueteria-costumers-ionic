@@ -38,7 +38,7 @@
   <div (click)="openMapaPage('origen')"
     style="border:1px solid #eee;width:100%;background:white;padding:12px;padding-left:20px;border-radius:20px;font-size:17.5px;display:flex;align-items:center;box-shadow: 0 0 20px #d3d3d3">
     <div style="border-radius:50%;height:7px;width:7px;background:orange;margin-right:15px"></div>
-    <div [ngStyle]="{'color': texto_origen == '¿Dónde retiramos?' ? '#999':'#333'}">
+    <div [ngStyle]="{'color': texto_origen == texto_origen_default ? '#999':'#333'}">
       {{ (texto_origen.length>25)? (texto_origen | slice:0:30)+'..':(texto_origen) }}
     </div>
   </div>
@@ -46,7 +46,7 @@
   <div (click)="openMapaPage('destino')"
     style="border:1px solid #eee;width:100%;margin-top:20px;background:white;padding:12px;padding-left:20px;border-radius:20px;font-size:17.5px;display:flex;align-items:center;box-shadow: 0 0 20px #d3d3d3">
     <div style="border-radius:50%;height:7px;width:7px;background:orange;margin-right:15px"></div>
-    <div [ngStyle]="{'color': texto_destino == '¿Dónde entregamos?' ? '#999':'#333'}">
+    <div [ngStyle]="{'color': texto_destino == texto_destino_default ? '#999':'#333'}">
       {{ (texto_destino.length>25)? (texto_destino | slice:0:30)+'..':(texto_destino) }}
     </div>
   </div>

@@ -43,6 +43,7 @@ import { EditarCamposComponent } from './components/editar-campos/editar-campos.
 import { PoliticasComponent } from './components/politicas/politicas.component';
 import { MapaComponent } from './components/mapa/mapa.component';
 import { UbicacionComponent } from './components/ubicacion/ubicacion.component';
+import { SeleccionarHoraComponent } from './components/seleccionar-hora/seleccionar-hora.component';
 
 
 @NgModule({
@@ -55,7 +56,8 @@ import { UbicacionComponent } from './components/ubicacion/ubicacion.component';
     EditarCamposComponent,
     PoliticasComponent,
     MapaComponent,
-    UbicacionComponent
+    UbicacionComponent,
+    SeleccionarHoraComponent
   ],
   entryComponents: [
     ForceUpgradeComponent,
@@ -65,7 +67,8 @@ import { UbicacionComponent } from './components/ubicacion/ubicacion.component';
     EditarCamposComponent,
     PoliticasComponent,
     MapaComponent,
-    UbicacionComponent
+    UbicacionComponent,
+    SeleccionarHoraComponent
   ],
   imports: [
     BrowserModule,

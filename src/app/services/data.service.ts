@@ -41,8 +41,8 @@ export class DataService {
     return this.http.post(url, body, { headers }).toPromise();
   }
 
-  getPedidos(id) {
-    const url = `${this._config.apiURL}/core/pedidos-get-by-client-id?id=${id}`;
+  getPedidos(id, tipo) {
+    const url = `${this._config.apiURL}/core/pedidos-get-by-client-id?id=${id}&tipo=${tipo}`;
     const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
     return this.http.get(url, { headers }).toPromise();
   }
@@ -101,6 +101,12 @@ export class DataService {
     const url = `${this._config.apiURL}/core/ubicacion-update?id=${id}`;
     const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
     return this.http.put(url, body, { headers }).toPromise();
+  }
+
+  cuotaPedidosProgramado(id, body) {
+    const url = `${this._config.apiURL}/core/cuota-pedidos-programado?id=${id}`;
+    const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
+    return this.http.post(url, body, { headers }).toPromise();
   }
 
 }

@@ -22,6 +22,7 @@ export class PayComponent implements OnInit {
   isLoading = false;
   cuponData: any;
   precio_descuento: number;
+  seleccion: any = { programado: false };
 
   constructor(
     public modalCtrl: ModalController,
@@ -61,7 +62,10 @@ export class PayComponent implements OnInit {
       destino: this.pedido.destino,
       rider: this.rider._id,
       cliente: this.usuario._id,
-      entregado: false
+      entregado: false,
+      programado: this.seleccion.programado,
+      fecha_recogida: `Hoy entre ${this.seleccion.start}:00 y ${this.seleccion.end}:00 hs`,
+      seleccion: this.seleccion
     };
 
     if (this.cuponData.ok) {

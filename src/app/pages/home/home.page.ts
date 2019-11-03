@@ -40,8 +40,10 @@ export class HomePage implements OnInit, OnDestroy {
   riderPrevio = '';
 
   transporte = 'moto';
-  texto_origen = '¿Dónde retiramos?';
-  texto_destino = '¿Dónde entregamos?';
+  texto_origen = 'Punto de recogida';
+  texto_origen_default = 'Punto de recogida';
+  texto_destino = 'Dirección de entrega';
+  texto_destino_default = 'Dirección de entrega';
 
   distancia_excedida_moto = false;
   distancia_excedida_bici = false;
@@ -151,7 +153,7 @@ export class HomePage implements OnInit, OnDestroy {
 
   riderSubCoors() {
     this.riderCoorsSub$ = this._fire.getRiderCoors(this.rider._id).subscribe((res: any) => {
-      console.log(res,'ressss')
+      console.log(res, 'ressss')
       if (res[0].cliente == this.usuario._id) {
         const coors = { lat: res[0].lat, lng: res[0].lng };
         this.graficarMarcador(coors, 'rider');
@@ -211,7 +213,7 @@ export class HomePage implements OnInit, OnDestroy {
 
   iniciarPedido() {
 
-    if (this.texto_origen == '¿Dónde retiramos?' || this.texto_destino == '¿Dónde entregamos?') {
+    if (this.texto_origen == this.texto_origen_default || this.texto_destino == this.texto_destino_default) {
       return;
     }
 
@@ -295,6 +297,7 @@ export class HomePage implements OnInit, OnDestroy {
                 nuevaSolicitud: true,
                 pagoPendiente: true,
                 created: new Date().getTime(),
+                fase: 'esperando_confirmacion',
                 dataPedido: {
                   cliente: {
                     _id: this.usuario._id,
@@ -336,7 +339,7 @@ export class HomePage implements OnInit, OnDestroy {
 
   cancelarBusqueda() {
     this.riderSub$.unsubscribe();
-    this._fire.updateRider(this.riderActivoEnBusqueda, 'rider', { nuevaSolicitud: false, pagoPendiente: false });
+    this._fire.updateRider(this.riderActivoEnBusqueda, 'rider', { nuevaSolicitud: false, pagoPendiente: false, fase: '' });
     this._fire.updateRider(this.riderActivoEnBusqueda, 'coors', { pagoPendiente: false });
 
     clearInterval(this.timer);
@@ -382,7 +385,8 @@ export class HomePage implements OnInit, OnDestroy {
           });
 
           this._fire.updateRider(id_previo, 'coors', {
-            pagoPendiente: false
+            pagoPendiente: false,
+            fase: ''
           });
 
           let id_actual = riders[this.riderIndex];
@@ -396,7 +400,8 @@ export class HomePage implements OnInit, OnDestroy {
 
           this._fire.updateRider(id_previo, 'rider', {
             pagoPendiente: false,
-            nuevaSolicitud: false
+            nuevaSolicitud: false,
+            fase: ''
           });
 
           this._fire.updateRider(id_previo, 'coors', {
@@ -700,8 +705,8 @@ export class HomePage implements OnInit, OnDestroy {
     this.rider = null;
     this.riderIndex = 0;
     this.rutaReady = false;
-    this.texto_origen = '¿Dónde retiramos?';
-    this.texto_destino = '¿Dónde entregamos?';
+    this.texto_origen = this.texto_origen_default;
+    this.texto_destino = this.texto_destino_default;
     this._control.origen = null;
     this._control.destino = null;
     this._control.origenReady = false;
@@ -716,8 +721,8 @@ export class HomePage implements OnInit, OnDestroy {
     this.rider = null;
     this.riderIndex = 0;
     this.rutaReady = false;
-    this.texto_origen = '¿Dónde retiramos?';
-    this.texto_destino = '¿Dónde entregamos?';
+    this.texto_origen = this.texto_origen_default;
+    this.texto_destino = this.texto_destino_default;
     this._control.origen = null;
     this._control.destino = null;
     this._control.origenReady = false;
@@ -730,13 +735,13 @@ export class HomePage implements OnInit, OnDestroy {
     this.pedidoActivo = false;
     this.directionsDisplay.setMap(null);
     this.riderSub$.unsubscribe();
-    this._fire.updateRider(this.rider._id, 'rider', { pagoPendiente: false, aceptadoId: '' });
+    this._fire.updateRider(this.rider._id, 'rider', { pagoPendiente: false, aceptadoId: '', fase: '' });
     this._fire.updateRider(this.rider._id, 'coors', { pagoPendiente: false });
     this.rider = null;
     this.riderIndex = 0;
     this.rutaReady = false;
-    this.texto_origen = '¿Dónde retiramos?';
-    this.texto_destino = '¿Dónde entregamos?';
+    this.texto_origen = this.texto_origen_default;
+    this.texto_destino = this.texto_destino_default;
     this._control.origen = null;
     this._control.destino = null;
     this._control.origenReady = false;

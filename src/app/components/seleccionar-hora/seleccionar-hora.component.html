@@ -1,0 +1,38 @@
+<ion-header no-border>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="closeModal('hora_no_seleccionada')">
+        <ion-icon slot="icon-only" name="close" style="color:#444"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Elige un horario de recogida</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-list>
+
+    <div *ngFor="let hora of horas; let i = index">
+      <ion-item *ngIf="hora.isActive" (click)="seleccionar(i)">
+        <div style="font-size:16px;color:#444">
+          {{hora.value}}
+        </div>
+        <ion-icon *ngIf="hora.selected" slot="end" name="radio-button-on" style="color:dodgerblue"></ion-icon>
+        <ion-icon *ngIf="!hora.selected" slot="end" name="radio-button-off"></ion-icon>
+      </ion-item>
+    </div>
+
+  </ion-list>
+
+</ion-content>
+
+<ion-footer style="background:white">
+  <div padding>
+    <ion-button [disabled]="isLoading" (click)="closeModal('hora_seleccionada')" mode="ios" expand="block" color="secondary">
+      <div style="font-size:20px;font-weight:600">
+        Seleccionar
+      </div>
+    </ion-button>
+  </div>
+</ion-footer>

@@ -19,10 +19,10 @@ export class PedidosPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this._data.getPedidos(this._auth.usuario._id).then((pedidos: any) => {
-      console.log(pedidos)
-      this.pedidos = pedidos;
-    });
+    // this._data.getPedidos(this._auth.usuario._id).then((pedidos: any) => {
+    //   console.log(pedidos)
+    //   this.pedidos = pedidos;
+    // });
   }
 
 

@@ -31,7 +31,7 @@ export class CodigoPage implements OnInit {
   addCodigo() {
     const body = {
       usuario: this._auth.usuario._id,
-      codigo: this.codigo
+      codigo: this.codigo.toLowerCase()
     };
 
     this._data.addCupon(body).then((res: any) => {
