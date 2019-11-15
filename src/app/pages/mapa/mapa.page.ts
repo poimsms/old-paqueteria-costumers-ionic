@@ -41,7 +41,7 @@ export class MapaPage implements OnInit {
   interval: any;
 
   image = {
-    url: 'https://res.cloudinary.com/ddon9fx1n/image/upload/v1565228910/tools/pin.png',
+    url: 'https://res.cloudinary.com/ddon9fx1n/image/upload/v1565228910/tools/pin_motocicleta.png',
     scaledSize: new google.maps.Size(40, 40),
     origin: new google.maps.Point(0, 0),
     anchor: new google.maps.Point(0, 32)
@@ -153,6 +153,9 @@ export class MapaPage implements OnInit {
     });
   }
 
+  back() {
+    this.router.navigateByUrl('home');
+  }
 
   closeModal() {
 
@@ -234,7 +237,7 @@ export class MapaPage implements OnInit {
   }
 
   getMyLocation() {
-    this.geolocation.getCurrentPosition().then((resp) => {            
+    this.geolocation.getCurrentPosition().then((resp) => {
       this.map.setCenter({ lat: resp.coords.latitude, lng: resp.coords.longitude });
     }).catch((error) => {
       console.log('Error getting location', error);
@@ -250,7 +253,7 @@ export class MapaPage implements OnInit {
       }
 
       if (data.ubicacion[tipo].configurado) {
-        this.setPositionFromUbicacion(tipo, data.ubicacion);        
+        this.setPositionFromUbicacion(tipo, data.ubicacion);
       } else {
         this.openUbicacionModal(tipo, 'editar', data.ubicacion._id);
       }
@@ -276,7 +279,7 @@ export class MapaPage implements OnInit {
       component: UbicacionComponent,
       componentProps: { tipo, accion, id }
     });
-    
+
     await modal.present();
 
     const { data } = await modal.onWillDismiss();

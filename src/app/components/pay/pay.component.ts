@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { NavParams, ModalController } from '@ionic/angular';
+import { NavParams, ModalController, PopoverController, ToastController } from '@ionic/angular';
 import { DataService } from 'src/app/services/data.service';
 import { PagarService } from 'src/app/services/pagar.service';
 import { FireService } from 'src/app/services/fire.service';
 import { ControlService } from 'src/app/services/control.service';
 import { AuthService } from 'src/app/services/auth.service';
+import { OtrosService } from 'src/app/services/otros.service';
 
 @Component({
   selector: 'app-pay',
@@ -14,7 +15,6 @@ import { AuthService } from 'src/app/services/auth.service';
 
 export class PayComponent implements OnInit {
 
-  metodoPago = 'Tarjeta';
   usuario: any;
   rider: any;
   monto: number;
@@ -24,6 +24,16 @@ export class PayComponent implements OnInit {
   precio_descuento: number;
   seleccion: any = { programado: false };
 
+  index_horario = 0;
+  index_metodo_pago = 0;
+  horario_value = 'Lo antes posible';
+  fecha_recogida = '';
+  metodo_pago = 'Efectivo';
+  telefono_origen: string;
+  telefono_destino: string;
+  instrucciones = '';
+  tiempo_entrega = '';
+
   constructor(
     public modalCtrl: ModalController,
     private navParams: NavParams,
@@ -31,22 +41,57 @@ export class PayComponent implements OnInit {
     private _pagar: PagarService,
     private _fire: FireService,
     private _control: ControlService,
-    private _auth: AuthService
+    private _auth: AuthService,
+    public popoverController: PopoverController,
+    private _otros: OtrosService,
+    public toastController: ToastController
   ) {
     this.usuario = navParams.get('pago').usuario;
     this.rider = navParams.get('pago').rider;
     this.monto = navParams.get('pago').monto;
     this.pedido = navParams.get('pago').pedido;
+    this.tiempo_entrega = navParams.get('tiempo');
     this.cuponData = navParams.get('cuponData');
+    this.telefono_origen = this._auth.usuario.telefono;
 
-    if (this.cuponData.ok) {
-      this.precio_descuento = Math.round((this.monto - this.monto * this.cuponData.cupon.descuento / 100) / 10) * 10;
+    if (this.cuponData.ok && this.cuponData.cupon.tipo == 'porcentaje') {
+      this.cuponPorcentaje();
     }
+
+    if (this.cuponData.ok && this.cuponData.cupon.tipo == 'dinero') {
+      this.cuponDinero();
+    }
+
+    // if (this.cuponData.ok) {
+    //   this.precio_descuento = Math.round((this.monto - this.monto * this.cuponData.cupon.descuento / 100) / 10) * 10;
+    // }
   }
 
   ngOnInit() { }
 
-  pagar() {
+  cuponPorcentaje() {
+    const delta = Math.round((this.monto - this.monto * this.cuponData.cupon.descuento / 100) / 10) * 10;
+    if (delta <= 0) {
+      this.precio_descuento = 0;
+    } else {
+      this.precio_descuento = delta;
+    }
+  }
+
+  cuponDinero() {
+    const delta = this.monto - this.cuponData.cupon.descuento;
+    if (delta <= 0) {
+      this.precio_descuento = 0;
+    } else {
+      this.precio_descuento = delta;
+    }
+  }
+
+  confirmar_envio() {
+
+    if (this.telefono_origen == '' || this.telefono_destino == '') {
+      return this.presentToast();
+    }
 
     const flow = {
       monto: this.monto,
@@ -56,16 +101,15 @@ export class PayComponent implements OnInit {
 
     const pedido = {
       costo: this.monto,
-      metodo_de_pago: this.metodoPago,
+      metodo_de_pago: this.metodo_pago,
       distancia: this.pedido.distancia,
       origen: this.pedido.origen,
       destino: this.pedido.destino,
       rider: this.rider._id,
       cliente: this.usuario._id,
-      entregado: false,
-      programado: this.seleccion.programado,
-      fecha_recogida: `Hoy entre ${this.seleccion.start}:00 y ${this.seleccion.end}:00 hs`,
-      seleccion: this.seleccion
+      telefono_origen: this.telefono_origen,
+      telefono_destino: this.telefono_destino,
+      instrucciones: this.instrucciones
     };
 
     if (this.cuponData.ok) {
@@ -73,7 +117,7 @@ export class PayComponent implements OnInit {
       pedido.costo = this.precio_descuento;
     }
 
-    if (this.metodoPago == 'Tarjeta' && this.usuario.role == 'USUARIO_ROLE') {
+    if (this.metodo_pago == 'Tarjeta') {
 
       this.isLoading = true;
 
@@ -91,21 +135,13 @@ export class PayComponent implements OnInit {
       });
     }
 
-    if (this.metodoPago == 'Efectivo' && this.usuario.role == 'USUARIO_ROLE') {
+    if (this.metodo_pago == 'Efectivo') {
 
-      this._data.crearPedido(pedido).then((pedido: any) => {
-        this.closeModal('pago_efectuado', pedido);
-      });
-    }
-
-
-    if (this.usuario.role == 'EMPRESA_ROLE') {
       this._data.crearPedido(pedido).then((pedido: any) => {
         this.closeModal('pago_efectuado', pedido);
       });
     }
   }
-
 
   closeModal(tipo, pedido?) {
 
@@ -113,18 +149,15 @@ export class PayComponent implements OnInit {
       return this.modalCtrl.dismiss({ pagoExitoso: false });
     }
 
-    this.updateRiderEstadoOcupado(pedido._id);
+    if (pedido) {
+      this.updateRiderEstadoOcupado(pedido._id);
+    }
 
     if (this.cuponData.ok) {
 
       this.isLoading = true;
 
-      const cuponBody = {
-        id: this.cuponData.id,
-        codigo: this.cuponData.cupon.codigo
-      };
-
-      this._data.useCupon(cuponBody).then(() => {
+      this._data.useCupon(this.cuponData.id).then(() => {
         this.isLoading = false;
         this.modalCtrl.dismiss({ pagoExitoso: true, riderID: this.rider._id });
       });
@@ -139,7 +172,7 @@ export class PayComponent implements OnInit {
     this._control.estaBuscandoRider = false;
 
     this._fire.updateRider(this.rider._id, 'rider', {
-      fase: 'navegando-al-origen',
+      fase: 'navegando_al_origen',
       pagoPendiente: false,
       actividad: 'ocupado',
       pedido: pedidoId,
@@ -154,8 +187,19 @@ export class PayComponent implements OnInit {
     });
   }
 
+
   togglePay(tipo) {
-    this.metodoPago = tipo;
+    this.metodo_pago = tipo;
   }
+
+  async presentToast() {
+    const toast = await this.toastController.create({
+      message: 'Por favor complete todos los campos',
+      duration: 2500,
+      position: 'middle'
+    });
+    toast.present();
+  }
+
 
 }

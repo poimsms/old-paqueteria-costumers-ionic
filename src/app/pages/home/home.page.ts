@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { MenuController, ModalController, LoadingController } from '@ionic/angular';
+import { MenuController, ModalController, LoadingController, PopoverController } from '@ionic/angular';
 import { ControlService } from 'src/app/services/control.service';
 import { Router } from '@angular/router';
 import { DataService } from 'src/app/services/data.service';
@@ -13,6 +13,7 @@ import { PayComponent } from 'src/app/components/pay/pay.component';
 import { FcmService } from 'src/app/services/fcm.service';
 import { CallNumber } from '@ionic-native/call-number/ngx';
 import { MapaComponent } from 'src/app/components/mapa/mapa.component';
+import { OtrosService } from 'src/app/services/otros.service';
 
 declare var google: any;
 
@@ -42,8 +43,8 @@ export class HomePage implements OnInit, OnDestroy {
   transporte = 'moto';
   texto_origen = 'Punto de recogida';
   texto_origen_default = 'Punto de recogida';
-  texto_destino = 'Dirección de entrega';
-  texto_destino_default = 'Dirección de entrega';
+  texto_destino = 'Punto de entrega';
+  texto_destino_default = 'Punto de entrega';
 
   distancia_excedida_moto = false;
   distancia_excedida_bici = false;
@@ -80,9 +81,12 @@ export class HomePage implements OnInit, OnDestroy {
   graciasPorComprar = false;
   estaBuscandoRider = false;
   riderActivoEnBusqueda: string;
+  ciudad: string;
 
   cuponData: any;
 
+  bodyNeerRider: any;
+  counter = 0;
 
   imageURL = 'https://res.cloudinary.com/ddon9fx1n/image/upload/v1555014076/tools/bike-parking.svg';
   origenImg = 'https://res.cloudinary.com/ddon9fx1n/image/upload/v1570429346/tools/pin_origen.png';
@@ -117,6 +121,11 @@ export class HomePage implements OnInit, OnDestroy {
   //   anchor: new google.maps.Point(4, 30)
   // };
 
+  showMoto: boolean;
+  showBici: boolean;
+
+  hola = 'HOOLA MUNDO'
+
   constructor(
     private menu: MenuController,
     private _control: ControlService,
@@ -129,31 +138,70 @@ export class HomePage implements OnInit, OnDestroy {
     public modalController: ModalController,
     public loadingController: LoadingController,
     private _fcm: FcmService,
-    private callNumber: CallNumber
+    private callNumber: CallNumber,
+    private _otros: OtrosService,
+    public popoverController: PopoverController
   ) {
     this.usuario = _auth.usuario;
     this.service = new google.maps.DistanceMatrixService();
-    this.directionsDisplay = new google.maps.DirectionsRenderer({ suppressMarkers: true });
+    this.directionsDisplay = new google.maps.DirectionsRenderer({
+      suppressMarkers: true, polylineOptions: {
+        strokeColor: '#404042'
+      }
+    });
     this.directionsService = new google.maps.DirectionsService();
   }
 
   ngOnInit() {
     this.cargarMapa();
     this.escucharCambiosDelMapa();
-    this.getPedido();
     this.getRating();
     this.getCupon();
+    this._otros.pedido$.subscribe(data => {
+      // this.resetMapa();
+      this.pedidoActivo = false;
+      this.pedidosHandler(data);
+    });
+
+    this._otros.getPedido('buscar_pedido_activo_mas_reciente');
   }
 
   ngOnDestroy() {
     this.riderCoorsSub$ ? this.riderCoorsSub$.unsubscribe() : console.log();
     this.riderSub$ ? this.riderSub$.unsubscribe() : console.log();
-    clearInterval(this.timer);
+    clearTimeout(this.timer);
+    this._otros.pedido$.unsubscribe();
   }
 
+  async presentRating(rating) {
+
+    const modal = await this.popoverController.create({
+      component: RatingComponent,
+      // event: ev,
+
+      componentProps: { rating }
+    });
+
+    await modal.present();
+
+    // const { data } = await modal.onWillDismiss();
+
+    // if (data) {
+    //   console.log(data, 'dataa')
+    //   this.index_metodo_pago = data.seleccion.index;
+    //   console.log(this.index_metodo_pago, 'indexxx')
+    //   this.metodoPago = data.seleccion.value;
+    // }
+  }
+
+
+
   riderSubCoors() {
+    console.log(this.rider, 'riii')
+    console.log(this.rider._id, 'iddd')
+
     this.riderCoorsSub$ = this._fire.getRiderCoors(this.rider._id).subscribe((res: any) => {
-      console.log(res, 'ressss')
+
       if (res[0].cliente == this.usuario._id) {
         const coors = { lat: res[0].lat, lng: res[0].lng };
         this.graficarMarcador(coors, 'rider');
@@ -171,7 +219,9 @@ export class HomePage implements OnInit, OnDestroy {
   getRating() {
     this._data.getActiveRating(this.usuario._id).then((data: any) => {
       if (data.ok) {
-        this.openRatingModal(data);
+        console.log(data)
+        // this.openRatingModal(data);
+        this.presentRating(data.rating);
       }
     });
   }
@@ -181,35 +231,35 @@ export class HomePage implements OnInit, OnDestroy {
     this._data.getCuponActivo(this._auth.usuario._id);
   }
 
-  getPedido() {
-    this._data.getPedidoActivo(this.usuario._id).then((data: any) => {
+  pedidosHandler(data) {
+    if (!data.ok) {
+      return;
+    }
 
-      if (!data.hayPedido) {
-        return;
-      }
+    this.resetMapa();
 
-      this.pedido = data.pedido;
-      this.rider = data.pedido.rider;
-      const origen = data.pedido.origen;
-      const destino = data.pedido.destino;
-      this.texto_origen = data.pedido.origen.direccion;
-      this.texto_destino = data.pedido.destino.direccion;
-      this.pedidoActivo = true;
+    this.pedido = data.pedido;
+    this.rider = data.pedido.rider;
+    const origen = data.pedido.origen;
+    const destino = data.pedido.destino;
+    this.texto_origen = data.pedido.origen.direccion;
+    this.texto_destino = data.pedido.destino.direccion;
 
-      if (this._auth.usuario.role == 'EMPRESA_ROLE') {
-        this.isEmpresa = true;
-      }
 
-      this.graficarRuta(origen, destino);
-      this.riderSubCoors();
-    });
+    this.pedidoActivo = true;
+
+    if (this._auth.usuario.role == 'EMPRESA_ROLE') {
+      this.isEmpresa = true;
+    }
+
+    this.graficarRuta(origen, destino, data.pedido.vehiculo);
+    this.riderSubCoors();
   }
 
   crearNuevoPedido() {
     this.riderCoorsSub$.unsubscribe();
     this.resetMapa();
   }
-
 
   iniciarPedido() {
 
@@ -222,8 +272,7 @@ export class HomePage implements OnInit, OnDestroy {
     }
 
     if (this.isMoto && this.distancia_excedida_moto) {
-      this.presentAlert('Distancia execida', 'La distancia supera nuestro limite')
-      return;
+      return this.limite_moto_excedido();
     }
 
     if (this.isBicicleta) {
@@ -240,185 +289,186 @@ export class HomePage implements OnInit, OnDestroy {
 
   buscarRider() {
 
+    this._fire.riders_consultados = [];
+
     this.loadingRider = true;
 
-    const vehiculo = this.vehiculo;
-    const lat = this._control.origen.lat;
-    const lng = this._control.origen.lng;
+    this.bodyNeerRider = {
+      ciudad: this.ciudad,
+      vehiculo: this.vehiculo,
+      lat: this._control.origen.lat,
+      lng: this._control.origen.lng
+    };
 
-    this._fire.getRiderMasCercano(vehiculo, lat, lng).then((resp: any) => {
+    this.getNeerestRider();
+  }
 
-      if (resp.hayRiders) {
 
-        this.riderSub$ = this._fire.rider$.subscribe(riderFireArr => {
-          const riderFire = riderFireArr[0];
-          this.riderActivoEnBusqueda = riderFire.rider;
+  getNeerestRider() {
 
-          if (riderFire.rechazadoId == this.usuario._id) {
+    return new Promise((resolve, reject) => {
 
-            this._fire.updateRider(riderFire.rider, 'rider', { rechazadoId: '' });
-            clearInterval(this.timer);
-            this.sendRiderSolicitude(resp.riders, true);
+      this.counter++;
 
-          } else if (riderFire.aceptadoId == this.usuario._id) {
-
-            this.riderSub$.unsubscribe();
-
-            clearInterval(this.timer);
-
-            this.loadingRider = false;
-
-            this._data.getOneRider(riderFire.rider).then(rider => {
-
-              this.rider = rider;
-
-              const data = {
-                monto: this.precio,
-                rider: this.rider,
-                usuario: this.usuario,
-                pedido: {
-                  origen: this._control.origen,
-                  destino: this._control.destino,
-                  distancia: this.distancia
-                }
-              }
-
-              this.openPayModal(data);
-            });
-
-          } else {
-
-            // Ver si rider aun está libre
-            if (riderFire.actividad == 'disponible' && riderFire.isOnline &&
-              !riderFire.pagoPendiente) {
-
-              // Enviar solicitud
-              this._fire.updateRider(riderFire.rider, 'rider', {
-                nuevaSolicitud: true,
-                pagoPendiente: true,
-                created: new Date().getTime(),
-                fase: 'esperando_confirmacion',
-                dataPedido: {
-                  cliente: {
-                    _id: this.usuario._id,
-                    nombre: this.usuario.nombre,
-                    img: this.usuario.img.url,
-                    role: this.usuario.role
-                  },
-                  pedido: {
-                    distancia: this.distancia,
-                    origen: this._control.origen.direccion,
-                    destino: this._control.destino.direccion,
-                    costo: this.precio
-                  }
-                }
-              });
-
-              this._fire.updateRider(riderFire.rider, 'coors', {
-                pagoPendiente: true
-              });
-
-              this._fcm.sendPushNotification(riderFire.rider, 'nuevo-pedido');
-            }
-
-            // Agregar cancelacion del pedido por parte del rider/cliente
-
-          }
-        });
-
-        this.sendRiderSolicitude(resp.riders, false);
-
-      } else {
+      if (this.counter == 4) {
         this.loadingRider = false;
-        clearInterval(this.timer);
-        this.presentAlert('No hay Riders disponibles', ' Intenta más tarde :)')
+        return this.alert_alta_demanda();
+      }
+
+      // console.log('aca vaaa')
+
+      this._fire.getNeerestRider(this.bodyNeerRider).then((res: any) => {
+
+        if (!res.ok) {
+          console.log('Se acabaron los riders!!')
+          return setTimeout(() => {
+            this.loadingRider = false;
+            this.alert_alta_demanda();
+          }, 5 * 1000);
+        }
+
+        console.log(this.bodyNeerRider, 'body-neer')
+        console.log(res, 'resss')
+
+        this.handShake(res.id);
+        this.sleepRider(res.id);
+
+        resolve();
+      });
+    });
+  }
+
+  sleepRider(id) {
+    console.log('sleeeping')
+    this.timer = setTimeout(async () => {
+      console.log('awakeee')
+
+      this._fire.riders_consultados.push(id);
+
+      this.getNeerestRider();
+
+      this._fire.updateRider(id, 'rider', {
+        cliente_activo: '',
+        pagoPendiente: false,
+        nuevaSolicitud: false
+      });
+
+      this._fire.updateRider(id, 'coors', {
+        pagoPendiente: false
+      });
+
+    }, 25 * 1000);
+  }
+
+  handShake(id) {
+    this._fire.getRiderPromise(id).then((rider: any) => {
+
+      console.log(rider, 'RIDER')
+
+      if (rider.cliente_activo == '') {
+        console.log('cliente_activo rider libre')
+
+        this._fire.updateRider(id, 'rider', { cliente_activo: this.usuario._id })
+          .then(() => this.handShake(id));
+      }
+
+      if (rider.cliente_activo != this.usuario._id && rider.cliente_activo != '') {
+        console.log('cliente_activo ganado por otro')
+        this.getNeerestRider();
+      }
+
+      if (rider.cliente_activo == this.usuario._id && rider.cliente_activo != '') {
+        console.log('cliente_activo ganado por Mi')
+        this.subscribeToRider(id);
+      }
+    });
+  }
+
+  subscribeToRider(id) {
+    this.riderSub$ = this._fire.getRider(id).subscribe(data => {
+      const riderFire: any = data[0];
+      this.riderActivoEnBusqueda = riderFire.rider;
+
+      if (riderFire.rechazadoId == this.usuario._id) {
+        console.log('rechazadoId')
+
+        clearTimeout(this.timer);
+        this.riderSub$.unsubscribe();
+        this._fire.riders_consultados.push(id);
+
+        this.getNeerestRider().then(() => {
+          this._fire.updateRider(id, 'rider', { rechazadoId: '', cliente_activo: '' });
+        });
+      }
+
+      if (riderFire.aceptadoId == this.usuario._id) {
+        console.log('aceptadoId')
+        clearTimeout(this.timer);
+        this.riderSub$.unsubscribe();
+        this.loadingRider = false;
+
+        this._data.getOneRider(riderFire.rider).then(rider => {
+
+          this.rider = rider;
+
+          const data = {
+            monto: this.precio,
+            rider: this.rider,
+            usuario: this.usuario,
+            pedido: {
+              origen: this._control.origen,
+              destino: this._control.destino,
+              distancia: this.distancia
+            }
+          }
+
+          this.openPayModal(data);
+        });
       }
 
     });
+
+    this.sendRiderRequest(id);
+  }
+
+  sendRiderRequest(id) {
+    this._fire.updateRider(id, 'rider', {
+      nuevaSolicitud: true,
+      pagoPendiente: true,
+      created: new Date().getTime(),
+      fase: 'esperando_confirmacion',
+      dataPedido: {
+        cliente: {
+          _id: this.usuario._id,
+          nombre: this.usuario.nombre,
+          img: this.usuario.img.url,
+          role: this.usuario.role
+        },
+        pedido: {
+          distancia: this.distancia,
+          origen: this._control.origen.direccion,
+          destino: this._control.destino.direccion,
+          costo: this.precio
+        }
+      }
+    });
+
+    this._fire.updateRider(id, 'coors', {
+      pagoPendiente: true
+    });
+
+    this._fcm.sendPushNotification(id, 'nuevo-pedido');
   }
 
   cancelarBusqueda() {
     this.riderSub$.unsubscribe();
-    this._fire.updateRider(this.riderActivoEnBusqueda, 'rider', { nuevaSolicitud: false, pagoPendiente: false, fase: '' });
+    clearTimeout(this.timer);
+
+    this._fire.updateRider(this.riderActivoEnBusqueda, 'rider', { nuevaSolicitud: false, pagoPendiente: false, fase: '', cliente_activo: '' });
     this._fire.updateRider(this.riderActivoEnBusqueda, 'coors', { pagoPendiente: false });
 
-    clearInterval(this.timer);
     this.loadingRider = false;
     this.resetMapaFromBusquedaCancelada();
-  }
-
-  sendRiderSolicitude(riders, next) {
-
-    if (this.riderIndex == 0) {
-
-      let id_init = riders[this.riderIndex];
-      this._fire.rider_query$.next(id_init);
-    }
-
-    if (this.riderIndex == riders.length - 1) {
-
-      let id_init = riders[this.riderIndex];
-      this._fire.rider_query$.next(id_init);
-    }
-
-    if (next) {
-
-      let id_next = riders[this.riderIndex];
-      this._fire.rider_query$.next(id_next);
-    }
-
-    this.riderIndex++;
-
-    this.timer = setTimeout(() => {
-      if (this.riderIndex <= 4) {
-
-        let id_previo = riders[this.riderIndex - 1];
-
-        this.riderPrevio = id_previo;
-
-
-        if (this.riderIndex < riders.length) {
-
-          this._fire.updateRider(id_previo, 'rider', {
-            pagoPendiente: false,
-            nuevaSolicitud: false
-          });
-
-          this._fire.updateRider(id_previo, 'coors', {
-            pagoPendiente: false,
-            fase: ''
-          });
-
-          let id_actual = riders[this.riderIndex];
-          this._fire.rider_query$.next(id_actual);
-
-          this.sendRiderSolicitude(riders, false);
-
-        } else {
-
-          this.riderSub$.unsubscribe();
-
-          this._fire.updateRider(id_previo, 'rider', {
-            pagoPendiente: false,
-            nuevaSolicitud: false,
-            fase: ''
-          });
-
-          this._fire.updateRider(id_previo, 'coors', {
-            pagoPendiente: false
-          });
-
-          clearInterval(this.timer);
-          this.loadingRider = false;
-          this.presentAlert_NoHayRiders();
-        }
-
-      } else {
-        this.loadingRider = false;
-        clearInterval(this.timer);
-        this.presentAlert_NoHayRiders();
-      }
-    }, 25000);
   }
 
   openMapaPage(tipo) {
@@ -456,9 +506,13 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   async openPayModal(pago) {
+
+    let tiempo = '';
+    this.isMoto ? tiempo = this.tiempoMoto : tiempo = this.tiempoBici;
+
     const modal = await this.modalController.create({
       component: PayComponent,
-      componentProps: { pago, cuponData: this.cuponData }
+      componentProps: { pago, cuponData: this.cuponData, tiempo }
     });
 
     await modal.present();
@@ -470,7 +524,11 @@ export class HomePage implements OnInit, OnDestroy {
       this.directionsDisplay.setMap(null);
 
       this.service = new google.maps.DistanceMatrixService();
-      this.directionsDisplay = new google.maps.DirectionsRenderer({ suppressMarkers: true });
+      this.directionsDisplay = new google.maps.DirectionsRenderer({
+        suppressMarkers: true, polylineOptions: {
+          strokeColor: '#404042'
+        }
+      });
       this.directionsService = new google.maps.DirectionsService();
 
       this.cargarMapa();
@@ -479,7 +537,7 @@ export class HomePage implements OnInit, OnDestroy {
 
       setTimeout(() => {
         this.graciasPorComprar = false;
-        this.getPedido();
+        this._otros.getPedido('buscar_pedido_activo_mas_reciente');
       }, 2000);
 
       this.getCupon();
@@ -487,7 +545,7 @@ export class HomePage implements OnInit, OnDestroy {
       this._fcm.sendPushNotification(data.riderID, 'confirmacion-pedido');
 
     } else {
-      this.presentAlert_OrdenCancelada();
+      this.alert_pedido_cancelado();
     }
   }
 
@@ -507,25 +565,71 @@ export class HomePage implements OnInit, OnDestroy {
 
     this._control.mapState.subscribe((data: any) => {
 
-      let self = this;
+      // let self = this;
 
       if (data.accion == 'calcular-ruta') {
 
         this.texto_origen = data.origen.direccion;
         this.texto_destino = data.destino.direccion;
+
+        const origen = [data.origen.lat, data.destino.lng];
+
+        let cobertura = this._fire.calcular_cobertura(origen);
+
+        if (!cobertura.ok) {
+          return this.alert_zona_no_cubierta();
+        }
+
         this.service.getDistanceMatrix(
           {
             origins: [data.origen.direccion],
             destinations: [data.destino.direccion],
             travelMode: 'DRIVING',
-          }, function (response, status) {
-            self.distancia = response.rows[0].elements[0].distance.value;
+          }, (response, status) => {
+
+            let distancia = response.rows[0].elements[0].distance.value;
             let seconds = response.rows[0].elements[0].duration.value;
-            self.tiempoMoto = `${Math.round(seconds / 60)} min`;
-            self.tiempoBici = `${(Math.round(seconds / 60)) * 4} min`;
-            self.calcularPrecio(self.distancia, 'bicicleta');
-            self.calcularPrecio(self.distancia, 'moto');
-            self.graficarRuta(data.origen, data.destino);
+
+            this.distancia = distancia;
+
+            this.ciudad = this._fire.calcular_ciudad(origen);
+            console.log(this.ciudad, 'ciudad')
+            const body = {
+              ciudad: this.ciudad,
+              lat: data.origen.lat,
+              lng: data.origen.lng
+            }
+
+            this._fire.detectarRidersCercanos(body).then((res: any) => {
+
+              if (!res.isMoto && !res.isBici) {
+                return this.alert_area_sin_riders();
+              }
+
+              this.showMoto = res.isMoto;
+              this.showBici = res.isBici;
+
+              const bici = this._global.tarifas.bici;
+              // const moto = self._global.tarifas.moto;
+
+              if (distancia > bici.maxLimite) {
+                this.showBici = false;
+              }
+
+              this.tiempoMoto = `${Math.round(seconds / 60 / 1.15) + 3} min`;
+              this.tiempoBici = `${Math.round(distancia / (13 * 1000) * 60) + 3} min`;
+
+              this.calcularPrecio(this.distancia, 'bicicleta');
+              this.calcularPrecio(this.distancia, 'moto');
+              this.graficarRuta(data.origen, data.destino, 'Moto');
+            });
+
+            // self.tiempoMoto = `${Math.round(seconds / 60 / 1.15) + 3} min`;
+            // self.tiempoBici = `${Math.round(distancia / (13 * 1000) * 60) + 3} min`;
+
+            // self.calcularPrecio(self.distancia, 'bicicleta');
+            // self.calcularPrecio(self.distancia, 'moto');
+            // self.graficarRuta(data.origen, data.destino, 'Moto');
             // self.rutaReady = true;
           });
       }
@@ -545,30 +649,33 @@ export class HomePage implements OnInit, OnDestroy {
   cargarMapa() {
     this.map = new google.maps.Map(document.getElementById('map'), {
       center: { lat: -33.444600, lng: -70.655585 },
-      zoom: 14,
+      zoom: 16,
       disableDefaultUI: true
       // zoomControl: true
     });
     this.directionsDisplay.setMap(this.map);
   }
 
-  graficarRuta(origen, destino) {
+  graficarRuta(origen, destino, vehiculo) {
     var self = this;
     this.rutaReady = true;
     this.directionsDisplay.setMap(this.map);
     const origenLatLng = new google.maps.LatLng(origen.lat, origen.lng);
     const destinoLatLng = new google.maps.LatLng(destino.lat, destino.lng);
 
+    let modo = '';
+
+    vehiculo == 'Bicicleta' ? modo = 'WALKING' : modo = 'DRIVING';
+
     this.directionsService.route({
       origin: origenLatLng,
       destination: destinoLatLng,
-      travelMode: 'DRIVING',
+      travelMode: modo,
     }, function (response, status) {
       self.directionsDisplay.setDirections(response);
       let leg = response.routes[0].legs[0];
       self.graficarMarcador(leg.start_location, 'origen');
       self.graficarMarcador(leg.end_location, 'destino');
-      // self.rutaReady = true;
     });
   }
 
@@ -651,17 +758,38 @@ export class HomePage implements OnInit, OnDestroy {
 
   }
 
-  async presentAlert(titulo, mensaje) {
+  // async presentAlert(titulo, mensaje) {
+  //   const alert = await this.alertController.create({
+  //     header: titulo,
+  //     subHeader: mensaje,
+  //     buttons: ['Aceptar']
+  //   });
+
+  //   await alert.present();
+  // }
+
+  // 'Distancia execida', 'La distancia supera nuestro limite')
+
+  async limite_moto_excedido() {
     const alert = await this.alertController.create({
-      header: titulo,
-      subHeader: mensaje,
-      buttons: ['Aceptar']
+      header: 'Distancia execida',
+      message: 'La distancia supera nuestro limite',
+      buttons: [
+        {
+          text: 'Ok',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: (blah) => {
+            this.resetMapaAndRider();
+          }
+        }
+      ]
     });
 
     await alert.present();
   }
 
-  async presentAlert_OrdenCancelada() {
+  async alert_pedido_cancelado() {
     const alert = await this.alertController.create({
       header: 'Pedido cancelado',
       message: 'Defina un nuevo trayecto!',
@@ -680,10 +808,10 @@ export class HomePage implements OnInit, OnDestroy {
     await alert.present();
   }
 
-  async presentAlert_NoHayRiders() {
+  async alert_area_sin_riders() {
     const alert = await this.alertController.create({
-      header: 'No hay Riders disponibles',
-      message: 'Intenta más tarde :)',
+      header: 'No hay riders en el área',
+      message: 'Enviaremos nuevos riders en unos momentos.',
       buttons: [
         {
           text: 'Ok',
@@ -699,7 +827,50 @@ export class HomePage implements OnInit, OnDestroy {
     await alert.present();
   }
 
+  async alert_zona_no_cubierta() {
+    const alert = await this.alertController.create({
+      header: 'Atención!',
+      message: 'No hay cobertura en esta zona.',
+      buttons: [
+        {
+          text: 'Ok',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: (blah) => {
+            this.resetMapa();
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async alert_alta_demanda() {
+    const alert = await this.alertController.create({
+      header: 'Lo sentimos mucho!',
+      message: 'Debido a una alta demanda no podemos procesar nuevos pedidos. Inténtalo de nuevo en unos minutos.',
+      buttons: [
+        {
+          text: 'Ok',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: (blah) => {
+            this.resetMapa();
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+
+
   resetMapaFromBusquedaCancelada() {
+    this.isMoto = false;
+    this.isBicicleta = false;
+    this.counter = 0;
     this.directionsDisplay.setMap(null);
     this.pedidoActivo = false;
     this.rider = null;
@@ -712,9 +883,13 @@ export class HomePage implements OnInit, OnDestroy {
     this._control.origenReady = false;
     this._control.destinoReady = false;
     this._control.rutaReady = false;
+    this.borrarMarcadores();
   }
 
   resetMapa() {
+    this.isMoto = false;
+    this.isBicicleta = false;
+    this.counter = 0;
     this.pedidoActivo = false;
     this.isEmpresa = false;
     this.directionsDisplay.setMap(null);
@@ -763,7 +938,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   callPhone(telefono) {
-    this.callNumber.callNumber("9" + telefono, true)
+    this.callNumber.callNumber(telefono, true)
       .then(res => console.log('Launched dialer!', res))
       .catch(err => console.log('Error launching dialer', err));
   }

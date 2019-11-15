@@ -20,7 +20,7 @@ export class LoginPage implements OnInit {
   isLoading = false;
 
   err_telefono_en_uso = false;
-  err_8_digitos_telefono = false;
+  err_9_digitos_telefono = false;
   err_num_telefono = false;
 
   passwordType = 'password';
@@ -39,38 +39,6 @@ export class LoginPage implements OnInit {
   ngOnInit() {
   }
 
-  showHidePassword() {
-    if (this.passwordType == 'password') {
-      this.passwordType = 'text';
-    } else {
-      this.passwordType = 'password';
-    }
-  }
-
-  changeLogin(tipo) {
-
-    if (tipo == 'login in') {
-      this.signInUsuario = true;
-      this.signUpUsuario = false;
-    }
-
-    if (tipo == 'login up') {
-      this.signInUsuario = false;
-      this.signUpUsuario = true;
-    }
-
-    this.password = undefined;
-    this.telefono = undefined;
-
-    this.resetErros();
-  }
-
-  resetErros() {
-    this.err_8_digitos_telefono = false;
-    this.err_num_telefono = false;
-    this.err_telefono_en_uso = false;
-  }
-
   next() {
 
     if (!this.politicas) {
@@ -79,8 +47,8 @@ export class LoginPage implements OnInit {
 
     this.resetErros();
 
-    if (this.telefono.length != 8) {
-      return this.err_8_digitos_telefono = true;
+    if (this.telefono.length != 9) {
+      return this.err_9_digitos_telefono = true;
     }
 
     if (!Number(this.telefono)) {
@@ -89,59 +57,27 @@ export class LoginPage implements OnInit {
 
     this.isLoading = true;
 
-    this._auth.phoneNumberSendRequest(this.telefono).then((res: any) => {
-
-      if (res.ok) {
-        if (res.result.status == '0') {
-          this._auth.idPhone = res.result.request_id;
-          this._auth.telefono = Number(this.telefono);
-          this.router.navigateByUrl(`login-verify`);
-        } else {
-          this.presentToast();
-        }
-      }
-      if (!res.ok) {
-        this.presentAlert(res.message);
-      }
+    const authData = {
+      telefono: this.telefono,
+      from: 'clients-app'
+    };
+    
+    this._auth.phoneNumberSendRequest(authData).then((res: any) => {
 
       this.isLoading = false;
-    });
-  }
 
-  loginUsuario() {
+      if (!res.ok) {
+        return this.presentAlert(res.message);
+      }
 
-    this.resetErros();
+      this._auth.tipo = res.tipo;
+      this._auth.id = res.id;
+      this._auth.telefono = this.telefono;
+      this.telefono = null;
 
-    // if (this.telefono.length != 8) {
-    //   return this.err_8_digitos_telefono = true;
-    // }
+      this.router.navigateByUrl(`login-verify`);
 
-    if (!Number(this.telefono)) {
-      return this.err_num_telefono = true;
-    }
-
-    this.isLoading = true;
-
-    if (this.telefono && this.password) {
-
-      const authData = {
-        telefono: this.telefono,
-        password: this.password,
-        from: 'clients-app'
-      };
-
-      this._auth.loginIn(authData).then((res: any) => {
-
-        if (!res.ok) {
-          return this.presentAlert(res.message);
-        }
-
-        this.telefono = null;
-        this.password = null;
-        this.isLoading = false;
-
-      }).catch(() => this.isLoading = false);
-    }
+    }).catch(() => this.isLoading = false);
   }
 
   togglePoliticas() {
@@ -150,6 +86,12 @@ export class LoginPage implements OnInit {
     } else {
       this.politicas = true;
     }
+  }
+
+  resetErros() {
+    this.err_9_digitos_telefono = false;
+    this.err_num_telefono = false;
+    this.err_telefono_en_uso = false;
   }
 
   async openPoliticasModal() {
@@ -174,7 +116,7 @@ export class LoginPage implements OnInit {
   async presentToast() {
     const toast = await this.toastController.create({
       message: 'Ya fue enviado un SMS',
-      duration: 2000,
+      duration: 2500,
       position: 'middle'
     });
     toast.present();

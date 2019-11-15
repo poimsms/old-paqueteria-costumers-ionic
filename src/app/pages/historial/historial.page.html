@@ -1,196 +1,91 @@
-<ion-header no-border>
+<ion-header >
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
-    <ion-title>Mis pedidos</ion-title>
+    <ion-title>Historial de envíos</ion-title>
   </ion-toolbar>
-  <!-- <ion-segment (ionChange)="segmentChanged($event)" value="proximos">
-      <ion-segment-button value="proximos">
-        <ion-label>Próximos</ion-label>
-      </ion-segment-button>
+  <ion-segment (ionChange)="segmentChanged($event)" value="completados" color="secondary">
       <ion-segment-button value="completados">
-        <ion-label>Completados</ion-label>
-      </ion-segment-button>
-    </ion-segment> -->
+          <ion-label>Pedidos anteriores</ion-label>
+        </ion-segment-button>
+    <ion-segment-button value="proximos">
+      <ion-label>Próximos</ion-label>
+    </ion-segment-button>   
+  </ion-segment>
 </ion-header>
 
 <ion-content>
 
-    <ion-item lines="none">
-        <div style="color:#444;font-size:16px">
-          Hora de Recogida
+  <div *ngFor="let pedido of pedidos" style="padding:15px;margin:15px;border-radius:10px;border:1px solid #eee">
+    <div style="width:100%">
+      <div style="width:100%;display:flex;justify-content:space-between">
+        <div style="color:#666">
+          {{pedido.fecha_creacion}}
         </div>
-      </ion-item>
-
-   <ion-item detail>
-    <ion-label>Programado</ion-label>
-    <!-- <ion-label>Recogida</ion-label> -->
-    <div slot="end">
-      <!-- Lo Antes Posible -->
-      Entre 10:00 y 11:00 hs
-    </div>
-  </ion-item>
-
-
-  <div (click)="openHoraModal()">
-    <h1>click</h1>
-  </div>
-
-
-  <!-- <ion-item>
-    <ion-label>Hora de entrega</ion-label>
-    <ion-select value="brown" okText="Okay" cancelText="Cancelar">
-      <ion-select-option value="brown">Lo antes posible</ion-select-option>
-      <ion-select-option value="blonde">Entre 14.00 y 15.00 hs</ion-select-option>
-      <ion-select-option value="black">Entre 14.00 y 15.00 hs</ion-select-option>
-      <ion-select-option value="red">Entre 14.00 y 15.00 hs</ion-select-option>
-    </ion-select>
-  </ion-item> -->
-
-
-  <div *ngFor="let pedido of pedidos">
-
-    <div style="width:100%;border-top:10px solid #F4F5F9;padding:15px;display:flex;align-items:center">
-
-      <div style="margin-left:10px;width:100%">
-        <!-- <div style="width:100%;display:flex;justify-content:space-between">
-          <div style="color:#777">
-            Costo del servicio:
-          </div>
-          <div style="color:#555;font-size:16px">
-            ${{pedido.costo}}
-          </div>
-        </div> -->
-        <div style="margin-top:5px;display:flex;justify-content:space-between">
-          <div style="color:#777;font-size:15px">
-            {{pedido.fecha_creacion}}
-          </div>
-          <div style="color:slategray;font-size:13px;text-transform:uppercase;display:flex;align-items:center">
-            <div *ngIf="!pedido.entregado && !pedido.cancelado"
-              style="margin-right:5px;width:10px;height:10px;border-radius:50%;background:lightgreen">
-            </div>
-            <div *ngIf="!pedido.entregado && pedido.cancelado">
-              Cancelado
-            </div>
-            <div *ngIf="pedido.entregado && !pedido.cancelado">
-              Entregado
-            </div>
-            <div *ngIf="!pedido.entregado && !pedido.cancelado">
-              Pendiente
-            </div>
-          </div>
+        <div *ngIf="tipo == 'proximos'" style="color:limegreen">
+          Activo
         </div>
-
-        <div style="width:100%;display:flex;justify-content:space-between">
-          <div style="color:#777">
-            Costo del servicio:
-          </div>
-          <div style="color:#555;font-size:16px">
-            ${{pedido.costo}}
-          </div>
+      </div>
+      <div style="width:100%;display:flex;justify-content:space-between">
+        <div style="color:#666">
+          Servicio
         </div>
-
+        <div style="color:#666">
+          ${{pedido.costo}}
+        </div>
       </div>
     </div>
 
-    <div
-      style="padding:15px;padding-bottom:0px;padding-left:30px;width:100%;display:flex;justify-content:space-between">
-      <div style="display:flex">
-        <div style="height:18px;width:18px;margin-top:3px">
-          <ion-icon name="radio-button-on" style="font-size:18px;color:#bbb"></ion-icon>
-        </div>
-        <div style="margin-left:20px">
-          <!-- <div style="color:slategray">
-            Origen
-          </div> -->
-          <div style="color:#555;font-size:14.5px;height:20px;overflow:hidden">
-            {{pedido.origen.direccion}}
-          </div>
-        </div>
-        <!-- <div style="margin-left:20px;margin-bottom:20px;display:flex;align-items:flex-start">
-          <div style="width:45px;height:45px;position:relative">
-            <img [src]="pedido.rider.img.url" style="width:45px;height:45px;border-radius:50%;object-fit:cover">
-            <div style="position:absolute;right:-20px;bottom:-10px;background:white;border-radius:50%">
-              <img *ngIf="pedido.rider.vehiculo == 'Moto'" src="assets/moto.png"
-                style="height:35px;width:35px;object-fit:cover">
-              <img *ngIf="pedido.rider.vehiculo == 'Bicicleta'" src="assets/bici.png"
-                style="height:35px;width:35px;object-fit:cover">
-            </div>
-          </div>
-          <div style="margin-left:30px;color:#666;width:55px;height:20px;flex:1">
-            <div style="font-size:14px;margin-top:5px">Rider</div>
-            <div>{{pedido.rider.nombre}}</div>
-          </div>
-        </div> -->
-      </div>
-    </div>
-
-    <div style="margin-top:10px;padding:15px;padding-left:30px;padding-top:0px;width:100%;display:flex;">
-      <div style="height:18px;width:18px">
+    <div style="margin-top:10px;display:flex;align-items:center">
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <ion-icon name="radio-button-on" style="font-size:18px;color:#bbb"></ion-icon>
+        <div style="height:30px;margin-top:5px;margin-bottom:5px;border:1px dashed #bbb"></div>
         <ion-icon name="pin" style="font-size:18px;color:#bbb"></ion-icon>
       </div>
       <div style="margin-left:20px">
-        <!-- <div style="color:slategray">
-          Destino
-        </div> -->
-        <div style="color:#555;font-size:14.5px;height:20px;overflow:hidden">
-          {{pedido.destino.direccion}}
+        <div>
+          <div style="color:#777;font-size:13px">
+            RECOGIDA
+          </div>
+          <div style="color:#555;font-weight:500;font-size:14px;height:17px;overflow:hidden">
+            {{pedido.origen.direccion}}
+          </div>
+        </div>
+        <div style="margin-top:13px">
+          <div style="color:#777;font-size:13px">
+            ENTREGA
+          </div>
+          <div style="color:#555;font-weight:500;font-size:14px;height:17px;overflow:hidden">
+            {{pedido.destino.direccion}}
+          </div>
         </div>
       </div>
     </div>
 
-    <div style="background:darkturquoise;padding:5px">
-      <div style="font-weight:600;color:white;text-align:center">
-        Entrega:
-      </div>
-      <div style="font-size:15px;color:white;width:100%;text-align:center">
-        10-12-2019 7:53 PM
+    <div *ngIf="tipo == 'proximos'" (click)="openPedido(pedido._id)"
+      style="border-top:1px solid #eee;padding:10px;padding-bottom:0px;margin-top:15px;width:100%;display:flex;justify-content:flex-end">
+      <div style="color:dodgerblue;font-weight:500;font-size:13px;text-transform:uppercase">
+        Ver mapa
       </div>
     </div>
-
-    <!-- <div style="margin-left:20px;margin-bottom:20px;display:flex;align-items:flex-start">
-      <div style="width:45px;height:45px;position:relative">
-        <img [src]="pedido.rider.img.url" style="width:45px;height:45px;border-radius:50%;object-fit:cover">
-        <div style="position:absolute;right:-20px;bottom:-10px;background:white;border-radius:50%">
-          <img *ngIf="pedido.rider.vehiculo == 'Moto'" src="assets/moto.png"
-            style="height:35px;width:35px;object-fit:cover">
-          <img *ngIf="pedido.rider.vehiculo == 'Bicicleta'" src="assets/bici.png"
-            style="height:35px;width:35px;object-fit:cover">
-        </div>
-      </div>
-      <div style="margin-left:30px;color:#666;width:55px;height:20px;flex:1">
-        <div style="font-size:14px;margin-top:5px">Rider</div>
-        <div style="text-transform:capitalize">{{pedido.rider.nombre}}</div>
-      </div>
-    </div> -->
 
   </div>
-
-
 
 </ion-content>
 
 
 
 
-<!-- <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(10, 10, 10, 0.5)">
-  <div style="width:100%;height:100%;position:relative">
-    <div style="position:absolute;top:30%;left:20%;height:40%;width:200px;background:white;">
-
+<div *ngIf="isLoading"
+  style="z-index:999;position:fixed;top:0px;left:0px;height:100%;width:100%;display:flex;align-items:center;justify-content:center;background:rgb(34, 34, 34, 0.5)">
+  <div
+    style="box-shadow: 0 0 20px rgba(68, 68, 68, 0.75);padding:30px;padding-top:20px;padding-bottom:20px;width:80%;border-radius:3px;background:white;">
+    <div style="width:100%;display:flex;align-items:center">
+      <ion-spinner color="secondary"></ion-spinner>
+      <div style="margin-left:20px;font-size:17px;margin-right:10px">
+        Cargando...
+      </div>
     </div>
   </div>
-</div> -->
-
-<!-- <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(10, 10, 10, 0.5);display:flex;align-items:center;justify-content:center;flex-wrap:wrap">
-    <div style="width:100%;height:30%;background:red">     
-    </div>
-    <div style="width:30%;height:40%;background:red">     
-      </div>
-      <div style="width:40%;height:40%;background:white">     
-        </div>
-        <div style="width:30%;height:40%;background:red">     
-          </div>
-      <div style="width:100%;height:30%;background:blue">     
-        </div>
-  </div> -->
+</div>

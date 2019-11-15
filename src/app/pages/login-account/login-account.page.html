@@ -7,38 +7,42 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content padding>
 
-  <div padding style="font-size:20px;color:#555;font-weight:550">
+  <div style="font-size:20px;color:#555;font-weight:550">
     Crea un perfil de usuario
   </div>
 
   <div style="height:30px;width:100%"></div>
 
-  <div style="margin:15px;border:1px solid #eee;border-radius:6px;padding:5px;display:flex;align-items:center;">
-    <ion-input type="text" [(ngModel)]="nombre" placeholder="Nombre"></ion-input>
-  </div>
+  <ion-input type="email" [(ngModel)]="email" placeholder="Email" style="border-bottom:1px solid #ccc;font-size:17.5px">
+  </ion-input>
 
-  <div style="margin:15px;border:1px solid #eee;border-radius:6px;padding:5px;display:flex;align-items:center;">
-    <ion-input type="email" [(ngModel)]="email" placeholder="Email"></ion-input>
-  </div>
+  <div style="height:10px;width:100%"></div>
 
-  <div style="margin:15px;border:1px solid #eee;border-radius:6px;padding:5px;display:flex;align-items:center;">
-    <ion-input [type]="passwordType" [(ngModel)]="password" placeholder="Contraseña"></ion-input>
-  </div>
-
-  <div style="margin-right:20px;text-align:right;color:#888;font-weight:600">
-    <span (click)="togglePass()">Mostrar</span>
-  </div>
-
-  <div *ngIf="!isLoading" padding style="margin-top:20px;width:100%;display:flex;justify-content:flex-end">
-    <ion-icon (click)="createAccount()" name="ios-arrow-dropright-circle" style="color:#0cd1e8;font-size:55px">
-    </ion-icon>
-  </div>
-
-  <div *ngIf="isLoading" padding style="margin-top:20px;width:100%;display:flex;justify-content:flex-end">
-    <ion-icon name="ios-arrow-dropright-circle" style="color:#6ed7e2;font-size:55px">
-    </ion-icon>
+  <div style="display:flex;justify-content:space-between">
+    <div style="width:45%">
+      <ion-input type="text" [(ngModel)]="nombre" placeholder="Nombre"
+        style="border-bottom:1px solid #ccc;font-size:17.5px"></ion-input>
+    </div>
+    <div style="width:45%">
+      <ion-input type="text" [(ngModel)]="apellido" placeholder="Apellido"
+        style="border-bottom:1px solid #ccc;font-size:17.5px">
+      </ion-input>
+    </div>
   </div>
 
 </ion-content>
+
+<ion-footer no-border>
+  <div style="font-size:14px;width:100%;text-align:center;color:#444">
+    Al registrarte aceptas los Términos y Condiciones
+  </div>
+  <div padding>
+    <ion-button [disabled]="isLoading" (click)="createAccount()" mode="ios" expand="block" color="secondary">
+        <div style="font-size:20px;font-weight:600">
+            Continuar
+      </div>
+    </ion-button>
+  </div>
+</ion-footer>

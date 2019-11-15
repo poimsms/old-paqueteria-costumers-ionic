@@ -9,6 +9,7 @@ import { ForceUpgradeComponent } from './components/force-upgrade/force-upgrade.
 import { BloqueadoComponent } from './components/bloqueado/bloqueado.component';
 import { FcmService } from './services/fcm.service';
 import { ConfigService } from './services/config.service';
+import { Market } from '@ionic-native/market/ngx';
 
 @Component({
   selector: 'app-root',
@@ -33,7 +34,8 @@ export class AppComponent {
     public modalController: ModalController,
     private _fcm: FcmService,
     private _config: ConfigService,
-    public alertController: AlertController
+    public alertController: AlertController,
+    private market: Market
   ) {
     this.initializeApp();
   }
@@ -83,7 +85,10 @@ export class AppComponent {
               }
 
             } else if(data.readyState) {
+              // this.router.navigateByUrl('login-account');
               this.router.navigateByUrl('login');
+              // this.router.navigateByUrl('login-verify');
+
             }
           });
 
@@ -126,7 +131,12 @@ export class AppComponent {
     const alert = await this.alertController.create({
       header: 'Nueva versión disponible',
       subHeader: 'Por favor actualiza la app para poder seguir usandola',
-      buttons: ['Actualizar']
+      buttons: [ {
+        text: 'Actualizar',
+        handler: () => {
+          this.market.open('cl.joopiter.paqueteria01');
+        }
+      }]
     });
 
     await alert.present();

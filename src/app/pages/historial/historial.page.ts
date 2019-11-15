@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
 import { DataService } from 'src/app/services/data.service';
-import { ControlService } from 'src/app/services/control.service';
-import { SeleccionarHoraComponent } from 'src/app/components/seleccionar-hora/seleccionar-hora.component';
-import { ModalController } from '@ionic/angular';
+import { OtrosService } from 'src/app/services/otros.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-historial',
@@ -13,50 +12,39 @@ import { ModalController } from '@ionic/angular';
 export class HistorialPage implements OnInit {
 
   pedidos = [];
+  list = [1, 2, 3];
+  isLoading = false;
+  tipo = 'completados';
 
   constructor(
     private _auth: AuthService,
     private _data: DataService,
-    private _control: ControlService,
-    private modalController: ModalController
+    private _otros: OtrosService,
+    private router: Router
   ) { }
 
   ngOnInit() {
-    this._data.getPedidos(this._auth.usuario._id, 'completados').then((pedidos: any) => {
-      console.log(pedidos)
-      this.pedidos = pedidos;
-    });
+    this.getHistorial('completados');
   }
 
-  async openHoraModal() {
-
-    const modal = await this.modalController.create({
-      component: SeleccionarHoraComponent,
-      componentProps: { index: 10}
+  getHistorial(tipo) {
+    this._data.getPedidos(this._auth.usuario._id, tipo).then((pedidos: any) => {
+      this.tipo = tipo;
+      this.pedidos = [];
+      this.pedidos = pedidos;
     });
-
-    await modal.present();
-
-    const { data } = await modal.onWillDismiss();
-
-    if (data.ok) {
-      console.log(data.seleccion.index)
-      if (data.seleccion.value == 'Lo antes posible') {
-        console.log(data.seleccion.value);
-      } else {
-        console.log('Hoy ' + data.seleccion.value.toLowerCase());
-      }
-    }
   }
 
   segmentChanged(e) {
-    // console.log(e.detail.value)
-    this._data.getPedidos(this._auth.usuario._id, e.detail.value).then((pedidos: any) => {
-      console.log(pedidos)
-      this.pedidos = pedidos;
-    });
+    this.getHistorial(e.detail.value);
   }
 
-
+  openPedido(id) {
+    this.isLoading = true;
+    this._otros.getPedido('buscar_pedido_seleccionado', id).then(() => {
+      this.isLoading = false;
+      this.router.navigateByUrl('home');
+    });
+  }
 }
 

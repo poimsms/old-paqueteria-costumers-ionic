@@ -14,14 +14,14 @@
   </div>
 
   <div
-    style="margin:15px;margin-top:5px;border:1px solid #eee;border-radius:6px;padding:5px;">
-    <ion-input type="text" [(ngModel)]="codigo" placeholder=""></ion-input>
+    style="margin:15px;margin-top:5px;border:1px solid #eee;border-radius:6px;padding:3px;">
+    <ion-input type="text" [(ngModel)]="codigo" placeholder="" style="font-size:22px"></ion-input>
   </div>
   <div style="padding:0px;padding-bottom:0px;width:100%;text-align:center;color:#999;font-size:15px">
-    Empieza a hacer el pedido, sin olvidarte de utilizar el código promocional. ¡Aprovecha!
+    Introduce el código y lo aplicaremos en tu siguiente pedido
   </div>
 
-  <div padding>
+  <div padding style="margin-top:50px">
     <ion-button [disabled]="isLoading" (click)="addCodigo()" mode="ios" expand="block" color="secondary">
       <div style="font-size:18px">
         Añadir código

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NavParams, ModalController, ToastController } from '@ionic/angular';
+import { NavParams, ModalController, ToastController, PopoverController } from '@ionic/angular';
 import { DataService } from 'src/app/services/data.service';
 
 @Component({
@@ -11,22 +11,35 @@ export class RatingComponent implements OnInit {
 
   rating: any;
   comentario = '';
-  starts = 3;
+  starts = 0;
+
+  rider: any;
+
+  isLoading = false;
 
   constructor(
     public modalCtrl: ModalController,
     private navParams: NavParams,
     private _data: DataService,
-    public toastController: ToastController
+    public toastController: ToastController,
+    public popoverController: PopoverController
+
   ) {
-    this.rating = navParams.get('data').rating;
+    this.rider = navParams.get('rating').rider;
   }
 
   closeModal() {
-    this.modalCtrl.dismiss();
+    this.popoverController.dismiss();
   }
 
   omitir() {
+
+    if (this.isLoading) {
+      return;
+    }
+
+    this.isLoading = true;
+
 
     const data: any = {
       isActive: false,
@@ -40,6 +53,12 @@ export class RatingComponent implements OnInit {
   }
 
   calificar() {
+
+    if (this.isLoading) {
+      return;
+    }
+
+    this.isLoading = true;
 
     const data: any = {
       comentario: this.comentario,

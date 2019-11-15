@@ -69,6 +69,7 @@ export class DataService {
     const url = `${this._config.apiURL}/core/cupones-get-active-one?id=${id}`;
     const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
     this.http.get(url, { headers }).toPromise().then((data: any) => {
+      console.log(data, 'dattaa')
       this.cuponData.next({ ok: data.ok, cupon: data.cupon, id: data.id });
     });
   }
@@ -79,10 +80,10 @@ export class DataService {
     return this.http.post(url, body, { headers }).toPromise();
   }
 
-  useCupon(body) {
-    const url = `${this._config.apiURL}/core/cupones-use-one`;
+  useCupon(id) {
+    const url = `${this._config.apiURL}/core/cupones-use-one?id=${id}`;
     const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
-    return this.http.put(url, body, { headers }).toPromise();
+    return this.http.get(url, { headers }).toPromise();
   }
 
   getUbicaciones(id) {
@@ -105,6 +106,12 @@ export class DataService {
 
   cuotaPedidosProgramado(id, body) {
     const url = `${this._config.apiURL}/core/cuota-pedidos-programado?id=${id}`;
+    const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
+    return this.http.post(url, body, { headers }).toPromise();
+  }
+
+  getNeerestRider(body) {
+    const url = `${this._config.apiURL}/core/get-neerest-rider`;
     const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
     return this.http.post(url, body, { headers }).toPromise();
   }

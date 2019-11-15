@@ -1,4 +1,4 @@
-<ion-header no-border>
+<!-- <ion-header no-border>
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-button (click)="omitir()">
@@ -9,15 +9,6 @@
 </ion-header>
 
 <ion-content>
-
-  <!-- <div
-      style="margin-bottom:20px;width:100%;padding:20px;display:flex;align-items:center;justify-content:space-between">
-      <ion-icon (click)="omitir()" name="close" style="color:#444;font-size:27px"></ion-icon>
-      <div (click)="calificar()" style="color:#444;font-size:16px">
-        Enviar calificación
-      </div>
-    </div> -->
-
 
   <div
     style="margin-top:10px;padding:20px;padding-left:50px;padding-right:50px;font-size:20px;font-weight:700;color:#444;text-align:center">
@@ -39,10 +30,6 @@
     {{rating.rider.nombre}}
   </div>
 
-  <!-- <div
-      style="margin-top:10px;padding:20px;padding-left:50px;padding-right:50px;font-size:20px;font-weight:700;color:#444;text-align:center">
-      Califica tu experiencia con {{rating.rider.nombre}}
-    </div> -->
 
   <div style="margin-top:10%;width:100%;display:flex;justify-content:center">
     <div style="display:flex;justify-content:center">
@@ -61,38 +48,7 @@
 
   <div style="margin-top:40px;margin-bottom:10px;width:100%;text-align:center;color:#999;font-size:14px">
     Toca para comenzar a evaluar
-    <!-- ¿Qué mejorarías del servicio? -->
   </div>
-
-  <!-- <div style="width:100%;display:flex;align-items:center;justify-content:space-around;flex-wrap:wrap">
-      <div style="margin:10px;padding:5px;border-radius:3px;border:1px solid #eee;color:#555">
-        Tiempo de espera?
-      </div>
-      <div style="margin:10px;padding:5px;border-radius:3px;border:1px solid #eee;color:#555">
-        Amabilidad
-      </div>
-      <div style="margin:10px;padding:5px;border-radius:3px;border:1px solid #eee;color:#555">
-        Casco?
-      </div>
-      <div style="margin:10px;padding:5px;border-radius:3px;border:1px solid #eee;color:#555">
-        Estado del paquete
-      </div>
-    </div> -->
-
-
-  <!-- <ion-item>
-      <ion-icon slot="start" name="chatboxes" style="color:#bbb"></ion-icon>
-      <ion-input placeholder="Deja un comentario (Opcional)"></ion-input>
-    </ion-item> -->
-
-
-  <!-- <ion-item> -->
-  <!-- <ion-textarea rows="4" placeholder="Deja una reseña (Opcional)" [(ngModel)]="comentario"></ion-textarea> -->
-  <!-- </ion-item> -->
-
-  <!-- <ion-item lines="none">
-    <ion-input type="text" [(ngModel)]="comentario" placeholder="Deja un comentario (Opcional)"></ion-input>
-  </ion-item> -->
 
   <div style="width:100%;height:5px;border-top:1px solid #eee;margin-top:60px"></div>
   <ion-item lines="none" style="margin-top:0px">
@@ -106,21 +62,58 @@
 </ion-content>
 
 <ion-footer no-border style="padding:15px">
-  <!-- <ion-item lines="none">
-    <ion-input type="text" [(ngModel)]="comentario" placeholder="Deja un comentario (Opcional)"></ion-input>
-  </ion-item> -->
-
-  <!-- <ion-item lines="none" style="margin-bottom:15px">
-    <ion-icon slot="start" name="chatboxes" style="color:#bbb"></ion-icon>
-    <ion-input placeholder="Deja un comentario (Opcional)"></ion-input>
-  </ion-item> -->
-
-  <!-- <div style="width:100%;display:flex;justify-content:center">
-      <ion-button color="medium" mode="ios">
-          Calificar
-        </ion-button>
-  </div> -->
   <ion-button (click)="calificar()" color="secondary" expand="block" mode="ios">
     Enviar calificación
   </ion-button>
-</ion-footer>
+</ion-footer> -->
+
+
+
+
+<ion-content>
+
+  <div style="padding:20px">
+    <div style="width:100%;display:flex;justify-content:center">
+      <img [src]="rider.img.url" style="height:50px;width:50px;border-radius:50%;object-fit:cover">
+    </div>
+
+    <div style="margin-top:10px;font-size:18px;color:#444">
+      ¿Cómo estuvo tu servicio con
+      <span style="text-transform:capitalize">{{rider.nombre}}?</span>
+    </div>
+
+    <div style="height:20px;width:100%"></div>
+
+    <div style="width:100%;display:flex;justify-content:center">
+      <ion-icon (click)="starts = 1" *ngIf="starts >= 1" name="star" class="start"></ion-icon>
+      <ion-icon (click)="starts = 1" *ngIf="starts < 1" name="star-outline" class="start"></ion-icon>
+      <ion-icon (click)="starts = 2" *ngIf="starts >= 2" name="star" class="start"></ion-icon>
+      <ion-icon (click)="starts = 2" *ngIf="starts < 2" name="star-outline" class="start"></ion-icon>
+      <ion-icon (click)="starts = 3" *ngIf="starts >= 3" name="star" class="start"></ion-icon>
+      <ion-icon (click)="starts = 3" *ngIf="starts < 3" name="star-outline" class="start"></ion-icon>
+      <ion-icon (click)="starts = 4" *ngIf="starts >= 4" name="star" class="start"></ion-icon>
+      <ion-icon (click)="starts = 4" *ngIf="starts < 4" name="star-outline" class="start"></ion-icon>
+      <ion-icon (click)="starts = 5" *ngIf="starts >= 5" name="star" class="start"></ion-icon>
+      <ion-icon (click)="starts = 5" *ngIf="starts < 5" name="star-outline" class="start"></ion-icon>
+    </div>
+
+    <div style="height:20px;width:100%"></div>
+
+    <div style="margin-top:10px;font-size:16px;color:#999;border-bottom:1px solid #eee;padding-bottom:2px">
+      Agregar nota
+    </div>
+
+    <div style="height:20px;width:100%"></div>
+
+    <div style="width:100%;display:flex;justify-content:flex-end;font-size:15px;color:#3880ff">
+      <div (click)="omitir()" style="margin-right:25px">
+        OMITIR
+      </div>
+      <div (click)="calificar()">
+        ENVIAR
+      </div>
+    </div>
+
+  </div>
+
+</ion-content>

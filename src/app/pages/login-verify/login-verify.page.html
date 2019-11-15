@@ -3,65 +3,61 @@
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
-    <ion-title>Registrar</ion-title>
+    <ion-title>Verificación</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
 
   <div padding style="font-size:20px;color:#555;font-weight:550">
-    Ingresa el código de verificación
+    Ingresa el código
   </div>
 
-  <!-- <div style="width:100%;display:flex;justify-content:center">
-      <div style="border:1px dashed #eee;height:100px;width:100px;display:flex;align-items:center;justify-content:center">
-        <ion-icon name="camera" style="font-size:40px;color:#bbb"></ion-icon>
-      </div>
-    </div> -->
-  <div style="height:20px;width:100%"></div>
+  <div style="height:10px;width:100%"></div>
 
-  <div style="padding:15px;padding-bottom:0px;width:100%;text-align:center;color:#888">
-    Te hemos enviado tu código de verificación a +56 9 {{_auth.telefono}}. Por favor ingresa el código acá.
-  </div>
 
-  <div padding style="display:flex;justify-content:space-around">
-    <div style="background:#fff;border-radius:3px;width:35px"
-      [ngStyle]="{'border': isActive[0] ? '1px solid #0cd1e8':'1px solid #eee'}">
-      <ion-input type="tel" maxlength="1" [(ngModel)]="n1" placeholder="" (ionChange)="codigoListo(0)"></ion-input>
-    </div>
-    <div style="background:#fff;border-radius:3px;width:35px"
-      [ngStyle]="{'border': isActive[1] ? '1px solid #0cd1e8':'1px solid #eee'}">
-      <ion-input type="tel" maxlength="1" [(ngModel)]="n2" placeholder="" (ionChange)="codigoListo(1)"></ion-input>
-    </div>
-    <div style="background:#fff;border-radius:3px;width:35px"
-      [ngStyle]="{'border': isActive[2] ? '1px solid #0cd1e8':'1px solid #eee'}">
-      <ion-input type="tel" maxlength="1" [(ngModel)]="n3" placeholder="" (ionChange)="codigoListo(2)"></ion-input>
-    </div>
-    <div style="background:#fff;border-radius:3px;width:35px"
-      [ngStyle]="{'border': isActive[3] ? '1px solid #0cd1e8':'1px solid #eee'}">
-      <ion-input type="tel" maxlength="1" [(ngModel)]="n4" placeholder="" (ionChange)="codigoListo(3)"></ion-input>
+  <div style="width:100%;display:flex;justify-content:center">
+    <div style="width:170px">
+      <ion-item>
+        <ion-input type="tel" maxlength="4" [(ngModel)]="codigo" (ionChange)="checkCode()"
+          style="text-align:center;font-size:20px" placeholder=""></ion-input>
+      </ion-item>
     </div>
   </div>
 
-  <div *ngIf="counter == 0" style="margin-top:10px;width:100%;text-align:center;">
+
+  <div style="padding:16px;padding-bottom:0px;width:100%;text-align:center;color:#888">
+    <!-- Te hemos enviado un código de verificación enviado a +5696372717. -->
+    <!-- Código de verificación enviado a +56{{_auth.telefono}}. -->
+    Un código de verificación ha sido enviado a +56{{_auth.telefono}}.
+  </div>
+
+
+
+  <div (click)="reenviar()" *ngIf="counter == 0" style="margin-top:10px;width:100%;text-align:center;">
     <span style="color:#0cd1e8">Reenviar</span>
   </div>
 
 
   <div *ngIf="counter > 0" style="margin-top:10px;width:100%;text-align:center;color:#888">
-    Reenviando código de verificación
+    Reenviando SMS en
     <span style="color:#0cd1e8">
       {{textTime}}
     </span>
   </div>
 
-  <!-- <ion-button (click)="cancelar()">
-    Cancelar
-  </ion-button> -->
-
-
-  <div padding style="margin-top:20px;width:100%;display:flex;justify-content:flex-end">
-    <ion-icon (click)="checkCode()" name="ios-arrow-dropright-circle" style="color:#0cd1e8;font-size:55px"></ion-icon>
-  </div>
-
 </ion-content>
+
+
+<div *ngIf="isLoading"
+  style="z-index:999;position:fixed;top:0px;left:0px;height:100%;width:100%;display:flex;align-items:center;justify-content:center;background:rgb(34, 34, 34, 0.5)">
+  <div
+    style="box-shadow: 0 0 20px rgba(68, 68, 68, 0.75);padding:30px;padding-top:20px;padding-bottom:20px;width:80%;border-radius:3px;background:white;">
+    <div style="width:100%;display:flex;align-items:center">
+      <ion-spinner color="secondary"></ion-spinner>
+      <div style="margin-left:20px;font-size:17px;margin-right:10px">
+        Cargando...
+      </div>
+    </div>
+  </div>
+</div>

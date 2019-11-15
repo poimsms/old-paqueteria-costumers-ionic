@@ -21,6 +21,7 @@ import { Camera } from '@ionic-native/camera/ngx';
 import { FileTransfer } from '@ionic-native/file-transfer/ngx';
 import { Keyboard } from '@ionic-native/keyboard/ngx';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
+import { Market } from '@ionic-native/market/ngx';
 
 export const firebaseConfig = {
   apiKey: "AIzaSyAmlXBSsNgsocMZ15dN8bc1D3ZD0gMAetQ",
@@ -44,6 +45,7 @@ import { PoliticasComponent } from './components/politicas/politicas.component';
 import { MapaComponent } from './components/mapa/mapa.component';
 import { UbicacionComponent } from './components/ubicacion/ubicacion.component';
 import { SeleccionarHoraComponent } from './components/seleccionar-hora/seleccionar-hora.component';
+import { OpcionesComponent } from './components/opciones/opciones.component';
 
 
 @NgModule({
@@ -57,7 +59,8 @@ import { SeleccionarHoraComponent } from './components/seleccionar-hora/seleccio
     PoliticasComponent,
     MapaComponent,
     UbicacionComponent,
-    SeleccionarHoraComponent
+    SeleccionarHoraComponent,
+    OpcionesComponent
   ],
   entryComponents: [
     ForceUpgradeComponent,
@@ -68,7 +71,8 @@ import { SeleccionarHoraComponent } from './components/seleccionar-hora/seleccio
     PoliticasComponent,
     MapaComponent,
     UbicacionComponent,
-    SeleccionarHoraComponent
+    SeleccionarHoraComponent,
+    OpcionesComponent
   ],
   imports: [
     BrowserModule,
@@ -91,7 +95,8 @@ import { SeleccionarHoraComponent } from './components/seleccionar-hora/seleccio
     Geolocation,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     AppVersion,
-    InAppBrowser
+    InAppBrowser,
+    Market
   ],
   bootstrap: [AppComponent]
 })

@@ -10,13 +10,15 @@ import { ConfigService } from './config.service';
 })
 export class AuthService {
 
-  telefono: number;
-  phone: number;
-  idPhone: string;
+  telefono: string;
+  id: string;
   authState = new BehaviorSubject({ isAuth: false, usuario: {}, token: null, readyState: false });
 
   usuario: any;
   token: string;
+
+  tipo: string;
+  tokenPhone: string;
 
   constructor(
     private http: HttpClient,
@@ -25,48 +27,24 @@ export class AuthService {
     private _config: ConfigService
   ) { }
 
-  phoneNumberSendRequest(telefono) {
-    const url = `${this._config.apiURL}/nexmo/number`;
-    const body = { telefono };
+  phoneNumberSendRequest(body) {
+    const url = `${this._config.apiURL}/usuarios/request-code`;
     return this.http.post(url, body).toPromise();
   }
 
-  phoneCancelRequest(id) {
-    const url = `${this._config.apiURL}/nexmo/cancel`;
-    const body = { id };
+  phoneResendCode(body) {
+    const url = `${this._config.apiURL}/usuarios/resend-code`;
     return this.http.post(url, body).toPromise();
   }
 
-  phoneVerifyCode(id, code) {
-    const url = `${this._config.apiURL}/nexmo/verify`;
-    const body = { id, code };
+  phoneVerifyCode(body) {
+    const url = `${this._config.apiURL}/usuarios/verify-code`;
     return this.http.post(url, body).toPromise();
   }
 
-  loginUp(data) {
-    return new Promise((resolve, reject) => {
-      this.signUp(data).then((res: any) => {
-
-        if (res.ok) {
-          this.saveStorage(res.token, res.usuario, res.usuario._id);
-        }
-
-        resolve(res);
-      });
-    });
-  }
-
-  loginIn(body) {
-    return new Promise((resolve, reject) => {
-      this.signIn(body).then((res: any) => {
-
-        if (res.ok) {
-          this.saveStorage(res.token, res.usuario, res.usuario._id);
-        }
-
-        resolve(res);
-      });
-    });
+  registrarUsuario(body) {
+    const url = `${this._config.apiURL}/usuarios/create-account`;
+    return this.http.post(url, body).toPromise();
   }
 
   logout() {
@@ -86,9 +64,9 @@ export class AuthService {
     }
   }
 
-  saveStorage(token, usuario, uid) {
+  saveStorage(token, usuario) {
 
-    const authData = { token, uid };
+    const authData = { token, uid: usuario._id };
     this.usuario = usuario;
     this.token = token;
 
@@ -137,16 +115,6 @@ export class AuthService {
         this.authState.next({ isAuth: false, usuario: null, token: null, readyState: true  });
       }
     }
-  }
-
-  signIn(body) {
-    const url = `${this._config.apiURL}/usuarios/signin-phone`;
-    return this.http.post(url, body).toPromise();
-  }
-
-  signUp(body) {
-    const url = `${this._config.apiURL}/usuarios/signup`;
-    return this.http.post(url, body).toPromise();
   }
 
   getUser(token, id) {

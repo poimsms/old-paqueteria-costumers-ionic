@@ -5,13 +5,16 @@
         <ion-icon slot="icon-only" name="close" style="color:#444;font-size:27px"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title style="text-transform:capitalize"> {{tipo}} </ion-title>
+    <ion-title> Agregar {{tipo}}</ion-title>
+    <!-- <ion-searchbar mode="ios" [(ngModel)]="autocomplete.input" (ionInput)="updateSearchResults()"
+      placeholder="Buscar un lugar">
+    </ion-searchbar> -->
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
 
-  <ion-toolbar>
+  <ion-toolbar color="white">
     <ion-searchbar mode="ios" [(ngModel)]="autocomplete.input" (ionInput)="updateSearchResults()"
       placeholder="Buscar un lugar">
     </ion-searchbar>
@@ -23,15 +26,55 @@
     </ion-item>
   </ion-list>
 
+  <ion-item lines="none" style="border-bottom: 1px solid #eee">
+      <ion-icon slot="start" style="color:#bbb;font-size:22px" name="home"></ion-icon>
+    <div>
+      <div style="color:#444">
+        Casa
+      </div>
+      <div style="color:#777;font-size:14px">
+        Simon Bolivar 802 Vadlvia
+      </div>
+    </div>
+  </ion-item>
+
+  <ion-item lines="none" style="border-bottom: 1px solid #eee">
+      <ion-icon slot="start" style="color:#bbb;font-size:22px" name="briefcase"></ion-icon>
+    <div>
+      <div style="color:#444">
+        Oficina
+      </div>
+      <div style="color:#777;font-size:14px">
+        Av Ramon Picarte 8219
+      </div>
+    </div>
+  </ion-item>
+
+
+
+  <!-- <div padding>
+    <ion-item style="margin-top:0px">
+      <ion-icon slot="start" name="create" style="color:#bbb"></ion-icon>
+      <ion-input placeholder="Piso, puerta... (opcional)" [(ngModel)]="puerta"></ion-input>
+    </ion-item>
+  </div> -->
+
+
 </ion-content>
 
 <ion-footer no-border>
+    <div padding>
+        <ion-item style="margin-top:0px">
+          <ion-icon slot="start" name="create" style="color:#bbb"></ion-icon>
+          <ion-input placeholder="Piso, puerta... (opcional)" [(ngModel)]="puerta"></ion-input>
+        </ion-item>
+      </div>
   <div *ngIf="!isLoading" (click)="closeModal()"
-    style="width:100%;background:#0cd1e8;text-align:center;padding:12px;font-weight:500;text-transform:uppercase;font-size:15px;color:white">
+    style="width:100%;background:#9EDF1F;text-align:center;padding:12px;font-weight:500;text-transform:uppercase;font-size:15px;color:white">
     Guardar ubicación
   </div>
   <div *ngIf="isLoading"
-    style="width:100%;background:#0cd1e87a;text-align:center;padding:12px;font-weight:500;text-transform:uppercase;font-size:15px;color:white">
+    style="width:100%;background:rgba(158, 223, 31, 0.5);text-align:center;padding:12px;font-weight:500;text-transform:uppercase;font-size:15px;color:white">
     Guardando...
   </div>
 </ion-footer>

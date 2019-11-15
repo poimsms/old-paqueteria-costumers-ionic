@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
 import { ToastController } from '@ionic/angular';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login-account',
@@ -10,15 +11,15 @@ import { ToastController } from '@ionic/angular';
 export class LoginAccountPage implements OnInit {
 
   nombre: string;
-  passwordType = "password";
-  password: string;
-  telefono: number;
+  apellido: string;
+  telefono: string;
   email: string;
   isLoading = false;
 
   constructor(
     private _auth: AuthService,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
+    private router: Router
   ) {
     this.telefono = this._auth.telefono;
   }
@@ -26,19 +27,41 @@ export class LoginAccountPage implements OnInit {
   ngOnInit() {
   }
 
-  togglePass() {
-    if (this.passwordType == 'password') {
-      this.passwordType = 'text';
-    } else {
-      this.passwordType = 'password';
+  createAccount() {
+
+    this.isLoading = true;
+
+    if (!this.validateEmail(this.email)) {
+      this.isLoading = false;
+      return this.toastPresent('Email incorrecto');
     }
+
+    const body = {
+      nombre: this.nombre.toLowerCase() + ' ' + this.apellido.toLowerCase(),
+      email: this.email.toLowerCase(),
+      telefono: this.telefono,
+      token: this._auth.tokenPhone
+    }
+
+    this._auth.registrarUsuario(body).then((res: any) => {
+
+      if (!res.ok) {
+        this.router.navigateByUrl(`login`);
+      }
+
+      this.isLoading = false;
+
+      this._auth.saveStorage(res.token, res.usuario);
+
+    }).catch(() => this.isLoading = false);
+
   }
 
   async toastPresent(text) {
 
     const toast = await this.toastCtrl.create({
       message: text,
-      duration: 2000,
+      duration: 2500,
       position: 'middle'
     });
 
@@ -48,29 +71,5 @@ export class LoginAccountPage implements OnInit {
   validateEmail(email) {
     var re = /\S+@\S+\.\S+/;
     return re.test(email);
-  }
-
-  createAccount() {
-
-    this.isLoading = true;
-
-    if (!(this.nombre && this.password && this.email)) {
-      this.isLoading = false;
-      return this.toastPresent('Favor completar todo los datos');
-    }
-
-    if (!this.validateEmail(this.email)) {
-      this.isLoading = false;
-      return this.toastPresent('Email incorrecto');
-    }
-
-    const data = {
-      nombre: this.nombre.toLowerCase(),
-      email: this.email.toLowerCase(),
-      telefono: this.telefono,
-      password: this.password
-    }
-
-    this._auth.loginUp(data).then(() => this.isLoading = false);
   }
 }

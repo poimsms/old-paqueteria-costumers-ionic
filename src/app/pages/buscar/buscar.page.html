@@ -1,0 +1,71 @@
+<ion-header no-border>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="closeModal()">
+        <ion-icon slot="icon-only" name="close" style="color:#444;font-size:27px"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Punto de recogida</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-toolbar>
+    <ion-searchbar mode="ios" [(ngModel)]="autocomplete.input" (ionInput)="updateSearchResults()"
+      placeholder="Buscar un lugar">
+    </ion-searchbar>
+  </ion-toolbar>
+
+  <ion-list [hidden]="autocompleteItems.length == 0">
+    <ion-item *ngFor="let item of autocompleteItems" tappable (click)="selectSearchResult(item)">
+      {{ item.description }}
+    </ion-item>
+  </ion-list>
+
+  <ion-item lines="none" style="border-bottom: 1px solid #eee">
+    <ion-icon slot="start" style="color:#bbb;font-size:22px" name="home"></ion-icon>
+    <div>
+      <div style="color:#444">
+        Casa
+      </div>
+      <div style="color:#777;font-size:14px">
+        Simon Bolivar 802 Vadlvia
+      </div>
+    </div>
+  </ion-item>
+
+  <ion-item lines="none" style="border-bottom: 1px solid #eee">
+    <ion-icon slot="start" style="color:#bbb;font-size:22px" name="briefcase"></ion-icon>
+    <div>
+      <div style="color:#444">
+        Oficina
+      </div>
+      <div style="color:#777;font-size:14px">
+        Av Ramon Picarte 8219
+      </div>
+    </div>
+  </ion-item>
+
+  <div style="margin-top:20px;width:100%;text-align:center;color:limegreen">
+    Posicionar en mapa
+  </div>
+
+
+
+  <!-- <div padding>
+      <ion-item style="margin-top:0px">
+        <ion-icon slot="start" name="create" style="color:#bbb"></ion-icon>
+        <ion-input placeholder="Piso, puerta... (opcional)" [(ngModel)]="puerta"></ion-input>
+      </ion-item>
+    </div> -->
+
+
+</ion-content>
+
+<ion-footer>
+  <ion-item style="margin-top:0px">
+    <ion-icon slot="start" name="create" style="color:#bbb"></ion-icon>
+    <ion-input placeholder="Piso, puerta... (opcional)" [(ngModel)]="puerta"></ion-input>
+  </ion-item>
+</ion-footer>

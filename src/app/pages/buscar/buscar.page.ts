@@ -5,11 +5,11 @@ import { AuthService } from 'src/app/services/auth.service';
 declare var google: any;
 
 @Component({
-  selector: 'app-ubicacion',
-  templateUrl: './ubicacion.component.html',
-  styleUrls: ['./ubicacion.component.scss'],
+  selector: 'app-buscar',
+  templateUrl: './buscar.page.html',
+  styleUrls: ['./buscar.page.scss'],
 })
-export class UbicacionComponent implements OnInit {
+export class BuscarPage implements OnInit {
 
   GoogleAutocomplete: any;
   autocomplete: any;
@@ -27,13 +27,14 @@ export class UbicacionComponent implements OnInit {
   constructor(
     private _data: DataService,
     private zone: NgZone,
-    private navParams: NavParams,
+    // private navParams: NavParams,
     public modalCtrl: ModalController,
     private _auth: AuthService
   ) {
-    this.tipo = this.navParams.get('tipo');
-    this.accion = this.navParams.get('accion');
-    this.id = this.navParams.get('id');
+    console.log('ENTROOOO')
+    // this.tipo = this.navParams.get('tipo');
+    // this.accion = this.navParams.get('accion');
+    // this.id = this.navParams.get('id');
 
     this.GoogleAutocomplete = new google.maps.places.AutocompleteService();
     this.autocomplete = { input: '' };
