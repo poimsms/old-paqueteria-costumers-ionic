@@ -6,6 +6,7 @@ import { FireService } from 'src/app/services/fire.service';
 import { ControlService } from 'src/app/services/control.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { OtrosService } from 'src/app/services/otros.service';
+import { OpcionesComponent } from '../opciones/opciones.component';
 
 @Component({
   selector: 'app-pay',
@@ -188,8 +189,20 @@ export class PayComponent implements OnInit {
   }
 
 
-  togglePay(tipo) {
-    this.metodo_pago = tipo;
+  async openMetodoPago() {
+
+    const modal = await this.modalCtrl.create({
+      component: OpcionesComponent,
+      componentProps: { metodo: this.metodo_pago }
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+
+    if (data) {
+      this.metodo_pago = data.seleccion;
+    }
   }
 
   async presentToast() {

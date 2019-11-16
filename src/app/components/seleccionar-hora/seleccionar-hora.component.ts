@@ -19,7 +19,7 @@ export class SeleccionarHoraComponent implements OnInit {
   horarioValue = 'Lo antes posible';
   fecha_recogida = '';
   metodoPago = 'Efectivo';
-  
+  metodo_pago = 'Efectivo';
 
   constructor(
     public modalCtrl: ModalController,
@@ -72,6 +72,22 @@ export class SeleccionarHoraComponent implements OnInit {
       //   }
       // });
 
+    }
+  }
+
+  async openMetodoPago() {
+
+    const modal = await this.modalCtrl.create({
+      component: OpcionesComponent,
+      componentProps: { metodo: this.metodo_pago }
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+
+    if (data) {
+      this.metodo_pago = data.seleccion;
     }
   }
 

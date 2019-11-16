@@ -5,7 +5,7 @@
     </ion-buttons>
     <ion-title>Historial de envíos</ion-title>
   </ion-toolbar>
-  <ion-segment (ionChange)="segmentChanged($event)" value="completados" color="secondary">
+  <ion-segment (ionChange)="segmentChanged($event)" value="completados" color="dark">
       <ion-segment-button value="completados">
           <ion-label>Pedidos anteriores</ion-label>
         </ion-segment-button>
@@ -29,7 +29,7 @@
       </div>
       <div style="width:100%;display:flex;justify-content:space-between">
         <div style="color:#666">
-          Servicio
+          Costo del servicio
         </div>
         <div style="color:#666">
           ${{pedido.costo}}

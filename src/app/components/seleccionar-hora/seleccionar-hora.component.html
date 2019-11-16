@@ -41,7 +41,7 @@
 
   <div style="padding:5px;padding-left:15px;padding-right:15px">
     <div style="font-size:18px;color:#444">
-      Costo del servicio <span>$1.500</span>
+      Costo del servicio <span style="text-decoration:line-through;color:#888">$2.500</span> <span>$1.500</span>
     </div>
     <div style="display:flex;align-items:center;color:#777">
       <ion-icon name="time" style="color:#bbb;margin-right:5px;font-size:18px;"></ion-icon>
@@ -59,31 +59,9 @@
   </ion-item>
 
 
-  <!-- <ion-item lines="none">
-    <div style="color:#444;font-size:17px">
-      Método de pago:
-    </div>
-  </ion-item>
-
-  <ion-item (click)="togglePay('Tarjeta')" lines="none">
-    <ion-icon slot="start" name="card" style="color:#666"></ion-icon>
-    <ion-label>Tarjeta</ion-label>
-    <ion-icon slot="end" name="checkmark-circle" style="color:limegreen"></ion-icon>
-  </ion-item>
-
-  <ion-item (click)="togglePay('Efectivo')" lines="none">
-    <ion-icon slot="start" name="cash" style="color:#666"></ion-icon>
-    <ion-label>Efectivo</ion-label>
-    <ion-icon slot="end" name="checkmark-circle" style="color:white"></ion-icon>
-  </ion-item> -->
-
-
   <ion-item lines="none">
     <div style="color:#444;font-size:17px">
-      <!-- ¿Quién envía? -->
-      <!-- Datos de recogida -->
       Detalles de recogida
-
     </div>
   </ion-item>
 
@@ -95,7 +73,6 @@
 
   <ion-item lines="none">
     <div style="color:#444;font-size:17px">
-      <!-- ¿Quién recibe? -->
       Detalles de entrega
     </div>
   </ion-item>
@@ -115,11 +92,24 @@
 
 
 <ion-footer style="background:white">
-  <div style="padding:5px">
-    <ion-item (click)="togglePay('Tarjeta')" lines="none">
+
+  <div *ngIf="metodo_pago == 'Tarjeta'" style="padding:5px">
+    <ion-item (click)="openMetodoPago()" lines="none">
       <ion-icon slot="start" name="card" style="color:#666"></ion-icon>
       <div style="font-size:14px">
         Tarjeta
+      </div>
+      <div slot="end" style="font-size:14px">
+        CAMBIAR
+      </div>
+    </ion-item>
+  </div>
+
+  <div *ngIf="metodo_pago == 'Efectivo'" style="padding:5px">
+    <ion-item (click)="openMetodoPago()" lines="none">
+      <ion-icon slot="start" name="cash" style="color:#666"></ion-icon>
+      <div style="font-size:14px">
+        Efectivo
       </div>
       <div slot="end" style="font-size:14px">
         CAMBIAR
@@ -136,35 +126,6 @@
 </ion-footer>
 
 
-<ion-footer *ngIf="false" style="background:white">
-
-  <div style="display:flex;align-items:center;justify-content:space-between">
-    <div style="color:#777;width:30%;text-align:center">
-      Entrega:
-      <div style="display:flex;align-items:center;width:100%;justify-content:center">
-        <ion-icon name="time" style="color:#bbb;margin-right:5px;font-size:18px;"></ion-icon>
-        <!-- 17:10 -->
-        15 min.
-      </div>
-    </div>
-    <div style="color:#777;width:30%;text-align:center">
-      Total:
-
-      <span style="color:limegreen;font-weight:600">$3000</span>
-
-
-      <!-- <span *ngIf="!cuponData.ok" style="color:limegreen;font-weight:600">${{monto}}</span>
-      <span *ngIf="cuponData.ok && precio_descuento != 0"
-        style="color:limegreen;font-weight:600">${{precio_descuento}}</span>
-      <span *ngIf="cuponData.ok && precio_descuento == 0" style="color:limegreen;font-weight:600">Gratis</span>
-    -->
-    </div>
-    <div (click)="confirmar_envio()"
-      style="width:40%;padding:15px;text-align:center;font-weight:600;background:limegreen;color:white;">
-      Confirmar
-    </div>
-  </div>
-</ion-footer>
 
 <div *ngIf="false"
   style="z-index:999;position:fixed;top:0px;left:0px;height:100%;width:100%;display:flex;align-items:center;justify-content:center;background:rgb(34, 34, 34, 0.5)">

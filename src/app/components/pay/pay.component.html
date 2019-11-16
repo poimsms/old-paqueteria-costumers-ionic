@@ -16,101 +16,118 @@
 
 <ion-content>
 
-  <div style="padding:15px">
+  <div *ngIf="cuponData.ok">
     <div
-      style="padding:10px;background:slategray;width:100%;border-radius:5px;display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <div style="font-size:17px;font-weight:600;color:white">
-          55% de descuento
-        </div>
-        <div style="color:#eee;font-size:14px">
-          <div>
-            Valido por 1 pedido
+      style="padding:10px;background:#F0F8ED;width:100%;border-radius:5px;display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center">
+        <img src="https://res.cloudinary.com/ddon9fx1n/image/upload/v1573825710/tools/coupon.png" style="width:27px">
+        <div style="margin-left:20px">
+          <div style="font-size:17px;font-weight:500;color:#3D9B1F">
+            <span *ngIf="cuponData.cupon.tipo == 'dinero'">${{cuponData.cupon.descuento}}</span>
+            <span *ngIf="cuponData.cupon.tipo == 'porcentaje'">{{cuponData.cupon.descuento}}</span>
+            de descuento
+          </div>
+          <div style="color:#3D9B1F;font-size:14px">
+            <div>
+              Válido por {{cuponData.cupon.proximos_pedidos}} pedidos
+            </div>
           </div>
         </div>
       </div>
-      <ion-icon name="checkmark" style="color:white;font-size:22px"></ion-icon>
+      <ion-icon name="checkmark" style="color:#3D9B1F;font-size:22px"></ion-icon>
     </div>
   </div>
 
+  <div style="padding:5px;padding-left:15px;padding-right:15px">
+    <div style="font-size:18px;color:#444">
+      Costo del servicio
+      <span *ngIf="!cuponData.ok">${{monto}}</span>
+      <span *ngIf="cuponData.ok" style="text-decoration:line-through;color:#888">${{monto}}</span>
+      <span *ngIf="cuponData.ok && precio_descuento != 0">${{precio_descuento}}</span>
+      <span *ngIf="cuponData.ok && precio_descuento == 0">Gratis</span>
+    </div>
+    <div style="display:flex;align-items:center;color:#777">
+      <ion-icon name="time" style="color:#bbb;margin-right:5px;font-size:18px;"></ion-icon>
+      {{tiempo_entrega}} Tiempo estimado de entrega
+    </div>
+  </div>
 
-  <ion-item lines="none">
-    <div style="color:#444;font-size:17px">
-      Método de pago:
+  <ion-item lines="none" detail>
+    <div style="color:#7AC602">
+      Aplicar código
     </div>
   </ion-item>
 
-  <ion-item (click)="togglePay('Tarjeta')" lines="none">
-    <ion-icon slot="start" name="card" style="color:#666"></ion-icon>
-    <ion-label>Tarjeta</ion-label>
-    <ion-icon *ngIf="metodo_pago == 'Tarjeta'" slot="end" name="checkmark-circle" style="color:limegreen"></ion-icon>
-    <ion-icon *ngIf="metodo_pago != 'Tarjeta'" slot="end" name="checkmark-circle" style="color:white"></ion-icon>
-  </ion-item>
-
-  <ion-item (click)="togglePay('Efectivo')" lines="none">
-    <ion-icon slot="start" name="cash" style="color:#666"></ion-icon>
-    <ion-label>Efectivo</ion-label>
-    <ion-icon *ngIf="metodo_pago == 'Efectivo'" slot="end" name="checkmark-circle" style="color:limegreen"></ion-icon>
-    <ion-icon *ngIf="metodo_pago != 'Efectivo'" slot="end" name="checkmark-circle" style="color:white"></ion-icon>
-  </ion-item>
-
-
   <ion-item lines="none">
     <div style="color:#444;font-size:17px">
-      ¿Quién envía?
+      Detalles de recogida
     </div>
   </ion-item>
 
   <ion-item lines="none">
     <ion-icon slot="start" name="phone-portrait" style="color:#bbb"></ion-icon>
-    <ion-input type="tel" placeholder="Teléfono" [(ngModel)]="telefono_origen" style="border-bottom:1px solid #eee">
+    <ion-input type="tel" placeholder="Teléfono de quién envía" [(ngModel)]="telefono_origen"
+      style="border-bottom:1px solid #eee">
     </ion-input>
   </ion-item>
 
   <ion-item lines="none">
     <div style="color:#444;font-size:17px">
-      ¿Quién recibe?
+      Detalles de entrega
     </div>
   </ion-item>
 
   <ion-item lines="none">
     <ion-icon slot="start" name="phone-portrait" style="color:#bbb"></ion-icon>
-    <ion-input type="tel" placeholder="Teléfono" [(ngModel)]="telefono_destino" style="border-bottom:1px solid #eee">
+    <ion-input type="tel" placeholder="Teléfono de quién recibe" [(ngModel)]="telefono_destino"
+      style="border-bottom:1px solid #eee">
     </ion-input>
   </ion-item>
 
   <div padding>
-    <ion-textarea placeholder="Agregar nota (opcional)" [(ngModel)]="instrucciones" rows="5"
+    <ion-textarea placeholder="Agrega una nota (opcional)" [(ngModel)]="instrucciones" rows="5"
       style="border:1px solid #eee;border-radius:5px">
     </ion-textarea>
   </div>
 
 </ion-content>
 
+
 <ion-footer style="background:white">
 
-  <div style="display:flex;align-items:center;justify-content:space-between">
-    <div style="color:#777;width:30%;text-align:center">
-      Entrega:
-      <div style="display:flex;align-items:center;width:100%;justify-content:center">
-        <ion-icon name="time" style="color:#bbb;margin-right:5px;font-size:18px;"></ion-icon>
-        <!-- 17:10 -->
-        {{tiempo_entrega}}
+  <div *ngIf="metodo_pago == 'Tarjeta'" style="padding:5px">
+    <ion-item (click)="openMetodoPago()" lines="none">
+      <ion-icon slot="start" name="card" style="color:#666"></ion-icon>
+      <div style="font-size:14px">
+        Tarjeta
       </div>
-    </div>
-    <div style="color:#777;width:30%;text-align:center">
-      Total:
-      <span *ngIf="!cuponData.ok" style="color:limegreen;font-weight:600">${{monto}}</span>
-      <span *ngIf="cuponData.ok && precio_descuento != 0"
-        style="color:limegreen;font-weight:600">${{precio_descuento}}</span>
-      <span *ngIf="cuponData.ok && precio_descuento == 0" style="color:limegreen;font-weight:600">Gratis</span>
-    </div>
+      <div slot="end" style="font-size:14px">
+        CAMBIAR
+      </div>
+    </ion-item>
+  </div>
+
+  <div *ngIf="metodo_pago == 'Efectivo'" style="padding:5px">
+    <ion-item (click)="openMetodoPago()" lines="none">
+      <ion-icon slot="start" name="cash" style="color:#666"></ion-icon>
+      <div style="font-size:14px">
+        Efectivo
+      </div>
+      <div slot="end" style="font-size:14px">
+        CAMBIAR
+      </div>
+    </ion-item>
+  </div>
+
+  <div style="display:flex;align-items:center;justify-content:space-between">
     <div (click)="confirmar_envio()"
-      style="width:40%;padding:15px;text-align:center;font-weight:600;background:limegreen;color:white;">
-      Confirmar
+      style="width:100%;padding:15px;font-size:15px;text-align:center;font-weight:500;background:#7AC602;color:white;">
+      CONFIRMAR
     </div>
   </div>
 </ion-footer>
+
+
 
 <div *ngIf="isLoading"
   style="z-index:999;position:fixed;top:0px;left:0px;height:100%;width:100%;display:flex;align-items:center;justify-content:center;background:rgb(34, 34, 34, 0.5)">
