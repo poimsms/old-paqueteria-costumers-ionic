@@ -10,11 +10,9 @@ import { DataService } from 'src/app/services/data.service';
 export class RatingComponent implements OnInit {
 
   rating: any;
-  comentario = '';
+  comentario: string;
   starts = 0;
-
   rider: any;
-
   isLoading = false;
 
   constructor(

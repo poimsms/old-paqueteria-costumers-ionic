@@ -4,7 +4,6 @@ import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { Router } from '@angular/router';
 import { AuthService } from './services/auth.service';
-import { GlobalService } from './services/global.service';
 import { ForceUpgradeComponent } from './components/force-upgrade/force-upgrade.component';
 import { BloqueadoComponent } from './components/bloqueado/bloqueado.component';
 import { FcmService } from './services/fcm.service';
@@ -29,8 +28,7 @@ export class AppComponent {
     private statusBar: StatusBar,
     private menu: MenuController,
     private router: Router,
-    private _auth: AuthService,
-    private _global: GlobalService,
+    public _auth: AuthService,
     public modalController: ModalController,
     private _fcm: FcmService,
     private _config: ConfigService,
@@ -47,20 +45,16 @@ export class AppComponent {
       this.splashScreen.hide();
 
 
-      this._global.checkAppVersion().then((data: any) => {
+      this._config.checkUpdate().then((data: any) => {
 
-        this._config.setApi(data.apiVersion);
         this._auth.loadStorage();
 
         if (data.forceUpgrade) {
 
-          // this.openForceModal();
           this.nuevaVersionAlert();
-
 
         } else if (data.recommendUpgrade) {
 
-          // this.openForceModal();
           this.nuevaVersionAlert();
 
         } else {
@@ -73,7 +67,6 @@ export class AppComponent {
 
               this._fcm.getToken(this.usuario._id);
               this._fcm.onTokenRefresh(this.usuario._id);
-              this._global.getTarifas();
 
               if (!data.usuario.isActive) {
                 
@@ -91,7 +84,6 @@ export class AppComponent {
 
             }
           });
-
         }
       });
     });

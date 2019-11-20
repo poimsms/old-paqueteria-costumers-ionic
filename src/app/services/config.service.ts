@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -6,20 +7,39 @@ import { Injectable } from '@angular/core';
 export class ConfigService {
 
   apiURL = '';
-  version = '1.0.1'
+  version = '1.6.0'
   ENTORNO = 'DEV';
 
-  constructor() { }
+  constructor(private http: HttpClient) {
+    this.setApi();
+  }
 
-  setApi(version) {
+  setApi() {
+    if (this.ENTORNO == 'DEV') {
+      this.apiURL = `http://localhost:3000/v1.0.1`;
+    }
+    if (this.ENTORNO == 'PROD') {
+      this.apiURL = `https://joopiterweb.com/v1.0.1`;
+    }
+  }
+
+  checkUpdate() {
+    let serverURL = '';
 
     if (this.ENTORNO == 'DEV') {
-      this.apiURL = `http://localhost:3000/v${version}`;
+      serverURL = `http://localhost:3000`;
     }
 
     if (this.ENTORNO == 'PROD') {
-      this.apiURL = `https://joopiterweb.com/v${version}`;
+      serverURL = `https://joopiterweb.com`;
     }
-    
+
+    return new Promise((resolve, reject) => {
+      const url = `${serverURL}/api-version?version=${this.version}&app=clients`;
+      this.http.get(url).toPromise().then(data => {
+        resolve(data);
+      });
+    });
   }
+
 }

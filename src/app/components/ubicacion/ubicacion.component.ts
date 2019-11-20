@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, OnInit, NgZone, OnDestroy } from '@angular/core';
 import { DataService } from 'src/app/services/data.service';
 import { NavParams, ModalController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth.service';
@@ -9,7 +9,7 @@ declare var google: any;
   templateUrl: './ubicacion.component.html',
   styleUrls: ['./ubicacion.component.scss'],
 })
-export class UbicacionComponent implements OnInit {
+export class UbicacionComponent implements OnInit, OnDestroy {
 
   GoogleAutocomplete: any;
   autocomplete: any;
@@ -23,6 +23,8 @@ export class UbicacionComponent implements OnInit {
   puerta: string;
 
   isLoading = false;
+  timer: any;
+  call_google_autocomplete = true;
 
   constructor(
     private _data: DataService,
@@ -43,7 +45,24 @@ export class UbicacionComponent implements OnInit {
 
   ngOnInit() { }
 
+  ngOnDestroy() {
+    if (this.timer) {
+      clearTimeout(this.timer);
+    }
+  }
+
   updateSearchResults() {
+
+    if (this.call_google_autocomplete) {
+
+      this.timer = setTimeout(() => {
+        this.call_google_autocomplete = true;
+      }, 2400);
+
+    } else {
+      return;
+    }
+
     if (this.autocomplete.input == '') {
       this.autocompleteItems = [];
       return;
@@ -81,7 +100,11 @@ export class UbicacionComponent implements OnInit {
     });
   }
 
-  closeModal() {
+  close() {
+    this.modalCtrl.dismiss({ ok: false });
+  }
+
+  save() {
     if (this.position.ok) {
 
       const body: any = {};

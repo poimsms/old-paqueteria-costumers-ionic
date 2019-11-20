@@ -21,6 +21,10 @@ export class OpcionesComponent implements OnInit {
   ngOnInit() { }
 
   togglePay(tipo) {
-    this.modalCtrl.dismiss({ seleccion: tipo });
+    this.modalCtrl.dismiss({ ok: true, seleccion: tipo });
+  }
+
+  close() {
+    this.modalCtrl.dismiss({ ok: false });
   }
 }

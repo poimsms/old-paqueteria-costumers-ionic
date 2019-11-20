@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NavParams, ModalController, PopoverController, ToastController } from '@ionic/angular';
+import { NavParams, ModalController, PopoverController, ToastController, AlertController } from '@ionic/angular';
 import { DataService } from 'src/app/services/data.service';
 import { PagarService } from 'src/app/services/pagar.service';
 import { FireService } from 'src/app/services/fire.service';
@@ -22,7 +22,7 @@ export class PayComponent implements OnInit {
   pedido: any;
   isLoading = false;
   cuponData: any;
-  precio_descuento: number;
+  precio_descuento = 0;
   seleccion: any = { programado: false };
 
   index_horario = 0;
@@ -44,8 +44,8 @@ export class PayComponent implements OnInit {
     private _control: ControlService,
     private _auth: AuthService,
     public popoverController: PopoverController,
-    private _otros: OtrosService,
-    public toastController: ToastController
+    public toastController: ToastController,
+    public alertController: AlertController
   ) {
     this.usuario = navParams.get('pago').usuario;
     this.rider = navParams.get('pago').rider;
@@ -55,44 +55,41 @@ export class PayComponent implements OnInit {
     this.cuponData = navParams.get('cuponData');
     this.telefono_origen = this._auth.usuario.telefono;
 
-    if (this.cuponData.ok && this.cuponData.cupon.tipo == 'porcentaje') {
-      this.cuponPorcentaje();
-    }
-
-    if (this.cuponData.ok && this.cuponData.cupon.tipo == 'dinero') {
-      this.cuponDinero();
-    }
-
-    // if (this.cuponData.ok) {
-    //   this.precio_descuento = Math.round((this.monto - this.monto * this.cuponData.cupon.descuento / 100) / 10) * 10;
-    // }
+    this.cuponHandler();
+    this.checkoutTime();
   }
 
   ngOnInit() { }
 
-  cuponPorcentaje() {
-    const delta = Math.round((this.monto - this.monto * this.cuponData.cupon.descuento / 100) / 10) * 10;
-    if (delta <= 0) {
-      this.precio_descuento = 0;
-    } else {
-      this.precio_descuento = delta;
+  cuponHandler() {
+    if (this.cuponData.ok) {
+      if (this.cuponData.cupon.tipo == 'PORCENTAJE') {
+        const delta = Math.round((this.monto - this.monto * this.cuponData.cupon.descuento / 100) / 10) * 10;
+        this.precio_descuento = delta;
+      }
+
+      if (this.cuponData.cupon.tipo == 'DINERO') {
+        const delta = this.monto - this.cuponData.cupon.descuento;
+        delta < 0 ? this.precio_descuento = 0 : this.precio_descuento = delta;
+      }
     }
   }
 
-  cuponDinero() {
-    const delta = this.monto - this.cuponData.cupon.descuento;
-    if (delta <= 0) {
-      this.precio_descuento = 0;
-    } else {
-      this.precio_descuento = delta;
-    }
+  checkoutTime() {
+
+    const body = {
+      cliente: this._auth.usuario._id,
+      rider: this.rider._id
+    };
+
+    this.isLoading = true;
+
+    this._data.creteCheckoutTime(body)
+      .then(() => this.isLoading = false)
+      .catch(() => this.isLoading = false);
   }
 
-  confirmar_envio() {
-
-    if (this.telefono_origen == '' || this.telefono_destino == '') {
-      return this.presentToast();
-    }
+  async confirmar_envio() {
 
     const flow = {
       monto: this.monto,
@@ -102,6 +99,7 @@ export class PayComponent implements OnInit {
 
     const pedido = {
       costo: this.monto,
+      costo_real: this.monto,
       metodo_de_pago: this.metodo_pago,
       distancia: this.pedido.distancia,
       origen: this.pedido.origen,
@@ -118,9 +116,20 @@ export class PayComponent implements OnInit {
       pedido.costo = this.precio_descuento;
     }
 
+    this.isLoading = true;
+
+    const time_data: any = await this._data.getCheckoutTime(this._auth.usuario._id);
+
+    if (!time_data.ok) {
+      this.isLoading = false;
+      return this.alert_tiempo_expirado();
+    }
+
     if (this.metodo_pago == 'Tarjeta') {
 
-      this.isLoading = true;
+      if (this.precio_descuento <= 350) {
+        return this.alert_monto_minimo();
+      }
 
       this._pagar.pagarConFlow(flow).then(pagoExitoso => {
 
@@ -128,7 +137,7 @@ export class PayComponent implements OnInit {
 
         if (pagoExitoso) {
           this._data.crearPedido(pedido).then((pedido: any) => {
-            this.closeModal('pago_efectuado', pedido);
+            this.save(pedido);
           });
         } else {
           this.modalCtrl.dismiss({ pagoExitoso: false });
@@ -139,26 +148,21 @@ export class PayComponent implements OnInit {
     if (this.metodo_pago == 'Efectivo') {
 
       this._data.crearPedido(pedido).then((pedido: any) => {
-        this.closeModal('pago_efectuado', pedido);
+        this.save(pedido);
       });
     }
   }
 
-  closeModal(tipo, pedido?) {
+  save(pedido) {
 
-    if (tipo == 'pago_no_efectuado') {
-      return this.modalCtrl.dismiss({ pagoExitoso: false });
-    }
-
-    if (pedido) {
-      this.updateRiderEstadoOcupado(pedido._id);
-    }
+    this.updateRiderEstadoOcupado(pedido._id);
 
     if (this.cuponData.ok) {
 
       this.isLoading = true;
 
       this._data.useCupon(this.cuponData.id).then(() => {
+        this._data.getCuponActivo(this.usuario._id);
         this.isLoading = false;
         this.modalCtrl.dismiss({ pagoExitoso: true, riderID: this.rider._id });
       });
@@ -166,6 +170,11 @@ export class PayComponent implements OnInit {
     } else {
       this.modalCtrl.dismiss({ pagoExitoso: true, riderID: this.rider._id });
     }
+  }
+
+  close() {
+    this.updateRiderEstadoDisponible();
+    this.modalCtrl.dismiss({ pagoExitoso: false });
   }
 
   updateRiderEstadoOcupado(pedidoId) {
@@ -188,6 +197,17 @@ export class PayComponent implements OnInit {
     });
   }
 
+  updateRiderEstadoDisponible() {
+    this._fire.updateRider(this.rider._id, 'rider', {
+      fase: '',
+      pagoPendiente: false,
+      aceptadoId: '',
+      cliente_activo: ''
+    });
+    this._fire.updateRider(this.rider._id, 'coors', {
+      pagoPendiente: false
+    });
+  }
 
   async openMetodoPago() {
 
@@ -200,19 +220,56 @@ export class PayComponent implements OnInit {
 
     const { data } = await modal.onWillDismiss();
 
-    if (data) {
+    if (data.ok) {
       this.metodo_pago = data.seleccion;
     }
   }
 
-  async presentToast() {
+  async toast_cambio_a_efectivo() {
     const toast = await this.toastController.create({
-      message: 'Por favor complete todos los campos',
+      message: 'Se ha cambiado tu metodo de pago',
       duration: 2500,
       position: 'middle'
     });
     toast.present();
   }
 
+  async alert_monto_minimo() {
+    const alert = await this.alertController.create({
+      header: 'Monto inválido',
+      message: 'Recuerda que el monto mínimo a pagar con TARJETA son $350 CLP.',
+      buttons: [
+        {
+          text: 'Ok',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: (blah) => {
+            // this.metodo_pago = 'Efectivo';
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async alert_tiempo_expirado() {
+    const alert = await this.alertController.create({
+      header: 'Tiempo expirado',
+      message: 'Por favor, crea un nuevo pedido.',
+      buttons: [
+        {
+          text: 'Ok',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: (blah) => {
+            this.modalCtrl.dismiss({ pagoExitoso: false });
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
 
 }

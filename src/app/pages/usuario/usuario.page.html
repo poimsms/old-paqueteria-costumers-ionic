@@ -68,13 +68,26 @@
 
 
 
-<div *ngIf="isLoading"
+<!-- <div *ngIf="isLoading"
   style="z-index:999;position:fixed;top:0px;left:0px;height:100%;width:100%;display:flex;align-items:center;justify-content:center;background:rgb(34, 34, 34, 0.5)">
   <div style="box-shadow: 0 0 20px rgba(68, 68, 68, 0.75);padding:40px;border-radius:3px;background:white;">
     <div style="width:100%;display:flex;align-items:center">
       <ion-spinner color="secondary"></ion-spinner>
       <div style="margin-left:20px;font-size:17.5px;margin-right:10px">
         Guardando...
+      </div>
+    </div>
+  </div>
+</div> -->
+
+<div *ngIf="isLoading"
+  style="z-index:999;position:fixed;top:0px;left:0px;height:100%;width:100%;display:flex;align-items:center;justify-content:center;background:rgb(34, 34, 34, 0.5)">
+  <div
+    style="box-shadow: 0 0 20px rgba(68, 68, 68, 0.75);padding:30px;padding-top:20px;padding-bottom:20px;width:80%;border-radius:3px;background:white;">
+    <div style="width:100%;display:flex;align-items:center">
+      <ion-spinner color="secondary"></ion-spinner>
+      <div style="margin-left:20px;font-size:17px;margin-right:10px">
+        Cargando...
       </div>
     </div>
   </div>

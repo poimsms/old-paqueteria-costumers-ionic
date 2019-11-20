@@ -1,4 +1,4 @@
-<ion-header >
+<ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
@@ -6,12 +6,12 @@
     <ion-title>Historial de envíos</ion-title>
   </ion-toolbar>
   <ion-segment (ionChange)="segmentChanged($event)" value="completados" color="dark">
-      <ion-segment-button value="completados">
-          <ion-label>Pedidos anteriores</ion-label>
-        </ion-segment-button>
+    <ion-segment-button value="completados">
+      <ion-label>Pedidos anteriores</ion-label>
+    </ion-segment-button>
     <ion-segment-button value="proximos">
       <ion-label>Próximos</ion-label>
-    </ion-segment-button>   
+    </ion-segment-button>
   </ion-segment>
 </ion-header>
 
@@ -20,7 +20,7 @@
   <div *ngFor="let pedido of pedidos" style="padding:15px;margin:15px;border-radius:10px;border:1px solid #eee">
     <div style="width:100%">
       <div style="width:100%;display:flex;justify-content:space-between">
-        <div style="color:#666">
+        <div style="color:#666;text-transform:capitalize">
           {{pedido.fecha_creacion}}
         </div>
         <div *ngIf="tipo == 'proximos'" style="color:limegreen">

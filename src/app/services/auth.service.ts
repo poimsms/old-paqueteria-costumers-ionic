@@ -129,6 +129,17 @@ export class AuthService {
     return this.http.put(url, body, { headers }).toPromise();
   }
 
+  refreshUser() {
+    return new Promise((resolve, reject) => {
+      const url = `${this._config.apiURL}/usuarios/get-one?id=${this.usuario._id}`;
+      const headers = new HttpHeaders({ token: this.token, version: this._config.version });
+      this.http.get(url, { headers }).toPromise().then(usuario => {
+        this.usuario = usuario;
+        resolve(usuario);
+      });
+    });
+  }
+
   updatePassword(body) {
     const url = `${this._config.apiURL}/usuarios/update-password?id=${this.usuario._id}`;
     const headers = new HttpHeaders({ token: this.token, version: this._config.version });

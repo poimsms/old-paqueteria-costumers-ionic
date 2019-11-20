@@ -15,15 +15,7 @@ export class FireService {
   ids = [];
   riders_consultados = [];
 
-  constructor(private db: AngularFirestore) {
-
-    // this.rider$ = this.rider_query$.pipe(
-    //   switchMap(id => {
-    //     return this.db.collection('riders', ref => ref.where('rider', '==', id)).valueChanges()
-    //   })
-    // );
-
-  }
+  constructor(private db: AngularFirestore) { }
 
   getRider(id) {
     return this.db.collection('riders', ref => ref.where('rider', '==', id)).valueChanges();
@@ -80,11 +72,6 @@ export class FireService {
 
     const { vehiculo, ciudad, lat, lng } = body;
 
-    // const vehiculo = body.vehiculo;
-    // const ciudad = body.ciudad;
-    // const lat = body.lat;
-    // const lng = body.lng;
-
     return new Promise((resolve, reject) => {
       this.db.collection('riders_coors', ref =>
         ref.where('isOnline', '==', true)
@@ -108,8 +95,6 @@ export class FireService {
           }
 
           const id = this.riders_loop(data.riders, lat, lng);
-
-          console.log(id, 'id_rider_cercano')
 
           resolve({ ok: true, id });
         });
@@ -138,9 +123,6 @@ export class FireService {
       }
     });
 
-    console.log(riders_disponibles, 'disponibleeeeess')
-    console.log(this.riders_consultados, 'consultadooooss')
-
     return riders_disponibles;
   }
 
@@ -155,7 +137,7 @@ export class FireService {
     const riders_bici = [];
 
     riders.forEach(rider => {
-      // const distance = Math.sqrt((rider.lat - lat) * (rider.lat - lat) + (rider.lng - lng) * (rider.lng - lng));
+
       const riderCoors = [rider.lat, rider.lng];
       const destinoCoors = [lat, lng];
 
@@ -194,14 +176,10 @@ export class FireService {
     let isBici = false;
 
     riders.forEach(rider => {
-      // const distance = Math.sqrt((rider.lat - lat) * (rider.lat - lat) + (rider.lng - lng) * (rider.lng - lng));
-
       const riderCoors = [rider.lat, rider.lng];
       const destinoCoors = [lat, lng];
 
       const distance = this.haversineDistance(riderCoors, destinoCoors);
-      console.log(distance)
-      console.log(rider.vehiculo)
       if (distance < 2300 && rider.vehiculo == 'moto') {
         riders_moto.push(rider);
       }
@@ -340,74 +318,6 @@ export class FireService {
     return id;
   }
 
-
-  ordenarRiders(riders, lat, lng) {
-    this.distanceMatrix = [];
-
-    riders.forEach(rider => {
-      const distance = Math.sqrt((rider.lat - lat) * (rider.lat - lat) + (rider.lng - lng) * (rider.lng - lng));
-      this.distanceMatrix.push({
-        distance,
-        id: rider.rider
-      });
-    });
-
-    const ridersOrdenados = [];
-    let matrix_temp = [];
-    matrix_temp = JSON.parse(JSON.stringify(this.distanceMatrix));
-
-    riders.forEach(rider => {
-
-      const data: any = this.iterar(matrix_temp);
-
-      const id = data.id;
-
-      ridersOrdenados.push(id);
-
-      matrix_temp = JSON.parse(JSON.stringify(data.matrix));
-
-    });
-
-    return ridersOrdenados;
-  }
-
-  iterar(riders) {
-
-    if (riders.length != 0) {
-      let a = 0;
-      let b = riders[0].distance;
-      let id = riders[0].id;
-
-      if (riders.length != 1) {
-        riders.forEach(data => {
-          a = data.distance;
-          if (a < b) {
-            b = a;
-            id = data.id;
-          }
-        });
-
-        this.ids.push(id);
-
-        let riders_restantes = [];
-
-        this.distanceMatrix.forEach(item => {
-          this.ids.forEach(id => {
-            if (id != item.id) {
-              riders_restantes.push(item);
-            }
-          });
-        });
-
-        return { id, matrix: riders_restantes };
-
-      } else {
-
-        return { id: riders[0].id, matrix: [] };
-      }
-
-    }
-  }
 
 
 }

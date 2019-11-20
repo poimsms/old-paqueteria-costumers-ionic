@@ -1,13 +1,13 @@
 <ion-header no-border>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button (click)="closeModal('pago_no_efectuado')">
+      <ion-button (click)="close()">
         <ion-icon slot="icon-only" name="close" style="color:#444;font-size:27px"></ion-icon>
       </ion-button>
     </ion-buttons>
     <!-- <ion-title>Nuevo envío</ion-title> -->
     <ion-buttons slot="end">
-      <ion-button (click)="closeModal('pago_no_efectuado')" color="dark">
+      <ion-button (click)="close()" color="dark">
         Cancelar
       </ion-button>
     </ion-buttons>
@@ -67,7 +67,7 @@
   <ion-item lines="none">
     <ion-icon slot="start" name="phone-portrait" style="color:#bbb"></ion-icon>
     <ion-input type="tel" placeholder="Teléfono de quién envía" [(ngModel)]="telefono_origen"
-      style="border-bottom:1px solid #eee">
+      style="border-bottom:1px solid #eee" autocomplete="off">
     </ion-input>
   </ion-item>
 
@@ -80,7 +80,7 @@
   <ion-item lines="none">
     <ion-icon slot="start" name="phone-portrait" style="color:#bbb"></ion-icon>
     <ion-input type="tel" placeholder="Teléfono de quién recibe" [(ngModel)]="telefono_destino"
-      style="border-bottom:1px solid #eee">
+      style="border-bottom:1px solid #eee" autocomplete="off">
     </ion-input>
   </ion-item>
 

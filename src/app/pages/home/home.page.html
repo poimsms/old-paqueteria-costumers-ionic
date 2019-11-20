@@ -84,7 +84,7 @@
         Seleccione un servicio:
       </div>
       <div *ngIf="cuponData.ok"
-        style="padding:5px;padding-left:10px;padding-right:10px;border-radius:15px;background:orange;font-size:14px;color:white;font-weight:500">
+        style="padding:5px;padding-left:10px;padding-right:10px;border-radius:15px;background:#C0C0CB;font-size:14px;color:white;text-transform:uppercase">
         <span *ngIf="cuponData.cupon.tipo == 'porcentaje'">{{cuponData.cupon.descuento}}%</span>
         <span *ngIf="cuponData.cupon.tipo == 'dinero'">${{cuponData.cupon.descuento}}</span>
         descuento
@@ -201,22 +201,39 @@
 </ion-footer>
 
 
-
+<!-- loadingRider -->
 <div *ngIf="loadingRider"
   style="z-index:999;position:fixed;top:0px;left:0px;height:100%;width:100%;display:flex;align-items:center;justify-content:center;background:rgb(34, 34, 34, 0.5)">
-  <div style="box-shadow: 0 0 20px rgba(68, 68, 68, 0.75);border-radius:3px;background:white;width:250px;padding:20px">
-    <div style="width:100%">
+  <div style="box-shadow: 0 0 20px rgba(68, 68, 68, 0.75);border-radius:3px;background:white;width:270px;padding:20px">
+    <div style="width:100%;flex:1">
       <div style="width:100%;font-size:17.5px;display:flex;align-items:center">
-        <ion-spinner color="secondary" name="dots" style="margin-right:5px"></ion-spinner>
-        BUSCANDO RIDER
-        <ion-spinner color="success" name="dots" style="margin-left:5px"></ion-spinner>
+        <ion-spinner color="dark" name="dots" style="margin-right:5px;margin-left:10px"></ion-spinner>
+        <div style="font-weight:500;color:#333;width:150px;text-align:center">
+          BUSCANDO RIDER
+        </div>
+        <ion-spinner color="dark" name="dots" style="margin-left:5px"></ion-spinner>
       </div>
-      <div style="width:100%;margin-top:5px">
-        Localizando riders cercanos
+      <div style="color:#666;width:100%;margin-top:10px;text-align:center">
+        Localizando Riders cercanos
       </div>
     </div>
     <div (click)="cancelarBusqueda()" style="margin-top:30px;width:100%;display:flex;justify-content:center">
-      <ion-icon name="close-circle" style="color:#444;font-size:40px"></ion-icon>
+      <ion-icon name="close-circle" style="color:#444;font-size:42px"></ion-icon>
+    </div>
+  </div>
+</div>
+
+
+
+<div *ngIf="isLoading"
+  style="z-index:999;position:fixed;top:0px;left:0px;height:100%;width:100%;display:flex;align-items:center;justify-content:center;background:rgb(34, 34, 34, 0.5)">
+  <div
+    style="box-shadow: 0 0 20px rgba(68, 68, 68, 0.75);padding:30px;padding-top:20px;padding-bottom:20px;width:80%;border-radius:3px;background:white;">
+    <div style="width:100%;display:flex;align-items:center">
+      <ion-spinner color="secondary"></ion-spinner>
+      <div style="margin-left:20px;font-size:17px;margin-right:10px">
+        Cargando...
+      </div>
     </div>
   </div>
 </div>

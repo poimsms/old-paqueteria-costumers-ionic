@@ -39,7 +39,7 @@
     </div>
   </div>
 
-<div
+<div *ngIf="autocompleteItems.length == 0"
   style="z-index:990;position:fixed;bottom:160px;left:0;width:100%;padding:10px;display:flex;align-items:center;justify-content:space-between">
   <div style="display:flex;align-items:center">
     <div (click)="ubicacionHandler('casa')"
@@ -58,7 +58,7 @@
 </div>
 
 
-<ion-footer padding style="background:#fff">
+<ion-footer  *ngIf="autocompleteItems.length == 0" padding style="background:#fff">
 
   <ion-item style="margin-top:0px">
     <ion-icon slot="start" name="home" style="color:#bbb"></ion-icon>

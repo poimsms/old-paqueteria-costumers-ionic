@@ -69,7 +69,6 @@ export class DataService {
     const url = `${this._config.apiURL}/core/cupones-get-active-one?id=${id}`;
     const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
     this.http.get(url, { headers }).toPromise().then((data: any) => {
-      console.log(data, 'dattaa')
       this.cuponData.next({ ok: data.ok, cupon: data.cupon, id: data.id });
     });
   }
@@ -116,5 +115,16 @@ export class DataService {
     return this.http.post(url, body, { headers }).toPromise();
   }
 
+  creteCheckoutTime(body) {
+    const url = `${this._config.apiURL}/core/checkout-time-create`;
+    const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
+    return this.http.post(url, body, { headers }).toPromise();
+  }
+
+  getCheckoutTime(id) {
+    const url = `${this._config.apiURL}/core/checkout-time-get?id=${id}`;
+    const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
+    return this.http.get(url, { headers }).toPromise();
+  }
 }
 

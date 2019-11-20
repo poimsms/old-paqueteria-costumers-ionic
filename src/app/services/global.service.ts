@@ -47,9 +47,73 @@ export class GlobalService {
     });
   }
 
-  getTarifas() {
-    const url = `${this._config.apiURL}/core/tarifas-get-active-one`;
-    this.http.get(url).toPromise().then(tarifas => this.tarifas = tarifas);
+  getTarifas(ciudad) {
+    const url = `${this._config.apiURL}/core/tarifas-get?ciudad=${ciudad}`;
+    return this.http.get(url).toPromise();
+  }
+
+  calcularPrecios(data) {
+
+    return new Promise(async (resolve, reject) => {
+
+      const { distancia, ciudad } = data;
+
+      const tarifas: any = await this.getTarifas(ciudad);
+
+      let precioBici = 0;
+      let precioMoto = 0;
+
+      if (distancia < tarifas.limite_aplicacion) {
+        precioBici = tarifas.bici.minima
+      } else {
+        const costo = tarifas.bici.distancia * distancia / 1000 + tarifas.bici.base;
+        precioBici = Math.ceil(costo / 10) * 10;
+      }
+
+      if (ciudad == 'santiago') {
+        precioMoto = this.precio_moto_santiago(tarifas, distancia);
+      } else {
+        precioMoto = this.precio_moto_normal(tarifas, distancia);
+      }
+
+
+      resolve({ bici: precioBici, moto: precioMoto })
+    });
+  }
+
+  precio_moto_santiago(tarifas_data, distancia) {
+
+    let precioMoto = 0;
+    let tarifas: any;
+
+    if (distancia < tarifas_data.limite_cambio) {
+      tarifas = tarifas_data.motos.A;
+    } else {
+      tarifas = tarifas_data.motos.B;
+    }
+
+    if (distancia < tarifas.moto.limite_aplicacion) {
+      precioMoto = tarifas.moto.minima;
+    } else {
+      const costo = tarifas.moto.distancia * distancia / 1000 + tarifas.moto.base;
+      precioMoto = Math.ceil(costo / 10) * 10;
+    }
+
+    return precioMoto;
+  }
+
+  precio_moto_normal(tarifas, distancia) {
+
+    let precioMoto = 0;
+
+    if (distancia < tarifas.moto.limite_aplicacion) {
+      precioMoto = tarifas.moto.minima;
+    } else {
+      const costo = tarifas.moto.distancia * distancia / 1000 + tarifas.moto.base;
+      precioMoto = Math.ceil(costo / 10) * 10;
+    }
+
+    return precioMoto;
   }
 
 

@@ -14,7 +14,7 @@
 
     <div style="margin:15px;border:1px solid #eee;border-radius:6px;padding:5px;display:flex;align-items:center;">
       <div style="padding:4px;margin-right:5px;font-size:17px;display:flex;align-items:center">
-          <ion-icon name="call" style="color:#bbb;margin-right:5px;font-size:20px"></ion-icon>
+        <ion-icon name="call" style="color:#bbb;margin-right:5px;font-size:20px"></ion-icon>
         +56
       </div>
       <ion-input type="tel" [(ngModel)]="telefono" placeholder="Número de teléfono" style="font-size:17px"></ion-input>
@@ -40,14 +40,14 @@
       <ion-toggle (ionChange)="togglePoliticas()" color="secondary" slot="start"></ion-toggle>
       <div style="color:#666">
         Acepto <span style="color:#9EDF1F;font-weight:500" (click)="openPoliticasModal()">política de privacidad</span>
-        de Moviapp
+        de MoviApp
       </div>
     </ion-item>
 
     <div padding style="margin-top:20px">
       <ion-button [disabled]="isLoading" (click)="next()" mode="ios" expand="block" color="secondary">
-          <div style="font-size:20px;font-weight:600">
-              Continuar
+        <div style="font-size:20px;font-weight:600">
+          Continuar
         </div>
       </ion-button>
     </div>

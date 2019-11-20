@@ -1,6 +1,6 @@
 import { Component, NgZone, OnInit, OnDestroy } from '@angular/core';
 import { ControlService } from 'src/app/services/control.service';
-import { ModalController, AlertController } from '@ionic/angular';
+import { ModalController, AlertController, Platform } from '@ionic/angular';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { Router } from '@angular/router';
 import { UbicacionComponent } from 'src/app/components/ubicacion/ubicacion.component';
@@ -40,6 +40,10 @@ export class MapaPage implements OnInit {
 
   interval: any;
 
+  timer: any;
+
+  call_google_autocomplete = true;
+
   image = {
     url: 'https://res.cloudinary.com/ddon9fx1n/image/upload/v1565228910/tools/pin_motocicleta.png',
     scaledSize: new google.maps.Size(40, 40),
@@ -48,14 +52,15 @@ export class MapaPage implements OnInit {
   };
 
   constructor(
-    private _control: ControlService,
+    public _control: ControlService,
     private zone: NgZone,
     public modalCtrl: ModalController,
     public alertController: AlertController,
     private geolocation: Geolocation,
     private router: Router,
     private _data: DataService,
-    private _auth: AuthService
+    private _auth: AuthService,
+    private platform: Platform
   ) {
     this.service = new google.maps.DistanceMatrixService();
     this.GoogleAutocomplete = new google.maps.places.AutocompleteService();
@@ -66,16 +71,44 @@ export class MapaPage implements OnInit {
 
 
   ngOnInit() {
-    this.cargarMapa();
-    this.position = {
-      coors: this.center,
-      ok: false,
-      address: 'hoola'
-    }
+    // this.cargarMapa();
+    this.start_map();   
   }
 
   ngOnDestroy() {
-    clearInterval(this.interval);
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
+    if (this.timer) {
+      clearTimeout(this.timer);
+    }
+  }
+
+  start_map() {
+    if (this.platform.is("cordova")) {
+      this.geolocation.getCurrentPosition().then((resp) => {
+        this.center = { lat: resp.coords.latitude, lng: resp.coords.longitude };
+        this.cargarMapa();
+        this.position = {
+          coors: this.center,
+          ok: false,
+          address: ''
+        }
+      }).catch((error) => {
+        this.router.navigateByUrl('home');
+      });
+    } else {
+      setTimeout(() => {
+        this.center = { lat: -33.444600, lng: -70.655585 };
+        this.lastCenter = { lat: -33.444700, lng: -70.655700 };
+        this.cargarMapa();
+        this.position = {
+          coors: this.center,
+          ok: false,
+          address: ''
+        }
+      }, 500);
+    }
   }
 
   cargarMapa() {
@@ -191,6 +224,18 @@ export class MapaPage implements OnInit {
 
   updateSearchResults() {
 
+    if (this.call_google_autocomplete) {
+
+      this.timer = setTimeout(() => {
+        this.call_google_autocomplete = true;
+      }, 2400);
+
+    } else {
+      return;
+    }
+
+    this.call_google_autocomplete = false;
+
     if (this.cambiandoBarraFromUbicacion) {
       return this.cambiandoBarraFromUbicacion = false;
     }
@@ -199,6 +244,7 @@ export class MapaPage implements OnInit {
       this.autocompleteItems = [];
       return;
     }
+
     this.GoogleAutocomplete.getPlacePredictions({ input: this.autocomplete.input, componentRestrictions: { country: 'cl' } },
       (predictions, status) => {
         this.autocompleteItems = [];

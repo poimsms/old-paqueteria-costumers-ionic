@@ -12,6 +12,7 @@ import { AlertController, ToastController } from '@ionic/angular';
 export class CodigoPage implements OnInit {
 
   codigo: string;
+  isLoading = false;
 
   constructor(
     private router: Router,
@@ -34,7 +35,11 @@ export class CodigoPage implements OnInit {
       codigo: this.codigo.toLowerCase()
     };
 
+    this.isLoading = true;
+
     this._data.addCupon(body).then((res: any) => {
+
+      this.isLoading = false;
 
       if (!res.ok) {
         return this.presentAlert(res.message);
@@ -60,7 +65,7 @@ export class CodigoPage implements OnInit {
     const toast = await this.toastController.create({
       message,
       duration: 2000,
-      position: 'bottom'
+      position: 'middle'
     });
     toast.present();
   }

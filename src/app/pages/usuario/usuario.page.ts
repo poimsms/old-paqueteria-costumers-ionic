@@ -21,7 +21,7 @@ export class UsuarioPage implements OnInit {
     private camera: Camera,
     private _img: ImageService
   ) {
-    this.usuario = _auth.usuario;
+    this._auth.refreshUser().then(usuario => this.usuario = usuario);    
   }
 
   ngOnInit() {

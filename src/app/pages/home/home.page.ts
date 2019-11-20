@@ -85,6 +85,8 @@ export class HomePage implements OnInit, OnDestroy {
 
   cuponData: any;
 
+  isLoading = false;
+
   bodyNeerRider: any;
   counter = 0;
 
@@ -113,13 +115,6 @@ export class HomePage implements OnInit, OnDestroy {
     origin: new google.maps.Point(0, 0),
     anchor: new google.maps.Point(4, 36)
   };
-
-  // destinoIcon = {
-  //   url: this.destinoImg,
-  //   scaledSize: new google.maps.Size(30, 30),
-  //   origin: new google.maps.Point(0, 0),
-  //   anchor: new google.maps.Point(4, 30)
-  // };
 
   showMoto: boolean;
   showBici: boolean;
@@ -154,11 +149,10 @@ export class HomePage implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.cargarMapa();
-    this.escucharCambiosDelMapa();
+    this.mapaSubscription();
     this.getRating();
     this.getCupon();
     this._otros.pedido$.subscribe(data => {
-      // this.resetMapa();
       this.pedidoActivo = false;
       this.pedidosHandler(data);
     });
@@ -177,34 +171,20 @@ export class HomePage implements OnInit, OnDestroy {
 
     const modal = await this.popoverController.create({
       component: RatingComponent,
-      // event: ev,
-
       componentProps: { rating }
     });
 
     await modal.present();
-
-    // const { data } = await modal.onWillDismiss();
-
-    // if (data) {
-    //   console.log(data, 'dataa')
-    //   this.index_metodo_pago = data.seleccion.index;
-    //   console.log(this.index_metodo_pago, 'indexxx')
-    //   this.metodoPago = data.seleccion.value;
-    // }
   }
 
-
-
   riderSubCoors() {
-    console.log(this.rider, 'riii')
-    console.log(this.rider._id, 'iddd')
-
     this.riderCoorsSub$ = this._fire.getRiderCoors(this.rider._id).subscribe((res: any) => {
 
       if (res[0].cliente == this.usuario._id) {
+
         const coors = { lat: res[0].lat, lng: res[0].lng };
         this.graficarMarcador(coors, 'rider');
+
       } else {
         this.riderCoorsSub$.unsubscribe();
         setTimeout(() => {
@@ -212,15 +192,12 @@ export class HomePage implements OnInit, OnDestroy {
           this.resetMapa();
         }, 6000);
       }
-
     });
   }
 
   getRating() {
     this._data.getActiveRating(this.usuario._id).then((data: any) => {
       if (data.ok) {
-        console.log(data)
-        // this.openRatingModal(data);
         this.presentRating(data.rating);
       }
     });
@@ -303,7 +280,6 @@ export class HomePage implements OnInit, OnDestroy {
     this.getNeerestRider();
   }
 
-
   getNeerestRider() {
 
     return new Promise((resolve, reject) => {
@@ -315,20 +291,14 @@ export class HomePage implements OnInit, OnDestroy {
         return this.alert_alta_demanda();
       }
 
-      // console.log('aca vaaa')
-
       this._fire.getNeerestRider(this.bodyNeerRider).then((res: any) => {
 
         if (!res.ok) {
-          console.log('Se acabaron los riders!!')
           return setTimeout(() => {
             this.loadingRider = false;
             this.alert_alta_demanda();
           }, 5 * 1000);
         }
-
-        console.log(this.bodyNeerRider, 'body-neer')
-        console.log(res, 'resss')
 
         this.handShake(res.id);
         this.sleepRider(res.id);
@@ -339,9 +309,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   sleepRider(id) {
-    console.log('sleeeping')
     this.timer = setTimeout(async () => {
-      console.log('awakeee')
 
       this._fire.riders_consultados.push(id);
 
@@ -363,22 +331,16 @@ export class HomePage implements OnInit, OnDestroy {
   handShake(id) {
     this._fire.getRiderPromise(id).then((rider: any) => {
 
-      console.log(rider, 'RIDER')
-
       if (rider.cliente_activo == '') {
-        console.log('cliente_activo rider libre')
-
         this._fire.updateRider(id, 'rider', { cliente_activo: this.usuario._id })
           .then(() => this.handShake(id));
       }
 
       if (rider.cliente_activo != this.usuario._id && rider.cliente_activo != '') {
-        console.log('cliente_activo ganado por otro')
         this.getNeerestRider();
       }
 
       if (rider.cliente_activo == this.usuario._id && rider.cliente_activo != '') {
-        console.log('cliente_activo ganado por Mi')
         this.subscribeToRider(id);
       }
     });
@@ -390,7 +352,6 @@ export class HomePage implements OnInit, OnDestroy {
       this.riderActivoEnBusqueda = riderFire.rider;
 
       if (riderFire.rechazadoId == this.usuario._id) {
-        console.log('rechazadoId')
 
         clearTimeout(this.timer);
         this.riderSub$.unsubscribe();
@@ -402,7 +363,7 @@ export class HomePage implements OnInit, OnDestroy {
       }
 
       if (riderFire.aceptadoId == this.usuario._id) {
-        console.log('aceptadoId')
+
         clearTimeout(this.timer);
         this.riderSub$.unsubscribe();
         this.loadingRider = false;
@@ -481,7 +442,6 @@ export class HomePage implements OnInit, OnDestroy {
     this.router.navigateByUrl('mapa');
   }
 
-
   async openMapaModal(tipo) {
 
     if (this.pedidoActivo) {
@@ -491,15 +451,6 @@ export class HomePage implements OnInit, OnDestroy {
     this._control.coorsTipo = tipo;
     const modal = await this.modalController.create({
       component: MapaComponent
-    });
-
-    await modal.present();
-  }
-
-  async openRatingModal(data) {
-    const modal = await this.modalController.create({
-      component: RatingComponent,
-      componentProps: { data }
     });
 
     await modal.present();
@@ -561,11 +512,9 @@ export class HomePage implements OnInit, OnDestroy {
     }
   }
 
-  escucharCambiosDelMapa() {
+  mapaSubscription() {
 
     this._control.mapState.subscribe((data: any) => {
-
-      // let self = this;
 
       if (data.accion == 'calcular-ruta') {
 
@@ -580,57 +529,59 @@ export class HomePage implements OnInit, OnDestroy {
           return this.alert_zona_no_cubierta();
         }
 
+        this.isLoading = true;
+
         this.service.getDistanceMatrix(
           {
             origins: [data.origen.direccion],
             destinations: [data.destino.direccion],
             travelMode: 'DRIVING',
-          }, (response, status) => {
+          }, async (response, status) => {
 
-            let distancia = response.rows[0].elements[0].distance.value;
-            let seconds = response.rows[0].elements[0].duration.value;
+            const distancia = response.rows[0].elements[0].distance.value;
+            const seconds = response.rows[0].elements[0].duration.value;
 
             this.distancia = distancia;
 
             this.ciudad = this._fire.calcular_ciudad(origen);
-            console.log(this.ciudad, 'ciudad')
+
             const body = {
               ciudad: this.ciudad,
               lat: data.origen.lat,
               lng: data.origen.lng
+            };
+
+            const res: any = await this._fire.detectarRidersCercanos(body)
+
+            if (!res.isMoto && !res.isBici) {
+              this.isLoading = false;
+              return this.alert_area_sin_riders();
             }
 
-            this._fire.detectarRidersCercanos(body).then((res: any) => {
+            this.showMoto = res.isMoto;
+            this.showBici = res.isBici;
 
-              if (!res.isMoto && !res.isBici) {
-                return this.alert_area_sin_riders();
-              }
+            if (distancia > 6000) {
+              this.showBici = false
+            }
 
-              this.showMoto = res.isMoto;
-              this.showBici = res.isBici;
+            if (distancia > 70000) {
+              this.distancia_excedida_moto = true;
+            }
 
-              const bici = this._global.tarifas.bici;
-              // const moto = self._global.tarifas.moto;
+            this.tiempoMoto = `${Math.round(seconds / 60 / 1.15) + 3} min`;
+            this.tiempoBici = `${Math.round(distancia / (13 * 1000) * 60) + 3} min`;
 
-              if (distancia > bici.maxLimite) {
-                this.showBici = false;
-              }
+            const tarifasBody = {
+              distancia: this.distancia,
+              ciudad: this.ciudad
+            };
 
-              this.tiempoMoto = `${Math.round(seconds / 60 / 1.15) + 3} min`;
-              this.tiempoBici = `${Math.round(distancia / (13 * 1000) * 60) + 3} min`;
+            const precios: any = await this._global.calcularPrecios(tarifasBody);
+            this.precioBici = precios.bici;
+            this.precioMoto = precios.moto;
 
-              this.calcularPrecio(this.distancia, 'bicicleta');
-              this.calcularPrecio(this.distancia, 'moto');
-              this.graficarRuta(data.origen, data.destino, 'Moto');
-            });
-
-            // self.tiempoMoto = `${Math.round(seconds / 60 / 1.15) + 3} min`;
-            // self.tiempoBici = `${Math.round(distancia / (13 * 1000) * 60) + 3} min`;
-
-            // self.calcularPrecio(self.distancia, 'bicicleta');
-            // self.calcularPrecio(self.distancia, 'moto');
-            // self.graficarRuta(data.origen, data.destino, 'Moto');
-            // self.rutaReady = true;
+            this.graficarRuta(data.origen, data.destino, 'Moto');
           });
       }
 
@@ -651,7 +602,6 @@ export class HomePage implements OnInit, OnDestroy {
       center: { lat: -33.444600, lng: -70.655585 },
       zoom: 16,
       disableDefaultUI: true
-      // zoomControl: true
     });
     this.directionsDisplay.setMap(this.map);
   }
@@ -659,6 +609,8 @@ export class HomePage implements OnInit, OnDestroy {
   graficarRuta(origen, destino, vehiculo) {
     var self = this;
     this.rutaReady = true;
+    this.isLoading = false;
+
     this.directionsDisplay.setMap(this.map);
     const origenLatLng = new google.maps.LatLng(origen.lat, origen.lng);
     const destinoLatLng = new google.maps.LatLng(destino.lat, destino.lng);
@@ -674,6 +626,7 @@ export class HomePage implements OnInit, OnDestroy {
     }, function (response, status) {
       self.directionsDisplay.setDirections(response);
       let leg = response.routes[0].legs[0];
+
       self.graficarMarcador(leg.start_location, 'origen');
       self.graficarMarcador(leg.end_location, 'destino');
     });
@@ -682,7 +635,6 @@ export class HomePage implements OnInit, OnDestroy {
 
   graficarMarcador(coors, tipo) {
     let data: any = {};
-    // actualizar marcador!
     data.position = coors;
     data.map = this.map;
     data.animation = google.maps.Animation.DROP
@@ -695,9 +647,8 @@ export class HomePage implements OnInit, OnDestroy {
 
         this.markerReady = true;
       } else {
-        this.marker.setPosition(coors);
+        this.riderMarker.setPosition(coors);
       }
-
     }
 
     if (tipo == 'origen') {
@@ -726,49 +677,6 @@ export class HomePage implements OnInit, OnDestroy {
       this.destinoMarker.setMap(null);
     }
   }
-
-  calcularPrecio(distancia, transporte) {
-
-    const bici = this._global.tarifas.bici;
-    const moto = this._global.tarifas.moto;
-
-    if (transporte == 'bicicleta' && distancia > bici.maxLimite) {
-      this.distancia_excedida_bici = true;
-    } else if (transporte == 'bicicleta') {
-      this.distancia_excedida_bici = false;
-      if (distancia < bici.limite) {
-        this.precioBici = bici.minima;
-      } else {
-        const costo = bici.distancia * distancia / 1000 + bici.base;
-        this.precioBici = Math.ceil(costo / 10) * 10;
-      }
-    }
-
-    if (transporte == 'moto' && distancia > moto.maxLimite) {
-      this.distancia_excedida_moto = true;
-    } else if (transporte == 'moto') {
-      this.distancia_excedida_moto = false;
-      if (distancia < moto.limite) {
-        this.precioMoto = moto.minima;
-      } else {
-        const costo = moto.distancia * distancia / 1000 + moto.base;
-        this.precioMoto = Math.ceil(costo / 10) * 10;
-      }
-    }
-
-  }
-
-  // async presentAlert(titulo, mensaje) {
-  //   const alert = await this.alertController.create({
-  //     header: titulo,
-  //     subHeader: mensaje,
-  //     buttons: ['Aceptar']
-  //   });
-
-  //   await alert.present();
-  // }
-
-  // 'Distancia execida', 'La distancia supera nuestro limite')
 
   async limite_moto_excedido() {
     const alert = await this.alertController.create({
@@ -864,8 +772,6 @@ export class HomePage implements OnInit, OnDestroy {
 
     await alert.present();
   }
-
-
 
   resetMapaFromBusquedaCancelada() {
     this.isMoto = false;
