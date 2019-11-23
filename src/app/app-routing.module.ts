@@ -19,7 +19,8 @@ const routes: Routes = [
   { path: 'codigo', loadChildren: './pages/codigo/codigo.module#CodigoPageModule' },
   { path: 'cupones', loadChildren: './pages/cupones/cupones.module#CuponesPageModule' },  { path: 'ayuda', loadChildren: './pages/ayuda/ayuda.module#AyudaPageModule' },
   { path: 'direcciones', loadChildren: './pages/direcciones/direcciones.module#DireccionesPageModule' },
-  { path: 'buscar', loadChildren: './pages/buscar/buscar.module#BuscarPageModule' }
+  { path: 'buscar', loadChildren: './pages/buscar/buscar.module#BuscarPageModule' },
+  { path: 'mis-lugares', loadChildren: './pages/mis-lugares/mis-lugares.module#MisLugaresPageModule' }
 
 
 

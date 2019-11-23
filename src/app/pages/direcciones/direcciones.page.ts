@@ -1,31 +1,219 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone, OnDestroy } from '@angular/core';
 import { DataService } from 'src/app/services/data.service';
-import { UbicacionComponent } from 'src/app/components/ubicacion/ubicacion.component';
 import { AuthService } from 'src/app/services/auth.service';
-import { ModalController } from '@ionic/angular';
-import { SeleccionarHoraComponent } from 'src/app/components/seleccionar-hora/seleccionar-hora.component';
+import { NavParams, ModalController } from '@ionic/angular';
+import { Subject } from 'rxjs';
+
+import { Subscription } from 'rxjs';
+import { Router } from '@angular/router';
+import { ControlService } from 'src/app/services/control.service';
+import { LugaresComponent } from 'src/app/components/lugares/lugares.component';
+
+declare var google: any;
 
 @Component({
   selector: 'app-direcciones',
   templateUrl: './direcciones.page.html',
   styleUrls: ['./direcciones.page.scss'],
 })
-export class DireccionesPage implements OnInit {
+export class DireccionesPage implements OnInit, OnDestroy {
 
-  casa_direccion = 'Agregar dirección';
-  casa_puerta = '';
+  GoogleAutocomplete: any;
+  autocomplete: any;
+  autocompleteItems = [];
 
-  oficina_direccion = 'Agregar dirección';
-  oficina_puerta = '';
+  itemsDestino = [];
+  itemsOrigen = [];
+  inputDestino: string;
+  inputOrigen: string;
+  posicionOrigen: any;
+  posicionDestino: any;
+
+  showOpenMap = false;
+
+  state = new Subject();
+
+  geocoder: any;
+
+  position: any = { ok: false };
+  tipo: string;
+  accion: string;
+  id: string;
+  puerta: string;
+  google_flag = true;
+
+
+  isLoading = false;
+  timer: any;
+  call_google_autocomplete = true;
+
+  tipo_mapa: string;
+
+  casa_direccion: string;
+  oficina_direccion: string;
 
   constructor(
     private _data: DataService,
     private _auth: AuthService,
-    private modalCtrl: ModalController
-  ) { }
+    private zone: NgZone,
+    public modalCtrl: ModalController,
+    private router: Router,
+    public _control: ControlService
+  ) {
+    this.GoogleAutocomplete = new google.maps.places.AutocompleteService();
+    this.autocomplete = { input: '' };
+    this.autocompleteItems = [];
+    this.geocoder = new google.maps.Geocoder();
+
+    this.getUbicaciones();
+  }
 
   ngOnInit() {
-    this.getUbicaciones();
+    this._control.ubicacionState.subscribe(done => {
+
+      if (this._control.origenReady) {
+        this.inputOrigen = this._control.origen.direccion;
+      }
+
+      if (this._control.destinoReady) {
+        this.inputDestino = this._control.destino.direccion;
+      }
+
+      if (done) {
+        setTimeout(() => {
+          this._control.calcularRuta();
+          this.router.navigateByUrl('home');
+        }, 500);
+      }
+
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.timer) {
+      clearTimeout(this.timer);
+    }
+  }
+
+  updateSearchResults(type) {
+
+    this.tipo = type;
+
+    if (!this.google_flag) {
+      return;
+    }
+
+    this.google_flag = false;
+
+    this.timer = setTimeout(() => {
+      this.google_flag = true;
+    }, 1500);
+
+    if (this.tipo == 'origen' && this.inputOrigen == '') {
+      this.itemsOrigen = [];
+      return;
+    }
+
+    if (this.tipo == 'destino' && this.inputDestino == '') {
+      this.itemsDestino = [];
+      return;
+    }
+
+    let input = '';
+
+    this.tipo == 'origen' ? input = this.inputOrigen : input = this.inputDestino;
+
+    this.GoogleAutocomplete.getPlacePredictions({ input, componentRestrictions: { country: 'cl' } },
+      (predictions, status) => {
+
+        if (!predictions) {
+          return;
+        }
+
+        if (this.tipo == 'origen') {
+          this.itemsOrigen = [];
+          this.zone.run(() => {
+            predictions.forEach((prediction) => {
+              this.itemsOrigen.push(prediction);
+            });
+          });
+        }
+
+        if (this.tipo == 'destino') {
+          this.itemsDestino = [];
+          this.zone.run(() => {
+            predictions.forEach((prediction) => {
+              this.itemsDestino.push(prediction);
+            });
+          });
+        }
+
+      });
+  }
+
+  selectSearchResult(item, type) {
+
+    this.tipo = type;
+
+    if (this.tipo == 'origen') {
+      this.itemsOrigen = [];
+      this.inputOrigen = item.description;
+    }
+
+    if (this.tipo == 'destino') {
+      this.itemsDestino = [];
+      this.inputDestino = item.description;
+    }
+
+    this.geocoder.geocode({ 'placeId': item.place_id }, (results, status) => {
+
+      if (this.tipo == 'origen') {
+        if (status === 'OK' && results[0]) {
+
+          const data = {
+            direccion: item.description,
+            lat: results[0].geometry.location.lat(),
+            lng: results[0].geometry.location.lng()
+          };
+
+          this._control.origen = data;
+          this._control.origenReady = true;
+        }
+      }
+
+      if (this.tipo == 'destino') {
+        if (status === 'OK' && results[0]) {
+
+          const data = {
+            direccion: item.description,
+            lat: results[0].geometry.location.lat(),
+            lng: results[0].geometry.location.lng()
+          };
+
+          this._control.destino = data;
+          this._control.destinoReady = true;
+        }
+      }
+
+      this._control.checkDirecciones();
+    });
+  }
+
+  clear(tipo) {
+
+    if (tipo == 'origen') {
+      this.inputOrigen = null;
+      this.itemsOrigen = [];
+      this._control.origenReady = false;
+      this._control.origen = null;
+    }
+
+    if (tipo == 'destino') {
+      this.inputDestino = null;
+      this.itemsDestino = [];
+      this._control.origenReady = false;
+      this._control.destino = null;
+    }
   }
 
   getUbicaciones() {
@@ -37,12 +225,12 @@ export class DireccionesPage implements OnInit {
 
       if (data.ubicacion.casa.configurado) {
         this.casa_direccion = data.ubicacion.casa.direccion;
-        this.casa_puerta = data.ubicacion.casa.puerta;
       }
 
       if (data.ubicacion.oficina.configurado) {
+        console.log('hmmm')
         this.oficina_direccion = data.ubicacion.oficina.direccion;
-        this.oficina_puerta = data.ubicacion.oficina.puerta;
+        console.log( this.oficina_direccion)
       }
     });
   }
@@ -55,14 +243,18 @@ export class DireccionesPage implements OnInit {
         return this.openUbicacionModal(tipo, 'crear');
       }
 
-      this.openUbicacionModal(tipo, 'editar', data.ubicacion._id);
+      if (data.ubicacion[tipo].configurado) {
+        this.setPositionFromUbicacion(tipo, data.ubicacion);
+      } else {
+        this.openUbicacionModal(tipo, 'editar', data.ubicacion._id);
+      }
     });
   }
 
   async openUbicacionModal(tipo, accion, id?) {
 
     const modal = await this.modalCtrl.create({
-      component: UbicacionComponent,
+      component: LugaresComponent,
       componentProps: { tipo, accion, id }
     });
 
@@ -75,14 +267,69 @@ export class DireccionesPage implements OnInit {
     }
   }
 
-  async openMaketa(tipo, accion, id?) {
+  ubicacionHandler2(tipo) {
 
-    const modal = await this.modalCtrl.create({
-      component: SeleccionarHoraComponent
+    this._data.getUbicaciones(this._auth.usuario._id).then((data: any) => {
+
+      console.log(data, 'dataaa')
+      if (!data.ok) {
+        this._control.mis_lugares.tipo = tipo;
+        this._control.mis_lugares.accion = 'crear';
+        console.log('entroo')
+        this.router.navigateByUrl('mis-lugares');
+      }
+
+      if (data.ubicacion[tipo].configurado) {
+        console.log('pasooo')
+        this._control.mis_lugares.tipo = tipo;
+        this.setPositionFromUbicacion(tipo, data.ubicacion);
+      } else {
+        this._control.mis_lugares.tipo = tipo;
+        this._control.mis_lugares.accion = 'editar';
+        this._control.mis_lugares.id = data.ubicacion._id;
+        this.router.navigateByUrl('mis-lugares');
+      }
+
     });
-
-    await modal.present();
   }
 
+  setPositionFromUbicacion(tipo, ubicacion) {
 
+    const data = {
+      direccion: ubicacion[tipo].direccion,
+      lat: ubicacion[tipo].lat,
+      lng: ubicacion[tipo].lng
+    };
+
+    if (this._control.tipo == 'origen') {
+      this._control.origen = data;
+      this._control.origenReady = true;
+      this.inputOrigen = ubicacion[tipo].direccion;
+    }
+
+    if (this._control.tipo == 'destino') {
+      this._control.destino = data;
+      this._control.destinoReady = true;
+      this.inputDestino = ubicacion[tipo].direccion;
+    }
+
+    this._control.checkDirecciones();
+  }
+
+  toggleMap(tipo) {
+    this.showOpenMap = false;
+    this._control.tipo = tipo;
+    setTimeout(() => {
+      this.showOpenMap = true;
+    }, 500);
+  }
+
+  openMapa() {
+    this.showOpenMap = false;
+    this.router.navigateByUrl('mapa');
+  }
+
+  back() {
+    this.router.navigateByUrl('home');
+  }
 }

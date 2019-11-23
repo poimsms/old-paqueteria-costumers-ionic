@@ -25,6 +25,10 @@ export class LoginVerifyPage implements OnInit {
 
   ngOnInit() {
     this.cuentaAtras();
+
+    setTimeout(() => {
+      this.codigo = null;
+    }, 200);
   }
 
   checkCode() {

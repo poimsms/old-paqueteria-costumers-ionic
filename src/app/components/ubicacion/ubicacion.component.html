@@ -1,88 +1,90 @@
 <ion-header no-border>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-button (click)="close()">
-        <ion-icon slot="icon-only" name="close" style="color:#444;font-size:27px"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-    <ion-title> Agregar {{tipo}}</ion-title>
-    <!-- <ion-searchbar mode="ios" [(ngModel)]="autocomplete.input" (ionInput)="updateSearchResults()"
-      placeholder="Buscar un lugar">
-    </ion-searchbar> -->
-  </ion-toolbar>
-</ion-header>
-
-<ion-content>
-
-  <ion-toolbar>
-    <ion-searchbar mode="ios" [(ngModel)]="autocomplete.input" (ionInput)="updateSearchResults()"
-      placeholder="Buscar un lugar">
-    </ion-searchbar>
-  </ion-toolbar>
-
-  <ion-list [hidden]="autocompleteItems.length == 0">
-    <ion-item *ngFor="let item of autocompleteItems" tappable (click)="selectSearchResult(item)">
-      {{ item.description }}
-    </ion-item>
-  </ion-list>
-
-
-  <div padding>
-      <ion-item style="margin-top:0px">
-        <ion-icon slot="start" name="create" style="color:#bbb"></ion-icon>
-        <ion-input placeholder="Piso, puerta... (opcional)" [(ngModel)]="puerta"></ion-input>
-      </ion-item>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-button (click)="back()">
+          <ion-icon slot="icon-only" name="arrow-back" style="color:#444;font-size:27px"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <ion-title>Elegir destino</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  
+  <ion-content padding>
+  
+    <div style="width:100%;display:flex;align-items:center">
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <ion-icon name="radio-button-on" style="font-size:18px;color:#bbb"></ion-icon>
+        <div style="height:30px;margin-top:3px;margin-bottom:3px;border:1px solid #bbb"></div>
+        <ion-icon name="pin" style="font-size:18px;color:#bbb"></ion-icon>
+      </div>
+      <div style="margin-left:10px;flex:1">
+        <!-- <div style="background:#F0F0F0;padding:10px;padding-left:10px;padding-right:10px;border-radius:5px">
+          <div style="color:#333;font-size:16px;height:20px;overflow:hidden">
+            Ubicación actual
+          </div>
+        </div> -->
+        <div (click)="toggleMap('origen')"
+          style="background:#F0F0F0;padding:10px;padding-left:10px;padding-right:10px;border-radius:5px;display:flex;align-items:center;justify-content:space-between">
+          <div style="width:80%">
+            <ion-input [(ngModel)]="inputOrigen" (ionInput)="updateSearchResults('origen')" placeholder="Buscar origen"
+              style="font-size:16px;height:20px;overflow:hidden"></ion-input>
+          </div>
+          <ion-icon (click)="clear('origen')" *ngIf="itemsOrigen.length != 0" name="close-circle"
+            style="font-size:18px;color:#999"></ion-icon>
+        </div>
+  
+        <div (click)="toggleMap('destino')"
+          style="margin-top:8px;background:#F0F0F0;padding:10px;padding-left:10px;padding-right:10px;border-radius:5px;display:flex;align-items:center;justify-content:space-between">
+          <div style="width:80%">
+            <ion-input [(ngModel)]="inputDestino" (ionInput)="updateSearchResults('destino')" placeholder="Buscar destino"
+              style="font-size:16px;height:20px;overflow:hidden"></ion-input>
+          </div>
+          <ion-icon (click)="clear('destino')" *ngIf="itemsDestino.length != 0" name="close-circle"
+            style="font-size:18px;color:#999"></ion-icon>
+        </div>
+      </div>
     </div>
-
-  <!-- <ion-item lines="none" style="border-bottom: 1px solid #eee">
-      <ion-icon slot="start" style="color:#bbb;font-size:22px" name="home"></ion-icon>
-    <div>
-      <div style="color:#444">
+  
+    <div style="width:100%;height:10px"></div>
+  
+    <ion-list [hidden]="itemsOrigen.length == 0">
+      <ion-item *ngFor="let item of itemsOrigen" tappable (click)="selectSearchResult(item, 'origen')">
+        {{ item.description }}
+      </ion-item>
+    </ion-list>
+  
+    <ion-list [hidden]="itemsDestino.length == 0">
+      <ion-item *ngFor="let item of itemsDestino" tappable (click)="selectSearchResult(item, 'destino')">
+        {{ item.description }}
+      </ion-item>
+    </ion-list>
+  
+    <ion-item lines="none">
+      <div slot="start"
+        style="width:30px;height:30px;background:#9EDF1F;border-radius:50%;display:flex;align-items:center;justify-content:center">
+        <ion-icon name="home" style="font-size:22px;color:white"></ion-icon>
+      </div>
+      <div style="width:100%;overflow:hidden;height:20px">
         Casa
       </div>
-      <div style="color:#777;font-size:14px">
-        Simon Bolivar 802 Vadlvia
-      </div>
-    </div>
-  </ion-item> -->
-
-  <!-- <ion-item lines="none" style="border-bottom: 1px solid #eee">
-      <ion-icon slot="start" style="color:#bbb;font-size:22px" name="briefcase"></ion-icon>
-    <div>
-      <div style="color:#444">
-        Oficina
-      </div>
-      <div style="color:#777;font-size:14px">
-        Av Ramon Picarte 8219
-      </div>
-    </div>
-  </ion-item> -->
-
-
-
-  <!-- <div padding>
-    <ion-item style="margin-top:0px">
-      <ion-icon slot="start" name="create" style="color:#bbb"></ion-icon>
-      <ion-input placeholder="Piso, puerta... (opcional)" [(ngModel)]="puerta"></ion-input>
     </ion-item>
-  </div> -->
-
-
-</ion-content>
-
-<ion-footer no-border>
-    <!-- <div padding>
-        <ion-item style="margin-top:0px">
-          <ion-icon slot="start" name="create" style="color:#bbb"></ion-icon>
-          <ion-input placeholder="Piso, puerta... (opcional)" [(ngModel)]="puerta"></ion-input>
-        </ion-item>
-      </div> -->
-  <div *ngIf="!isLoading" (click)="save()"
-    style="width:100%;background:#9EDF1F;text-align:center;padding:12px;font-weight:500;text-transform:uppercase;font-size:15px;color:white">
-    Guardar ubicación
-  </div>
-  <div *ngIf="isLoading"
-    style="width:100%;background:rgba(158, 223, 31, 0.5);text-align:center;padding:12px;font-weight:500;text-transform:uppercase;font-size:15px;color:white">
-    Guardando...
-  </div>
-</ion-footer>
+  
+    <ion-item lines="none">
+      <div slot="start"
+        style="width:30px;height:30px;background:#9EDF1F;border-radius:50%;display:flex;align-items:center;justify-content:center">
+        <ion-icon name="briefcase" style="font-size:21px;color:white"></ion-icon>
+      </div>
+      <div style="width:100%;overflow:hidden;height:20px">
+        Trabajo
+      </div>
+    </ion-item>
+  
+  </ion-content>
+  
+  
+  <ion-footer padding style="background:white">
+    <div *ngIf="showOpenMap" (click)="openMapa()" style="width:100%;text-align:center;">
+      <ion-icon name="pin" style="color:#bbb;margin-right:5px"></ion-icon>
+      Ubicar en el mapa
+    </div>
+  </ion-footer>

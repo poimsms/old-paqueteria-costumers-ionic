@@ -9,6 +9,7 @@ import { BloqueadoComponent } from './components/bloqueado/bloqueado.component';
 import { FcmService } from './services/fcm.service';
 import { ConfigService } from './services/config.service';
 import { Market } from '@ionic-native/market/ngx';
+import { ControlService } from './services/control.service';
 
 @Component({
   selector: 'app-root',
@@ -33,7 +34,8 @@ export class AppComponent {
     private _fcm: FcmService,
     private _config: ConfigService,
     public alertController: AlertController,
-    private market: Market
+    private market: Market,
+    private _control: ControlService
   ) {
     this.initializeApp();
   }
@@ -58,6 +60,7 @@ export class AppComponent {
           this.nuevaVersionAlert();
 
         } else {
+
           this._auth.authState.subscribe((data: any) => {
             if (data.isAuth && data.readyState) {
 
@@ -69,19 +72,17 @@ export class AppComponent {
               this._fcm.onTokenRefresh(this.usuario._id);
 
               if (!data.usuario.isActive) {
-                
+
                 this.openBloqueadoModal();
 
               } else {
 
-                this.router.navigateByUrl('home');                
+                this._control.grand_GPS_permission();
+                this.router.navigateByUrl('home');
               }
 
-            } else if(data.readyState) {
-              // this.router.navigateByUrl('login-account');
+            } else if (data.readyState) {
               this.router.navigateByUrl('login');
-              // this.router.navigateByUrl('login-verify');
-
             }
           });
         }
@@ -123,7 +124,7 @@ export class AppComponent {
     const alert = await this.alertController.create({
       header: 'Nueva versión disponible',
       subHeader: 'Por favor actualiza la app para poder seguir usandola',
-      buttons: [ {
+      buttons: [{
         text: 'Actualizar',
         handler: () => {
           this.market.open('cl.joopiter.paqueteria01');
@@ -134,6 +135,21 @@ export class AppComponent {
     await alert.present();
   }
 
+  async alert_test(text) {
+    const alert = await this.alertController.create({
+      header: 'Hmmm',
+      subHeader: text,
+      buttons: [{
+        text: 'Actualizar',
+        handler: () => {
+          // this.market.open('cl.joopiter.paqueteria01');
+        }
+      }]
+    });
 
-  
+    await alert.present();
+  }
+
+
+
 }

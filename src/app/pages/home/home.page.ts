@@ -12,8 +12,8 @@ import { RatingComponent } from 'src/app/components/rating/rating.component';
 import { PayComponent } from 'src/app/components/pay/pay.component';
 import { FcmService } from 'src/app/services/fcm.service';
 import { CallNumber } from '@ionic-native/call-number/ngx';
-import { MapaComponent } from 'src/app/components/mapa/mapa.component';
 import { OtrosService } from 'src/app/services/otros.service';
+import { UbicacionComponent } from 'src/app/components/ubicacion/ubicacion.component';
 
 declare var google: any;
 
@@ -33,6 +33,7 @@ export class HomePage implements OnInit, OnDestroy {
   riderMarker: any;
   origenMarker: any;
   destinoMarker: any;
+  gpsMarker: any;
 
   distancia: number;
   precioBici = 0;
@@ -93,7 +94,14 @@ export class HomePage implements OnInit, OnDestroy {
   imageURL = 'https://res.cloudinary.com/ddon9fx1n/image/upload/v1555014076/tools/bike-parking.svg';
   origenImg = 'https://res.cloudinary.com/ddon9fx1n/image/upload/v1570429346/tools/pin_origen.png';
   destinoImg = 'https://res.cloudinary.com/ddon9fx1n/image/upload/v1571242743/tools/pin_destino.png';
+  gpsImg = 'https://res.cloudinary.com/ddon9fx1n/image/upload/v1574420400/tools/current.png';
 
+  gpsIcon = {
+    url: this.gpsImg,
+    scaledSize: new google.maps.Size(60, 60),
+    origin: new google.maps.Point(0, 0),
+    anchor: new google.maps.Point(30, 30)
+  };
 
   riderIcon = {
     url: this.imageURL,
@@ -118,6 +126,8 @@ export class HomePage implements OnInit, OnDestroy {
 
   showMoto: boolean;
   showBici: boolean;
+
+  no_riders_area = false;
 
   hola = 'HOOLA MUNDO'
 
@@ -158,6 +168,11 @@ export class HomePage implements OnInit, OnDestroy {
     });
 
     this._otros.getPedido('buscar_pedido_activo_mas_reciente');
+
+    this._control.gpsState.subscribe(() => {
+     this.graficarMarcador(this._control.gpsCoors, 'gps');
+     this.map.setCenter(this._control.gpsCoors);
+    });
   }
 
   ngOnDestroy() {
@@ -266,9 +281,16 @@ export class HomePage implements OnInit, OnDestroy {
 
   buscarRider() {
 
-    this._fire.riders_consultados = [];
-
     this.loadingRider = true;
+
+    if (this.no_riders_area) {
+      return setTimeout(() => {
+        this.loadingRider = false;
+        this.alert_area_sin_riders();
+      }, 5 * 1000);
+    }
+
+    this._fire.riders_consultados = [];
 
     this.bodyNeerRider = {
       ciudad: this.ciudad,
@@ -438,22 +460,17 @@ export class HomePage implements OnInit, OnDestroy {
       return;
     }
 
-    this._control.coorsTipo = tipo;
+    this._control.tipo = tipo;
     this.router.navigateByUrl('mapa');
   }
 
-  async openMapaModal(tipo) {
+  async openUbicaciones() {
+    this.router.navigateByUrl('direcciones');
+    // const modal = await this.modalController.create({
+    //   component: UbicacionComponent
+    // });
 
-    if (this.pedidoActivo) {
-      return;
-    }
-
-    this._control.coorsTipo = tipo;
-    const modal = await this.modalController.create({
-      component: MapaComponent
-    });
-
-    await modal.present();
+    // await modal.present();
   }
 
   async openPayModal(pago) {
@@ -523,7 +540,7 @@ export class HomePage implements OnInit, OnDestroy {
 
         const origen = [data.origen.lat, data.destino.lng];
 
-        let cobertura = this._fire.calcular_cobertura(origen);
+        const cobertura = this._fire.calcular_cobertura(origen);
 
         if (!cobertura.ok) {
           return this.alert_zona_no_cubierta();
@@ -554,11 +571,11 @@ export class HomePage implements OnInit, OnDestroy {
             const res: any = await this._fire.detectarRidersCercanos(body)
 
             if (!res.isMoto && !res.isBici) {
-              this.isLoading = false;
-              return this.alert_area_sin_riders();
+              this.no_riders_area = true;
             }
 
-            this.showMoto = res.isMoto;
+            this.showMoto = true;
+            // this.showMoto = res.isMoto;
             this.showBici = res.isBici;
 
             if (distancia > 6000) {
@@ -584,26 +601,20 @@ export class HomePage implements OnInit, OnDestroy {
             this.graficarRuta(data.origen, data.destino, 'Moto');
           });
       }
-
-      if (data.accion == 'actualizar-origen') {
-        this.rutaReady = false;
-        this.texto_origen = data.origen.direccion;
-      }
-
-      if (data.accion == 'actualizar-destino') {
-        this.rutaReady = false;
-        this.texto_destino = data.destino.direccion;
-      }
     });
   }
 
   cargarMapa() {
     this.map = new google.maps.Map(document.getElementById('map'), {
-      center: { lat: -33.444600, lng: -70.655585 },
+      center: this._control.gpsCoors,
       zoom: 16,
       disableDefaultUI: true
     });
     this.directionsDisplay.setMap(this.map);
+
+    // this.
+    // this.graficarMarcador(this._control.gpsCoors, 'gps');
+    // this.graficarMarcador({ lat: -33.444600, lng: -70.655585 }, 'default');
   }
 
   graficarRuta(origen, destino, vehiculo) {
@@ -637,11 +648,11 @@ export class HomePage implements OnInit, OnDestroy {
     let data: any = {};
     data.position = coors;
     data.map = this.map;
-    data.animation = google.maps.Animation.DROP
 
     if (tipo == 'rider') {
       if (!this.markerReady) {
 
+        data.animation = google.maps.Animation.DROP;
         data.icon = this.riderIcon;
         this.riderMarker = new google.maps.Marker(data);
 
@@ -651,22 +662,37 @@ export class HomePage implements OnInit, OnDestroy {
       }
     }
 
+    if (tipo == 'default') {
+      new google.maps.Marker(data);
+    }
+
+    if (tipo == 'gps') {
+      data.icon = this.gpsIcon;
+      this.gpsMarker = new google.maps.Marker(data);
+    }
+
     if (tipo == 'origen') {
+      data.animation = google.maps.Animation.DROP;
       data.icon = this.origenIcon;
       this.origenMarker = new google.maps.Marker(data);
     }
 
     if (tipo == 'destino') {
+      data.animation = google.maps.Animation.DROP;
       data.icon = this.destinoIcon;
       this.destinoMarker = new google.maps.Marker(data);
     }
   }
 
   borrarMarcadores() {
-
+   
     if (this.riderMarker) {
       this.markerReady = false;
       this.riderMarker.setMap(null);
+    }
+
+    if (this.gpsMarker) {
+      this.gpsMarker.setMap(null);
     }
 
     if (this.origenMarker) {

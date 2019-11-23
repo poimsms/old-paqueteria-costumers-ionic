@@ -1,0 +1,34 @@
+<ion-header no-border>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>Direcciones</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-item (click)="ubicacionHandler('casa')" detail lines="none" style="border-bottom: 1px solid #eee">
+    <div slot="start" style="font-weight:500;color:#444;width:50px">
+      Casa
+    </div>
+    <div>
+      <div style="color:#777;width:100%;overflow:hidden;height:20px">
+        {{casa_direccion}}
+      </div>
+    </div>
+  </ion-item>
+  <ion-item (click)="ubicacionHandler('oficina')" detail lines="none" style="border-bottom: 1px solid #eee">
+    <div slot="start" style="font-weight:500;color:#444">
+      Oficina
+    </div>
+    <div>
+      <div style="color:#777;width:100%;overflow:hidden;height:20px">
+        {{oficina_direccion}}
+      </div>
+    </div>
+  </ion-item>
+
+
+</ion-content>

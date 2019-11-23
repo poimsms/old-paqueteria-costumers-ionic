@@ -1,0 +1,37 @@
+<ion-header no-border>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="close()">
+        <ion-icon slot="icon-only" name="close" style="color:#444;font-size:27px"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title> Agregar {{tipo}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  
+  <ion-toolbar>
+    <ion-searchbar mode="ios" [(ngModel)]="autocomplete.input" (ionInput)="updateSearchResults()"
+      placeholder="Buscar un lugar">
+    </ion-searchbar>
+  </ion-toolbar>
+
+  <ion-list [hidden]="autocompleteItems.length == 0">
+    <ion-item *ngFor="let item of autocompleteItems" tappable (click)="selectSearchResult(item)">
+      {{ item.description }}
+    </ion-item>
+  </ion-list>
+
+</ion-content>
+
+<ion-footer no-border>
+  <div *ngIf="!isLoading" (click)="save()"
+    style="width:100%;background:#9EDF1F;text-align:center;padding:12px;font-weight:500;text-transform:uppercase;font-size:15px;color:white">
+    Guardar ubicación
+  </div>
+  <div *ngIf="isLoading"
+    style="width:100%;background:rgba(158, 223, 31, 0.5);text-align:center;padding:12px;font-weight:500;text-transform:uppercase;font-size:15px;color:white">
+    Guardando...
+  </div>
+</ion-footer>

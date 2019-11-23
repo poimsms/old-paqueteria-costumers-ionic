@@ -180,7 +180,7 @@ export class FireService {
       const destinoCoors = [lat, lng];
 
       const distance = this.haversineDistance(riderCoors, destinoCoors);
-      if (distance < 2300 && rider.vehiculo == 'moto') {
+      if (distance < 6000 && rider.vehiculo == 'moto') {
         riders_moto.push(rider);
       }
       if (distance < 1500 && rider.vehiculo == 'bicicleta') {

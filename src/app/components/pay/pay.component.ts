@@ -53,13 +53,18 @@ export class PayComponent implements OnInit {
     this.pedido = navParams.get('pago').pedido;
     this.tiempo_entrega = navParams.get('tiempo');
     this.cuponData = navParams.get('cuponData');
-    this.telefono_origen = this._auth.usuario.telefono;
+    // this.telefono_origen = this._auth.usuario.telefono;
 
     this.cuponHandler();
-    this.checkoutTime();
+    // this.checkoutTime();
   }
 
-  ngOnInit() { }
+  ngOnInit() { 
+    setTimeout(() => {
+      this.telefono_origen = this._auth.usuario.telefono;
+      this.telefono_destino = null;
+    }, 200);
+  }
 
   cuponHandler() {
     if (this.cuponData.ok) {
@@ -118,12 +123,12 @@ export class PayComponent implements OnInit {
 
     this.isLoading = true;
 
-    const time_data: any = await this._data.getCheckoutTime(this._auth.usuario._id);
+    // const checkout_time: any = await this._data.getCheckoutTime(this._auth.usuario._id);
 
-    if (!time_data.ok) {
-      this.isLoading = false;
-      return this.alert_tiempo_expirado();
-    }
+    // if (!checkout_time.ok) {
+    //   this.isLoading = false;
+    //   return this.alert_tiempo_expirado();
+    // }
 
     if (this.metodo_pago == 'Tarjeta') {
 

@@ -42,10 +42,11 @@ import { PayComponent } from './components/pay/pay.component';
 import { BloqueadoComponent } from './components/bloqueado/bloqueado.component';
 import { EditarCamposComponent } from './components/editar-campos/editar-campos.component';
 import { PoliticasComponent } from './components/politicas/politicas.component';
-import { MapaComponent } from './components/mapa/mapa.component';
+// import { MapaComponent } from './components/mapa/mapa.component';
 import { UbicacionComponent } from './components/ubicacion/ubicacion.component';
 import { SeleccionarHoraComponent } from './components/seleccionar-hora/seleccionar-hora.component';
 import { OpcionesComponent } from './components/opciones/opciones.component';
+import { LugaresComponent } from './components/lugares/lugares.component';
 
 
 @NgModule({
@@ -57,10 +58,11 @@ import { OpcionesComponent } from './components/opciones/opciones.component';
     BloqueadoComponent,
     EditarCamposComponent,
     PoliticasComponent,
-    MapaComponent,
+    // MapaComponent,
     UbicacionComponent,
     SeleccionarHoraComponent,
-    OpcionesComponent
+    OpcionesComponent,
+    LugaresComponent
   ],
   entryComponents: [
     ForceUpgradeComponent,
@@ -69,10 +71,11 @@ import { OpcionesComponent } from './components/opciones/opciones.component';
     BloqueadoComponent,
     EditarCamposComponent,
     PoliticasComponent,
-    MapaComponent,
+    // MapaComponent,
     UbicacionComponent,
     SeleccionarHoraComponent,
-    OpcionesComponent
+    OpcionesComponent,
+    LugaresComponent
   ],
   imports: [
     BrowserModule,
