@@ -42,7 +42,6 @@ export class DireccionesPage implements OnInit, OnDestroy {
   puerta: string;
   google_flag = true;
 
-
   isLoading = false;
   timer: any;
   call_google_autocomplete = true;
@@ -51,6 +50,8 @@ export class DireccionesPage implements OnInit, OnDestroy {
 
   casa_direccion: string;
   oficina_direccion: string;
+
+  ubicacionSub$: Subscription;
 
   constructor(
     private _data: DataService,
@@ -69,7 +70,7 @@ export class DireccionesPage implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this._control.ubicacionState.subscribe(done => {
+    this.ubicacionSub$ = this._control.ubicacionState.subscribe(done => {
 
       if (this._control.origenReady) {
         this.inputOrigen = this._control.origen.direccion;
@@ -93,7 +94,10 @@ export class DireccionesPage implements OnInit, OnDestroy {
     if (this.timer) {
       clearTimeout(this.timer);
     }
+    this.reset();
+    this.ubicacionSub$.unsubscribe();
   }
+
 
   updateSearchResults(type) {
 
@@ -228,9 +232,7 @@ export class DireccionesPage implements OnInit, OnDestroy {
       }
 
       if (data.ubicacion.oficina.configurado) {
-        console.log('hmmm')
         this.oficina_direccion = data.ubicacion.oficina.direccion;
-        console.log( this.oficina_direccion)
       }
     });
   }
@@ -265,32 +267,6 @@ export class DireccionesPage implements OnInit, OnDestroy {
     if (data.ok) {
       this.getUbicaciones();
     }
-  }
-
-  ubicacionHandler2(tipo) {
-
-    this._data.getUbicaciones(this._auth.usuario._id).then((data: any) => {
-
-      console.log(data, 'dataaa')
-      if (!data.ok) {
-        this._control.mis_lugares.tipo = tipo;
-        this._control.mis_lugares.accion = 'crear';
-        console.log('entroo')
-        this.router.navigateByUrl('mis-lugares');
-      }
-
-      if (data.ubicacion[tipo].configurado) {
-        console.log('pasooo')
-        this._control.mis_lugares.tipo = tipo;
-        this.setPositionFromUbicacion(tipo, data.ubicacion);
-      } else {
-        this._control.mis_lugares.tipo = tipo;
-        this._control.mis_lugares.accion = 'editar';
-        this._control.mis_lugares.id = data.ubicacion._id;
-        this.router.navigateByUrl('mis-lugares');
-      }
-
-    });
   }
 
   setPositionFromUbicacion(tipo, ubicacion) {
@@ -331,5 +307,17 @@ export class DireccionesPage implements OnInit, OnDestroy {
 
   back() {
     this.router.navigateByUrl('home');
+  }
+
+  reset() {
+
+    if (this._control.origenReady && this._control.destinoReady) {
+      return;
+    }
+    
+    this._control.origenReady = false;
+    this._control.origen = null;
+    this._control.destinoReady = false;
+    this._control.destino = null;
   }
 }

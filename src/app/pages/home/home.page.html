@@ -1,34 +1,26 @@
-<div *ngIf="rutaReady && pedidoActivo" style="z-index:990;position:fixed;top:15px;left:15px">
+<div *ngIf="rutaReady && pedidoActivo" style="z-index:990;position:fixed;top:20px;left:15px">
   <div (click)="openMenu()"
-    style="background:white;height:35px;width:35px;display:flex;align-items:center;justify-content:center;border-radius:10px;box-shadow: 0 0 20px #eee;">
-    <ion-icon name="menu" style="color:#777;font-size:20px"></ion-icon>
+    style="background:white;height:38px;width:38px;display:flex;align-items:center;justify-content:center;border-radius:10px;box-shadow: 0 0 20px #ccc;">
+    <ion-icon name="menu" style="color:#444;font-size:22px"></ion-icon>
   </div>
 </div>
-<div *ngIf="!rutaReady" style="z-index:990;position:fixed;top:15px;left:15px">
+<div *ngIf="!rutaReady" style="z-index:990;position:fixed;top:20px;left:15px">
   <div (click)="openMenu()"
-    style="background:white;height:35px;width:35px;display:flex;align-items:center;justify-content:center;border-radius:10px;box-shadow: 0 0 20px #eee;">
-    <ion-icon name="menu" style="color:#777;font-size:20px"></ion-icon>
+    style="background:white;height:38px;width:38px;display:flex;align-items:center;justify-content:center;border-radius:10px;box-shadow: 0 0 20px #ccc;">
+    <ion-icon name="menu" style="color:#444;font-size:22px"></ion-icon>
   </div>
 </div>
-<!-- <div *ngIf="rutaReady && !pedidoActivo" style="z-index:990;position:fixed;top:15px;left:15px">
-  <div (click)="resetMapa()"
-    style="background:white;height:35px;width:35px;display:flex;align-items:center;justify-content:center;border-radius:50%;box-shadow: 0 0 20px #eee;">
-    <ion-icon name="arrow-round-back" style="color:#555;font-size:18px"></ion-icon>
-  </div>
-</div> -->
-<div *ngIf="cuponData.ok" style="z-index:990;position:fixed;top:15px;right:15px">
+<div *ngIf="!rutaReady" style="z-index:990;position:fixed;top:20px;right:15px">
   <div
-    style="background:white;height:35px;padding-left:10px;padding-right:10px;display:flex;align-items:center;justify-content:center;border-radius:10px;box-shadow: 0 0 20px #eee;">
-    <div style="color:#444">
-      <ion-icon name="gift" style="color:#777;font-size:20px"></ion-icon>
-    </div>
+    style="background:white;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:10px;box-shadow: 0 0 20px #ccc;">
+    <ion-icon name="gift" style="color:#555;font-size:24px"></ion-icon>
   </div>
 </div>
 
-<div *ngIf="pedidoActivo && isEmpresa" style="z-index:990;position:fixed;bottom:150px;left:15px">
+<div *ngIf="pedidoActivo && isEmpresa" style="z-index:990;position:fixed;bottom:170px;left:10px">
   <div (click)="crearNuevoPedido()"
-    style="background:white;color:#444;height:35px;padding-left:10px;padding-right:10px;display:flex;align-items:center;justify-content:center;border-radius:2px;box-shadow: 0 0 20px #ccc;">
-    <ion-icon name="add" style="margin-right:5px;color:#777;font-size:18px"></ion-icon>
+    style="background:white;color:#666;font-weight:500;height:35px;padding:20px;display:flex;align-items:center;justify-content:center;border-radius:2px;box-shadow: 0 0 20px #bbb;">
+    <ion-icon name="add" style="margin-right:5px;color:#444;font-size:22px"></ion-icon>
     Crear nuevo pedido
   </div>
 </div>
@@ -53,11 +45,12 @@
     <div id='map'></div>
     <div *ngIf="rutaReady && !pedidoActivo" style="position:absolute;bottom:30px;left:15px">
       <div (click)="resetMapa()"
-        style="background:white;height:35px;width:35px;display:flex;align-items:center;justify-content:center;border-radius:50%;box-shadow: 0 0 20px #c2c2c2;">
-        <ion-icon name="arrow-round-back" style="color:#555;font-size:18px"></ion-icon>
+        style="background:white;height:38px;width:38px;display:flex;align-items:center;justify-content:center;border-radius:10px;box-shadow: 0 0 20px #c2c2c2;">
+        <ion-icon name="arrow-round-back" style="color:#444;font-size:22px"></ion-icon>
       </div>
     </div>
   </div>
+
 
 </ion-content>
 
@@ -68,18 +61,17 @@
   <div *ngIf="!pedidoActivo">
 
     <div *ngIf="rutaReady"
-      style="padding-bottom:5px;width:100%;display:flex;align-items:center;justify-content:space-between">
-      <div style="color:#444">
-        Seleccione un servicio:
+      style="padding-bottom:10px;margin-bottom:25px;border-bottom:1px solid #eee;padding-left:15px;padding-right:15px;width:100%;display:flex;align-items:center;justify-content:space-between">
+      <div style="color:#444;font-size:13px;font-weight:500;text-transform:uppercase">
+        Elige un servicio
       </div>
-      <div *ngIf="cuponData.ok"
-        style="padding:5px;padding-left:10px;padding-right:10px;border-radius:15px;background:#df1f9f;font-size:13px;color:white;font-weight:500">
+      <div *ngIf="cuponData?.ok"
+        style="margin-left:10px;text-align:center;padding:5px;padding-left:10px;padding-right:10px;border-radius:15px;background:#df1f9f;font-size:14px;color:white;font-weight:500">
         <span *ngIf="cuponData.cupon.tipo == 'PORCENTAJE'">{{cuponData.cupon.descuento}}%</span>
         <span *ngIf="cuponData.cupon.tipo == 'DINERO'">${{cuponData.cupon.descuento}}</span>
         descuento
       </div>
     </div>
-
 
     <div *ngIf="rutaReady" style="width:100%;">
 
@@ -89,8 +81,13 @@
           <div class="burbuja" [ngClass]="{'burbujaActiva': isBicicleta}">
             <img src="assets/bici.png" class="transporte" [ngClass]="{'transporteActivo': isBicicleta}">
           </div>
-          <div class="small" [ngClass]="{'smallActivo': isBicicleta}">
-            Bici mensajero
+          <div style="margin-left:15px">
+            <div class="small" [ngClass]="{'smallActivo': isBicicleta}">
+              Bici
+            </div>
+            <div class="smallDos" [ngClass]="{'smallActivoDos': isBicicleta}">
+              Mensajero
+            </div>
           </div>
         </div>
         <div>
@@ -100,7 +97,7 @@
           <div *ngIf="distancia_excedida_bici" class="large" [ngClass]="{'largeActivo': isBicicleta}">
             --
           </div>
-          <div class="small" [ngClass]="{'smallActivo': isBicicleta}">
+          <div class="smallTres" [ngClass]="{'smallActivoTres': isBicicleta}">
             {{tiempoBici}}
           </div>
         </div>
@@ -112,8 +109,13 @@
           <div class="burbuja" [ngClass]="{'burbujaActiva': isMoto}">
             <img src="assets/moto.png" class="transporte" [ngClass]="{'transporteActivo': isMoto}">
           </div>
-          <div class="small" [ngClass]="{'smallActivo': isMoto}">
-            Moto mensajero
+          <div style="margin-left:15px">
+            <div class="small" [ngClass]="{'smallActivo': isMoto}">
+              Moto
+            </div>
+            <div class="smallDos" [ngClass]="{'smallActivoDos': isMoto}">
+              Mensajero
+            </div>
           </div>
         </div>
         <div>
@@ -123,7 +125,7 @@
           <div *ngIf="distancia_excedida_moto" class="large" [ngClass]="{'largeActivo': isMoto}">
             --
           </div>
-          <div class="small" [ngClass]="{'smallActivo': isMoto}">
+          <div class="smallTres" [ngClass]="{'smallActivoTres': isMoto}">
             {{tiempoMoto}}
           </div>
         </div>
@@ -131,16 +133,27 @@
 
     </div>
 
-    <!-- <div *ngIf="!rutaReady" style="margin:15px;color:#222;font-size:17px">
-      Buenas tarde <span style="text-transform:capitalize"> {{usuario.nombre.split(' ')[0] }}!</span>
-    </div> -->
+    <div *ngIf="!rutaReady" style="color:#666;font-weight:300">
+      Buenas tardes <span style="text-transform:capitalize"> {{usuario.nombre.split(' ')[0] }}</span>
+    </div>
 
-    <div *ngIf="!rutaReady" style="font-size:17.5px;margin-bottom:10px;font-weight:500;color:#333">
-      Dónde hacemos el envío?
+    <div *ngIf="!rutaReady"
+      style="margin-bottom:10px;width:100%;display:flex;align-items:center;justify-content:space-between;align-items:center">
+      <div style="font-size:20px;font-weight:500;color:#333">
+        Dónde hacemos el envío?
+      </div>
+      <div *ngIf="cuponData?.ok"
+        style="margin-left:10px;text-align:center;padding:5px;padding-left:10px;padding-right:10px;border-radius:15px;background:#df1f9f;font-size:14px;color:white;font-weight:500">
+        <span *ngIf="cuponData.cupon.tipo == 'PORCENTAJE'">{{cuponData.cupon.descuento}}%</span>
+        <!-- <span *ngIf="cuponData.cupon.tipo == 'PORCENTAJE'"> descuento</span> -->
+        <span *ngIf="cuponData.cupon.tipo == 'DINERO'">${{cuponData.cupon.descuento}}</span>
+        <!-- <span *ngIf="cuponData.cupon.tipo == 'DINERO'"> Descto.</span> -->
+        Descto.
+      </div>
     </div>
 
     <div *ngIf="!rutaReady" (click)="openUbicaciones()"
-      style="margin-bottom:10px;border:1px solid #9EDF1F;border-radius:15px;padding:10px;padding-left:10px;padding-right:10px;display:flex;align-items:center;justify-content:space-between">
+      style="margin-bottom:10px;border:1px solid #9EDF1F;border-radius:15px;padding:12px;padding-left:10px;padding-right:10px;display:flex;align-items:center;justify-content:space-between">
       <ion-icon name="flag" style="font-size:25px;color:#dfcf1f"></ion-icon>
       <div style="width:80%">
       </div>
@@ -178,11 +191,10 @@
     </ion-button> -->
 
 
-
     <ion-button *ngIf="rutaReady" [disabled]="!(isMoto || isBicicleta)" mode="ios" (click)="iniciarPedido()"
-      expand="block" color="secondary" style="margin:15px">
-      <div style="font-size:18px;font-weight:600">
-        Pedir Rider
+      expand="block" color="secondary" style="margin:15px;margin-top:25px">
+      <div style="font-size:20px;font-weight:500">
+        Solicitar Rider
       </div>
     </ion-button>
 
@@ -219,9 +231,13 @@
             <ion-icon *ngIf="rider?.stats?.startsAvg >= 5" name="star" class="start"></ion-icon>
             ({{rider?.stats?.startsAvg}})
           </div>
-          <div style="font-size:14px;color:#999;text-transform:capitalize">
-            Distancia: {{pedido?.distancia / 1000}} km
+          <div style="font-size:14px;color:#999;margin-top:2px;margin-bottom:2px">
+            Entrega estimada: {{pedido.entrega_estimada}}
           </div>
+          <ion-button *ngIf="pedido.metodo_de_pago == 'Efectivo'" (click)="alert_cancelacion(rider._id)"
+            color="secondary" size="small">
+            Cancelar
+          </ion-button>
         </div>
       </div>
 

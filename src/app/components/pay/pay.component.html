@@ -23,8 +23,8 @@
         <img src="https://res.cloudinary.com/ddon9fx1n/image/upload/v1573825710/tools/coupon.png" style="width:27px">
         <div style="margin-left:20px">
           <div style="font-size:17px;font-weight:500;color:#3D9B1F">
-            <span *ngIf="cuponData.cupon.tipo == 'dinero'">${{cuponData.cupon.descuento}}</span>
-            <span *ngIf="cuponData.cupon.tipo == 'porcentaje'">{{cuponData.cupon.descuento}}</span>
+            <span *ngIf="cuponData.cupon.tipo == 'DINERO'">${{cuponData.cupon.descuento}}</span>
+            <span *ngIf="cuponData.cupon.tipo == 'PORCENTAJE'">{{cuponData.cupon.descuento}}%</span>
             de descuento
           </div>
           <div style="color:#3D9B1F;font-size:14px">
@@ -52,9 +52,9 @@
     </div>
   </div>
 
-  <ion-item lines="none" detail>
+  <ion-item (click)="codigo_promo()" lines="none" detail>
     <div style="color:#7AC602">
-      Aplicar código
+      Ingresar código promo
     </div>
   </ion-item>
 
@@ -98,10 +98,10 @@
   <div *ngIf="metodo_pago == 'Tarjeta'" style="padding:5px">
     <ion-item (click)="openMetodoPago()" lines="none">
       <ion-icon slot="start" name="card" style="color:#666"></ion-icon>
-      <div style="font-size:14px">
+      <div style="font-size:15px;color:#333">
         Tarjeta
       </div>
-      <div slot="end" style="font-size:14px">
+      <div slot="end" style="font-size:14px;color:#333">
         CAMBIAR
       </div>
     </ion-item>
@@ -110,10 +110,10 @@
   <div *ngIf="metodo_pago == 'Efectivo'" style="padding:5px">
     <ion-item (click)="openMetodoPago()" lines="none">
       <ion-icon slot="start" name="cash" style="color:#666"></ion-icon>
-      <div style="font-size:14px">
+      <div style="font-size:15px;color:#333">
         Efectivo
       </div>
-      <div slot="end" style="font-size:14px">
+      <div slot="end" style="font-size:14px;color:#333">
         CAMBIAR
       </div>
     </ion-item>
@@ -121,7 +121,7 @@
 
   <div style="display:flex;align-items:center;justify-content:space-between">
     <div (click)="confirmar_envio()"
-      style="width:100%;padding:15px;font-size:15px;text-align:center;font-weight:500;background:#7AC602;color:white;">
+      style="width:100%;padding:15px;font-size:17px;text-align:center;font-weight:500;background:#7AC602;color:white;">
       CONFIRMAR
     </div>
   </div>

@@ -52,36 +52,15 @@ export class PayComponent implements OnInit {
     this.monto = navParams.get('pago').monto;
     this.pedido = navParams.get('pago').pedido;
     this.tiempo_entrega = navParams.get('tiempo');
-    this.cuponData = navParams.get('cuponData');
-    // this.telefono_origen = this._auth.usuario.telefono;
-
-    this.cuponHandler();
-    // this.checkoutTime();
+    this.checkoutTime();
   }
 
-  ngOnInit() { 
-    setTimeout(() => {
-      this.telefono_origen = this._auth.usuario.telefono;
-      this.telefono_destino = null;
-    }, 200);
-  }
-
-  cuponHandler() {
-    if (this.cuponData.ok) {
-      if (this.cuponData.cupon.tipo == 'PORCENTAJE') {
-        const delta = Math.round((this.monto - this.monto * this.cuponData.cupon.descuento / 100) / 10) * 10;
-        this.precio_descuento = delta;
-      }
-
-      if (this.cuponData.cupon.tipo == 'DINERO') {
-        const delta = this.monto - this.cuponData.cupon.descuento;
-        delta < 0 ? this.precio_descuento = 0 : this.precio_descuento = delta;
-      }
-    }
+  ngOnInit() {
+    this.codigoSubcription();
+    this.clearAutocomplete();
   }
 
   checkoutTime() {
-
     const body = {
       cliente: this._auth.usuario._id,
       rider: this.rider._id
@@ -113,7 +92,8 @@ export class PayComponent implements OnInit {
       cliente: this.usuario._id,
       telefono_origen: this.telefono_origen,
       telefono_destino: this.telefono_destino,
-      instrucciones: this.instrucciones
+      instrucciones: this.instrucciones,
+      tiempo_entrega: this.tiempo_entrega
     };
 
     if (this.cuponData.ok) {
@@ -123,12 +103,12 @@ export class PayComponent implements OnInit {
 
     this.isLoading = true;
 
-    // const checkout_time: any = await this._data.getCheckoutTime(this._auth.usuario._id);
+    const checkout_time: any = await this._data.getCheckoutTime(this._auth.usuario._id);
 
-    // if (!checkout_time.ok) {
-    //   this.isLoading = false;
-    //   return this.alert_tiempo_expirado();
-    // }
+    if (!checkout_time.ok) {
+      this.isLoading = false;
+      return this.alert_tiempo_expirado();
+    }
 
     if (this.metodo_pago == 'Tarjeta') {
 
@@ -145,7 +125,7 @@ export class PayComponent implements OnInit {
             this.save(pedido);
           });
         } else {
-          this.modalCtrl.dismiss({ pagoExitoso: false });
+          this.modalCtrl.dismiss({ state: 'PAGO_NO_REALIZADO', tiempoExpirado: false });
         }
       });
     }
@@ -169,17 +149,18 @@ export class PayComponent implements OnInit {
       this._data.useCupon(this.cuponData.id).then(() => {
         this._data.getCuponActivo(this.usuario._id);
         this.isLoading = false;
-        this.modalCtrl.dismiss({ pagoExitoso: true, riderID: this.rider._id });
+        this.modalCtrl.dismiss({ state: 'PAGO_EXITOSO', riderID: this.rider._id, tiempoExpirado: false });
       });
 
     } else {
-      this.modalCtrl.dismiss({ pagoExitoso: true, riderID: this.rider._id });
+      this.modalCtrl.dismiss({ state: 'PAGO_EXITOSO', riderID: this.rider._id, tiempoExpirado: false });
     }
   }
 
   close() {
+    this._data.getCheckoutTime(this._auth.usuario._id);
     this.updateRiderEstadoDisponible();
-    this.modalCtrl.dismiss({ pagoExitoso: false });
+    this.modalCtrl.dismiss({ state: 'PAGO_NO_REALIZADO' });
   }
 
   updateRiderEstadoOcupado(pedidoId) {
@@ -230,13 +211,100 @@ export class PayComponent implements OnInit {
     }
   }
 
-  async toast_cambio_a_efectivo() {
+  async codigo_promo() {
+    const alert = await this.alertController.create({
+      header: 'Código promo',
+      subHeader: 'Ingresa acá tu Código Promo de Moviapp',
+      inputs: [
+        {
+          name: 'codigo',
+          type: 'text',
+          placeholder: ''
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {
+            console.log('Confirm Cancel');
+          }
+        }, {
+          text: 'Ok',
+          handler: (data) => {
+            this.ingresar_codigo(data.codigo);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  codigoSubcription() {
+    this._data.cuponData.subscribe(data => {
+      this.cuponData = data;
+      this.aplicar_codigo();
+    });
+  }
+
+  ingresar_codigo(codigo) {
+    const body = {
+      usuario: this._auth.usuario._id,
+      codigo: codigo.toLowerCase()
+    };
+
+    this.isLoading = true;
+
+    this._data.addCupon(body).then((res: any) => {
+
+      this.isLoading = false;
+
+      if (!res.ok) {
+        return this.toast(res.message);
+      }
+
+      this._data.getCuponActivo(this._auth.usuario._id);
+    });
+  }
+
+  aplicar_codigo() {
+    if (this.cuponData.ok) {
+
+      if (this.cuponData.cupon.tipo == 'PORCENTAJE') {
+
+        const delta = this.monto * this.cuponData.cupon.descuento / 100;
+
+        if (delta > this.cuponData.cupon.tope) {
+          const diff = this.monto - this.cuponData.cupon.tope;
+          diff < 0 ? this.precio_descuento = 0 : this.precio_descuento = diff;
+        } else {
+          this.precio_descuento = Math.round((this.monto - this.monto * this.cuponData.cupon.descuento / 100) / 100) * 100;
+        }
+      }
+
+      if (this.cuponData.cupon.tipo == 'DINERO') {
+        const delta = this.monto - this.cuponData.cupon.descuento;
+        delta < 0 ? this.precio_descuento = 0 : this.precio_descuento = delta;
+      }
+    }
+  }
+
+  async toast(message) {
     const toast = await this.toastController.create({
-      message: 'Se ha cambiado tu metodo de pago',
+      message: message,
       duration: 2500,
       position: 'middle'
     });
     toast.present();
+  }
+
+  clearAutocomplete() {
+    setTimeout(() => {
+      this.telefono_origen = this._auth.usuario.telefono;
+      this.telefono_destino = null;
+    }, 200);
   }
 
   async alert_monto_minimo() {
@@ -249,7 +317,6 @@ export class PayComponent implements OnInit {
           role: 'cancel',
           cssClass: 'secondary',
           handler: (blah) => {
-            // this.metodo_pago = 'Efectivo';
           }
         }
       ]
@@ -261,14 +328,14 @@ export class PayComponent implements OnInit {
   async alert_tiempo_expirado() {
     const alert = await this.alertController.create({
       header: 'Tiempo expirado',
-      message: 'Por favor, crea un nuevo pedido.',
+      message: 'Se ha agotado el tiempo de confirmación. Por favor, solicita un nuevo rider.',
       buttons: [
         {
           text: 'Ok',
           role: 'cancel',
           cssClass: 'secondary',
           handler: (blah) => {
-            this.modalCtrl.dismiss({ pagoExitoso: false });
+            this.modalCtrl.dismiss({ state: 'TIEMPO_EXPIRADO' });
           }
         }
       ]
@@ -276,5 +343,6 @@ export class PayComponent implements OnInit {
 
     await alert.present();
   }
+
 
 }

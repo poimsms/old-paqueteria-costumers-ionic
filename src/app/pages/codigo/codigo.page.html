@@ -9,7 +9,7 @@
 
 <ion-content padding>
 
-  <div style="color:#777;margin-left:15px;margin-top:0px;font-size:18px">
+  <div style="color:#555;margin-left:15px;margin-top:0px;font-size:18px">
     Ingresa tu código
   </div>
 
@@ -17,14 +17,14 @@
     <ion-input type="text" [(ngModel)]="codigo" placeholder="" style="text-transform:uppercase;font-size:22px">
     </ion-input>
   </div>
-  <div style="padding:0px;padding-bottom:0px;width:100%;text-align:center;color:#999;font-size:15px">
+  <div style="padding:20px;padding-top:0px;padding-bottom:0px;width:100%;text-align:center;color:#999;font-size:16px">
     Introduce el código y lo aplicaremos en tu siguiente pedido
   </div>
 
   <div padding style="margin-top:50px">
     <ion-button [disabled]="isLoading" (click)="addCodigo()" mode="ios" expand="block" color="secondary">
-      <div style="font-size:18px">
-        Añadir código
+      <div style="font-size:18px;text-transform:uppercase">
+        Aplicar
       </div>
     </ion-button>
   </div>

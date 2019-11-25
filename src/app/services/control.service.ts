@@ -47,35 +47,41 @@ export class ControlService {
 
   grand_GPS_permission() {
 
-    if (this._config.ENTORNO == 'DEV') {
-      if (!this.platform.is('cordova')) {
-        return;
+    return new Promise((resolve, reject) => {
+
+      if (this._config.ENTORNO == 'DEV') {
+        if (!this.platform.is('cordova')) {
+          return resolve(false);
+        }
       }
-    }
 
-    this.geolocation.getCurrentPosition().then((resp) => {
+      this.geolocation.getCurrentPosition().then((resp) => {
 
-      this.gpsCoors = {
-        lat: resp.coords.latitude,
-        lng: resp.coords.longitude
-      };
+        this.gpsCoors = {
+          lat: resp.coords.latitude,
+          lng: resp.coords.longitude
+        };
 
-      setTimeout(() => {
-        this.gpsState.next(true);
-      }, 500);
+        resolve(true)
 
-    }).catch((error) => {
+      }).catch((error) => {
 
-      if (this.gps_counter <= 1) {
+        resolve(false);
 
-        this.gps_counter++;
 
-        setTimeout(() => {
-          this.grand_GPS_permission();
-        }, 1000);
+        // if (this.gps_counter <= 1) {
 
-      }
-    });
+        //   this.gps_counter++;
+
+        //   setTimeout(() => {
+        //     this.grand_GPS_permission();
+        //   }, 1000);
+
+        // } else {
+        //   resolve(false);
+        // }
+      });
+    })
   }
 
   grand_GPS_permission2() {
@@ -106,26 +112,6 @@ export class ControlService {
     });
   }
 
-  actualizarOrigen(posicion) {
-    this.origen = posicion;
-    this.origenReady = true;
-    const data = {
-      accion: 'actualizar-origen',
-      origen: posicion
-    }
-    this.mapState.next(data);
-  }
-
-  actualizarDestino(posicion) {
-    this.destino = posicion;
-    this.destinoReady = true;
-    const data = {
-      accion: 'actualizar-destino',
-      destino: posicion
-    }
-    this.mapState.next(data);
-  }
-
   calcularRuta() {
     this.rutaReady = true;
     const data = {
@@ -137,13 +123,10 @@ export class ControlService {
   }
 
   checkDirecciones() {
-    console.log('aca vaae')
     if (this.origenReady && this.destinoReady) {
-      console.log('pasoo')
       this.ubicacionState.next(true);
     } else {
       this.ubicacionState.next(false);
-
     }
   }
 }

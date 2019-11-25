@@ -13,7 +13,6 @@ import { PayComponent } from 'src/app/components/pay/pay.component';
 import { FcmService } from 'src/app/services/fcm.service';
 import { CallNumber } from '@ionic-native/call-number/ngx';
 import { OtrosService } from 'src/app/services/otros.service';
-import { UbicacionComponent } from 'src/app/components/ubicacion/ubicacion.component';
 
 declare var google: any;
 
@@ -65,7 +64,10 @@ export class HomePage implements OnInit, OnDestroy {
   isAuth: boolean;
 
   riderCoorsSub$: Subscription;
+  mapaSub$: Subscription;
   riderSub$: Subscription;
+  cuponSub$: Subscription;
+
 
   solicitudAceptada = false;
 
@@ -158,20 +160,24 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.cargarMapa();
-    this.mapaSubscription();
-    this.getRating();
-    this.getCupon();
-    this._otros.pedido$.subscribe(data => {
-      this.pedidoActivo = false;
-      this.pedidosHandler(data);
-    });
+    this._control.grand_GPS_permission().then((isGPS: any) => {
 
-    this._otros.getPedido('buscar_pedido_activo_mas_reciente');
+      this.cargarMapa();
+      this.mapaSubscription();
 
-    this._control.gpsState.subscribe(() => {
-     this.graficarMarcador(this._control.gpsCoors, 'gps');
-     this.map.setCenter(this._control.gpsCoors);
+      this.getRating();
+      this.getCupon();
+
+      if (isGPS) {
+        this.graficarMarcador(this._control.gpsCoors, 'gps');
+      }
+
+      this._otros.pedido$.subscribe(data => {
+        this.pedidoActivo = false;
+        this.pedidosHandler(data);
+      });
+
+      this._otros.getPedido('buscar_pedido_activo_mas_reciente');
     });
   }
 
@@ -180,6 +186,8 @@ export class HomePage implements OnInit, OnDestroy {
     this.riderSub$ ? this.riderSub$.unsubscribe() : console.log();
     clearTimeout(this.timer);
     this._otros.pedido$.unsubscribe();
+    this.mapaSub$.unsubscribe();
+    this.cuponSub$.unsubscribe();
   }
 
   async presentRating(rating) {
@@ -219,7 +227,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   getCupon() {
-    this._data.cuponData.subscribe(data => this.cuponData = data)
+    this.cuponSub$ = this._data.cuponData.subscribe(data => this.cuponData = data)
     this._data.getCuponActivo(this._auth.usuario._id);
   }
 
@@ -251,6 +259,9 @@ export class HomePage implements OnInit, OnDestroy {
   crearNuevoPedido() {
     this.riderCoorsSub$.unsubscribe();
     this.resetMapa();
+
+    this.graficarMarcador(this._control.gpsCoors, 'gps');
+    this.map.setCenter(this._control.gpsCoors);
   }
 
   iniciarPedido() {
@@ -286,6 +297,7 @@ export class HomePage implements OnInit, OnDestroy {
     if (this.no_riders_area) {
       return setTimeout(() => {
         this.loadingRider = false;
+        this.no_riders_area = false;
         this.alert_area_sin_riders();
       }, 5 * 1000);
     }
@@ -452,6 +464,20 @@ export class HomePage implements OnInit, OnDestroy {
 
     this.loadingRider = false;
     this.resetMapaFromBusquedaCancelada();
+
+    this.graficarMarcador(this._control.gpsCoors, 'gps');
+    this.map.setCenter(this._control.gpsCoors);
+  }
+
+  cancelarServicio(id) {
+    this.riderCoorsSub$.unsubscribe();
+    this._fire.cancelarServicio(this.rider._id);
+    this._fcm.sendPushNotification(this.rider._id, 'servicio-cancelado');
+    this._data.updatePedido(this.pedido._id, { cancelado: true, activo: false });
+    this.resetMapa();
+
+    this.graficarMarcador(this._control.gpsCoors, 'gps');
+    this.map.setCenter(this._control.gpsCoors);
   }
 
   openMapaPage(tipo) {
@@ -487,7 +513,11 @@ export class HomePage implements OnInit, OnDestroy {
 
     const { data } = await modal.onWillDismiss();
 
-    if (data.pagoExitoso) {
+    if (!data) {
+      return this.resetMapa();
+    }
+
+    if (data.state == 'PAGO_EXITOSO') {
 
       this.directionsDisplay.setMap(null);
 
@@ -512,8 +542,14 @@ export class HomePage implements OnInit, OnDestroy {
 
       this._fcm.sendPushNotification(data.riderID, 'confirmacion-pedido');
 
-    } else {
+    }
+
+    if (data.state == 'PAGO_NO_REALIZADO') {
       this.alert_pedido_cancelado();
+    }
+
+    if (data.state == 'TIEMPO_EXPIRADO') {
+      this.resetMapa();
     }
   }
 
@@ -531,7 +567,7 @@ export class HomePage implements OnInit, OnDestroy {
 
   mapaSubscription() {
 
-    this._control.mapState.subscribe((data: any) => {
+    this.mapaSub$ = this._control.mapState.subscribe((data: any) => {
 
       if (data.accion == 'calcular-ruta') {
 
@@ -610,11 +646,8 @@ export class HomePage implements OnInit, OnDestroy {
       zoom: 16,
       disableDefaultUI: true
     });
-    this.directionsDisplay.setMap(this.map);
 
-    // this.
-    // this.graficarMarcador(this._control.gpsCoors, 'gps');
-    // this.graficarMarcador({ lat: -33.444600, lng: -70.655585 }, 'default');
+    this.directionsDisplay.setMap(this.map);
   }
 
   graficarRuta(origen, destino, vehiculo) {
@@ -685,7 +718,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   borrarMarcadores() {
-   
+
     if (this.riderMarker) {
       this.markerReady = false;
       this.riderMarker.setMap(null);
@@ -799,6 +832,31 @@ export class HomePage implements OnInit, OnDestroy {
     await alert.present();
   }
 
+  async alert_cancelacion(id) {
+    const alert = await this.alertController.create({
+      header: 'Atención!',
+      message: 'Estás a punto de cancelar el viaje. ¿Desea continuar?',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: (blah) => {
+            // this.cancelarServicio(id);
+          }
+        },
+        {
+          text: 'Ok',
+          handler: () => {
+            this.cancelarServicio(id);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
   resetMapaFromBusquedaCancelada() {
     this.isMoto = false;
     this.isBicicleta = false;
@@ -842,7 +900,7 @@ export class HomePage implements OnInit, OnDestroy {
     this.pedidoActivo = false;
     this.directionsDisplay.setMap(null);
     this.riderSub$.unsubscribe();
-    this._fire.updateRider(this.rider._id, 'rider', { pagoPendiente: false, aceptadoId: '', fase: '' });
+    this._fire.updateRider(this.rider._id, 'rider', { pagoPendiente: false, aceptadoId: '', fase: '', cliente_activo: '' });
     this._fire.updateRider(this.rider._id, 'coors', { pagoPendiente: false });
     this.rider = null;
     this.riderIndex = 0;

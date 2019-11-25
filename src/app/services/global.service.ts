@@ -60,8 +60,6 @@ export class GlobalService {
 
       const tarifas: any = await this.getTarifas(ciudad);
 
-      console.log(tarifas);
-
       let precioBici = 0;
       let precioMoto = 0;
 
@@ -69,7 +67,7 @@ export class GlobalService {
         precioBici = tarifas.bici.minima
       } else {
         const costo = tarifas.bici.distancia * distancia / 1000 + tarifas.bici.base;
-        precioBici = Math.ceil(costo / 10) * 10;
+        precioBici = Math.round(costo / 100) * 100;
       }
 
       if (ciudad == 'santiago') {
@@ -93,13 +91,12 @@ export class GlobalService {
       tarifas = tarifas_data.moto.B;
     }
 
-    console.log(tarifas, 'tarifaaas')
-
     if (distancia < tarifas.limite_aplicacion) {
       precioMoto = tarifas.minima;
     } else {
       const costo = tarifas.distancia * distancia / 1000 + tarifas.base;
-      precioMoto = Math.ceil(costo / 10) * 10;
+
+      precioMoto = Math.round(costo / 100) * 100;
     }
 
     return precioMoto;
@@ -113,7 +110,8 @@ export class GlobalService {
       precioMoto = tarifas.moto.minima;
     } else {
       const costo = tarifas.moto.distancia * distancia / 1000 + tarifas.moto.base;
-      precioMoto = Math.ceil(costo / 10) * 10;
+
+      precioMoto = Math.round(costo / 100) * 100;
     }
 
     return precioMoto;

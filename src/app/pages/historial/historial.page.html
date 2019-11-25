@@ -23,8 +23,11 @@
         <div style="color:#666;text-transform:capitalize">
           {{pedido.fecha_creacion}}
         </div>
-        <div *ngIf="tipo == 'proximos'" style="color:limegreen">
+        <div *ngIf="pedido.activo" style="color:limegreen">
           Activo
+        </div>
+        <div *ngIf="pedido.cancelado" style="color:red">
+          Cancelado
         </div>
       </div>
       <div style="width:100%;display:flex;justify-content:space-between">

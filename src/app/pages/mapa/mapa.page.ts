@@ -65,8 +65,7 @@ export class MapaPage implements OnInit {
   }
 
   start_map() {
-    this.center = this._control.gpsCoors;
-    this.lastCenter = { lat: -33.444700, lng: -70.655700 };
+    this.center = this._control.gpsCoors;    
     this.cargarMapa();
     this.position = {
       coors: this.center,
@@ -77,11 +76,9 @@ export class MapaPage implements OnInit {
 
   cargarMapa() {
 
-    this.center = this._control.centro;
-
     this.map = new google.maps.Map(document.getElementById('map2'), {
       center: this.center,
-      zoom: 15,
+      zoom: 17,
       disableDefaultUI: true
     });
 

@@ -76,8 +76,7 @@ export class AppComponent {
                 this.openBloqueadoModal();
 
               } else {
-
-                this._control.grand_GPS_permission();
+                
                 this.router.navigateByUrl('home');
               }
 

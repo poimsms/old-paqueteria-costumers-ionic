@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { take, switchMap } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
+import { ToastController } from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,10 @@ export class FireService {
   ids = [];
   riders_consultados = [];
 
-  constructor(private db: AngularFirestore) { }
+  constructor(
+    private db: AngularFirestore,
+    public toastController: ToastController
+  ) { }
 
   getRider(id) {
     return this.db.collection('riders', ref => ref.where('rider', '==', id)).valueChanges();
@@ -30,6 +34,38 @@ export class FireService {
       return this.db.doc('riders_coors/' + id).update(data);
     } else {
       return this.db.doc('riders/' + id).update(data);
+    }
+  }
+
+  async cancelarServicio(id) {
+    const rider: any = await this.getRiderPromise(id);
+    if (rider.fase == 'navegando_al_origen') {
+
+      const data_rider = {
+        actividad: 'disponible',
+        cliente_activo: '',
+        pedido: '',
+        servicio_cancelado: true
+      }
+
+      const data_coors = {
+        actividad: 'disponible',
+        cliente: ''
+      }
+
+      this.updateRider(id, 'rider', data_rider);
+      this.updateRider(id, 'coors', data_coors);
+    }
+
+    if (rider.fase == 'navegando_al_destino') {
+
+      const data_rider = {
+        bloqueado: true,
+        servicio_cancelado: true
+      };
+
+      this.updateRider(id, 'rider', data_rider);
+      this.toast_devolucion_paquete();
     }
   }
 
@@ -72,6 +108,9 @@ export class FireService {
 
     const { vehiculo, ciudad, lat, lng } = body;
 
+    console.log(body, 'body neer')
+
+    console.log(this.riders_consultados, 'consultadooos')
     return new Promise((resolve, reject) => {
       this.db.collection('riders_coors', ref =>
         ref.where('isOnline', '==', true)
@@ -81,20 +120,24 @@ export class FireService {
           .where('actividad', '==', 'disponible')
           .where('vehiculo', '==', vehiculo))
         .valueChanges().pipe(take(1)).subscribe((riders: any) => {
-
+          console.log(riders, 'resp riderss fire')
           if (riders.length == 0) {
             return resolve({ isMoto: false, isBici: false });
           }
 
+          console.log('keep')
           const riders_zero = this.filtro_zero(riders);
+          console.log(riders_zero, 'zero')
 
           const data = this.filtro_uno(riders_zero, lat, lng, vehiculo);
+          console.log(data, 'uno')
 
           if (!data.ok) {
             return resolve({ ok: false });
           }
 
           const id = this.riders_loop(data.riders, lat, lng);
+          console.log(id, 'id')
 
           resolve({ ok: true, id });
         });
@@ -143,7 +186,7 @@ export class FireService {
 
       const distance = this.haversineDistance(riderCoors, destinoCoors);
 
-      if (distance < 2300 && rider.vehiculo == 'moto') {
+      if (distance < 6000 && rider.vehiculo == 'moto') {
         riders_moto.push(rider);
       }
       if (distance < 1500 && rider.vehiculo == 'bicicleta') {
@@ -318,6 +361,25 @@ export class FireService {
     return id;
   }
 
+  async toast_devolucion_paquete() {
+    const toast = await this.toastController.create({
+      header: 'Te devolveremos el paquete en el punto de inicio',
+      position: 'middle',
+      duration: 15000,
+      mode: 'md',
+      buttons: [
+        {
+          text: 'Cerrar',
+          role: 'cancel',
+          handler: () => {
+            console.log('Cancel clicked');
+          }
+        }
+      ]
+    });
+
+    toast.present();
+  }
 
 
 }
