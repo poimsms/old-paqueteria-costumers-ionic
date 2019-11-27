@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { ConfigService } from './config.service';
-import { Platform } from '@ionic/angular';
+import { Platform, AlertController } from '@ionic/angular';
 import { FCM } from '@ionic-native/fcm/ngx';
 import { AuthService } from './auth.service';
 
@@ -16,8 +16,12 @@ export class FcmService {
     private _config: ConfigService,
     private platform: Platform,
     private fcm: FCM,
-    private _auth: AuthService
-  ) { }
+    private _auth: AuthService,
+    public alertController: AlertController
+
+  ) { 
+    // this.listenToNotifications();
+  }
 
   async getToken(uid) {
 
@@ -44,14 +48,22 @@ export class FcmService {
 
   listenToNotifications() {
 
+    
+
     if (!this.platform.is('android')) {
       return;
     }
 
+    // alert( 'JSON.stringify(data)' );
+
+
     this.fcm.onNotification().subscribe(data => {
       if (data.wasTapped) {
         console.log('Received in background');
+        this.alert_area_sin_riders(JSON.stringify(data));   
+
       } else {
+        this.alert_area_sin_riders(JSON.stringify(data));
         console.log('Received in foreground');
       }
     });
@@ -74,4 +86,24 @@ export class FcmService {
     const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
     return this.http.get(url, { headers }).toPromise();
   }
+
+  async alert_area_sin_riders(m) {
+    const alert = await this.alertController.create({
+      header: 'fcm',
+      message: m,
+      buttons: [
+        {
+          text: 'Ok',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: (blah) => {
+            // this.resetMapa();
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
 }

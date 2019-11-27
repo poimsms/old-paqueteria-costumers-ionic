@@ -179,13 +179,13 @@ export class PayComponent implements OnInit {
       pagoPendiente: false,
       actividad: 'ocupado',
       pedido: pedidoId,
-      cliente: this.usuario._id
+      cliente: this.usuario._id,
+      evento: 1
     });
   }
 
   updateRiderEstadoDisponible() {
     this._fire.updateRider(this.rider._id, 'rider', {
-      fase: '',
       pagoPendiente: false,
       aceptadoId: '',
       cliente_activo: ''

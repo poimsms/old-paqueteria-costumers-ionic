@@ -39,7 +39,7 @@
   </div>
 
   <div style="padding:5px;padding-left:15px;padding-right:15px">
-    <div style="font-size:18px;color:#444">
+    <div style="font-size:20px;color:#444">
       Costo del servicio
       <span *ngIf="!cuponData.ok">${{monto}}</span>
       <span *ngIf="cuponData.ok" style="text-decoration:line-through;color:#888">${{monto}}</span>
@@ -52,8 +52,9 @@
     </div>
   </div>
 
-  <ion-item (click)="codigo_promo()" lines="none" detail>
-    <div style="color:#7AC602">
+  
+  <ion-item (click)="codigo_promo()" lines="none" style="margin-top:10px;margin-bottom:5px" detail>
+    <div style="color:#7AC602;font-size:18px">
       Ingresar código promo
     </div>
   </ion-item>
@@ -67,7 +68,7 @@
   <ion-item lines="none">
     <ion-icon slot="start" name="phone-portrait" style="color:#bbb"></ion-icon>
     <ion-input type="tel" placeholder="Teléfono de quién envía" [(ngModel)]="telefono_origen"
-      style="border-bottom:1px solid #eee" autocomplete="off">
+      style="border-bottom:1px solid #eee;font-size:18px" autocomplete="off">
     </ion-input>
   </ion-item>
 
@@ -80,13 +81,13 @@
   <ion-item lines="none">
     <ion-icon slot="start" name="phone-portrait" style="color:#bbb"></ion-icon>
     <ion-input type="tel" placeholder="Teléfono de quién recibe" [(ngModel)]="telefono_destino"
-      style="border-bottom:1px solid #eee" autocomplete="off">
+      style="border-bottom:1px solid #eee;font-size:18px" autocomplete="off">
     </ion-input>
   </ion-item>
 
   <div padding>
     <ion-textarea placeholder="Agrega una nota (opcional)" [(ngModel)]="instrucciones" rows="5"
-      style="border:1px solid #eee;border-radius:5px">
+      style="border:1px solid #eee;border-radius:5px;font-size:18px">
     </ion-textarea>
   </div>
 

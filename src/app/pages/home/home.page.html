@@ -17,11 +17,11 @@
   </div>
 </div>
 
-<div *ngIf="pedidoActivo && isEmpresa" style="z-index:990;position:fixed;bottom:170px;left:10px">
+<div *ngIf="pedidoActivo && isEmpresa" style="z-index:990;position:fixed;bottom:260px;left:10px">
   <div (click)="crearNuevoPedido()"
     style="background:white;color:#666;font-weight:500;height:35px;padding:20px;display:flex;align-items:center;justify-content:center;border-radius:2px;box-shadow: 0 0 20px #bbb;">
     <ion-icon name="add" style="margin-right:5px;color:#444;font-size:22px"></ion-icon>
-    Crear nuevo pedido
+    Crear más pedidos
   </div>
 </div>
 
@@ -57,6 +57,8 @@
 
 
 <ion-footer padding style="background:#fff">
+
+
 
   <div *ngIf="!pedidoActivo">
 
@@ -145,9 +147,7 @@
       <div *ngIf="cuponData?.ok"
         style="margin-left:10px;text-align:center;padding:5px;padding-left:10px;padding-right:10px;border-radius:15px;background:#df1f9f;font-size:14px;color:white;font-weight:500">
         <span *ngIf="cuponData.cupon.tipo == 'PORCENTAJE'">{{cuponData.cupon.descuento}}%</span>
-        <!-- <span *ngIf="cuponData.cupon.tipo == 'PORCENTAJE'"> descuento</span> -->
         <span *ngIf="cuponData.cupon.tipo == 'DINERO'">${{cuponData.cupon.descuento}}</span>
-        <!-- <span *ngIf="cuponData.cupon.tipo == 'DINERO'"> Descto.</span> -->
         Descto.
       </div>
     </div>
@@ -190,7 +190,6 @@
 
     </ion-button> -->
 
-
     <ion-button *ngIf="rutaReady" [disabled]="!(isMoto || isBicicleta)" mode="ios" (click)="iniciarPedido()"
       expand="block" color="secondary" style="margin:15px;margin-top:25px">
       <div style="font-size:20px;font-weight:500">
@@ -201,9 +200,81 @@
   </div>
 
 
-  <!-- PEDIDO ACTIVO -->
+
+
+
+
+
 
   <div *ngIf="pedidoActivo">
+
+
+    <div style="margin-bottom:15px;font-size:18px;color:#555">
+      <div *ngIf="evento == 0">
+        Solicitud confirmada
+      </div>
+      <div *ngIf="evento == 1">
+        El Rider está en camino al punto de inicio
+      </div>
+      <div *ngIf="evento == 2">
+        <!-- Tu pedido se está recogiendo -->
+        <!-- El Rider ha llegado! -->
+        Vé al punto de inicio, el Rider ha llegado!
+      </div>
+      <div *ngIf="evento == 3">
+        El Rider está en camino al punto de entrega
+      </div>
+      <div *ngIf="evento == 4">
+        Tu pedido se está entregando
+      </div>
+    </div>
+
+    <div style="margin-bottom:15px;width:100%;display:flex;align-items:center">
+
+      <div
+        [ngClass]="{'bubble-step-forward': evento < 0, 'bubble-step-done': evento == 0, 'bubble-step-done': evento > 0}">
+        <ion-icon *ngIf="evento > 0" name="checkmark-circle" style="color:limegreen;font-size:28px"></ion-icon>
+        <div *ngIf="evento == 0" style="color:white;font-weight:600">1</div>
+      </div>
+
+      <div [ngClass]="{'bar-step-forward': evento <= 0, 'bar-step-done': evento > 0}">
+      </div>
+
+      <div
+        [ngClass]="{'bubble-step-forward': evento < 1, 'bubble-step-active': evento == 1, 'bubble-step-done': evento > 1}">
+        <ion-icon *ngIf="evento > 1" name="checkmark-circle" style="color:limegreen;font-size:28px"></ion-icon>
+        <div *ngIf="evento == 1" style="color:white;font-weight:600">2</div>
+      </div>
+
+      <div [ngClass]="{'bar-step-forward': evento <= 1, 'bar-step-done': evento > 1}">
+      </div>
+
+      <div
+        [ngClass]="{'bubble-step-forward': evento < 2, 'bubble-step-active': evento == 2, 'bubble-step-done': evento > 2}">
+        <ion-icon *ngIf="evento > 2" name="checkmark-circle" style="color:limegreen;font-size:28px"></ion-icon>
+        <div *ngIf="evento == 2" style="color:white;font-weight:600">3</div>
+      </div>
+
+      <div [ngClass]="{'bar-step-forward': evento <= 2, 'bar-step-done': evento > 2}">
+      </div>
+
+      <div
+        [ngClass]="{'bubble-step-forward': evento < 3, 'bubble-step-active': evento == 3, 'bubble-step-done': evento > 3}">
+        <ion-icon *ngIf="evento > 3" name="checkmark-circle" style="color:limegreen;font-size:28px"></ion-icon>
+        <div *ngIf="evento == 3" style="color:white;font-weight:600">4</div>
+      </div>
+
+      <div [ngClass]="{'bar-step-forward': evento <= 3, 'bar-step-done': evento > 3}">
+      </div>
+
+      <div
+        [ngClass]="{'bubble-step-forward': evento < 4, 'bubble-step-active': evento == 4, 'bubble-step-done': evento > 4}">
+        <ion-icon *ngIf="evento > 4" name="checkmark-circle" style="color:limegreen;font-size:28px"></ion-icon>
+        <div *ngIf="evento == 4" style="color:white;font-weight:600">5</div>
+      </div>
+
+    </div>
+
 
     <div style="width:100%;padding-bottom:15px;display:flex;align-items:center;justify-content:space-between">
       <div style="display:flex;align-items:center;">

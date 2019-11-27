@@ -57,7 +57,7 @@ export class FireService {
       this.updateRider(id, 'coors', data_coors);
     }
 
-    if (rider.fase == 'navegando_al_destino') {
+    if (rider.fase != 'navegando_al_origen') {
 
       const data_rider = {
         bloqueado: true,

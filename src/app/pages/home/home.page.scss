@@ -59,12 +59,13 @@
     width:100%;
     text-align:center;
     color:#999;
+    font-size:18px;
 }
 
 .largeActivo {
-    color: #444;
+    color: #333;
     // font-weight:500;
-    font-size: 16px; 
+    // font-size: 16px; 
 }
 
 .start {
@@ -86,12 +87,53 @@
 }
 
 .holderActivo {
-    border: 1px solid #9EDF1F;
+    border: 2px solid #9EDF1F;
 }
 
 
 
+.bubble-step-done {
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  background:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
 
+.bubble-step-active {
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  background:limegreen;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.bubble-step-forward {
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  background:white;
+  border: 1px solid #e2e2e2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.bar-step-done {
+  width:40px;
+  height:10px;
+  background:limegreen;
+}
+
+.bar-step-forward {
+  width:40px;
+  height:10px;
+  background:#e2e2e2;
+}
 
 
 

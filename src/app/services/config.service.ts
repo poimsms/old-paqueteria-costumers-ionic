@@ -7,7 +7,7 @@ import { HttpClient } from '@angular/common/http';
 export class ConfigService {
 
   apiURL = '';
-  version = '1.6.2'
+  version = '1.6.3'
   ENTORNO = 'PROD';
 
   constructor(private http: HttpClient) {

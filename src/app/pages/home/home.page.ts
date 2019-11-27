@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { MenuController, ModalController, LoadingController, PopoverController } from '@ionic/angular';
+import { MenuController, ModalController, LoadingController, PopoverController, ToastController } from '@ionic/angular';
 import { ControlService } from 'src/app/services/control.service';
 import { Router } from '@angular/router';
 import { DataService } from 'src/app/services/data.service';
@@ -132,6 +132,7 @@ export class HomePage implements OnInit, OnDestroy {
   no_riders_area = false;
 
   hola = 'HOOLA MUNDO'
+  evento = 0;
 
   constructor(
     private menu: MenuController,
@@ -147,7 +148,8 @@ export class HomePage implements OnInit, OnDestroy {
     private _fcm: FcmService,
     private callNumber: CallNumber,
     private _otros: OtrosService,
-    public popoverController: PopoverController
+    public popoverController: PopoverController,
+    public toastController: ToastController
   ) {
     this.usuario = _auth.usuario;
     this.service = new google.maps.DistanceMatrixService();
@@ -201,20 +203,30 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   riderSubCoors() {
-    this.riderCoorsSub$ = this._fire.getRiderCoors(this.rider._id).subscribe((res: any) => {
+    this.riderCoorsSub$ = this._fire.getRiderCoors(this.rider._id).subscribe((riders: any) => {
 
-      if (res[0].cliente == this.usuario._id) {
+      let rider = riders[0];
+      this.evento = rider.evento;
 
-        const coors = { lat: res[0].lat, lng: res[0].lng };
+      if (rider.cliente == this.usuario._id) {
+
+        const coors = { lat: rider.lat, lng: rider.lng };
         this.graficarMarcador(coors, 'rider');
+      }
 
-      } else {
+      if (rider.cliente != this.usuario._id) {
         this.riderCoorsSub$.unsubscribe();
+
+        setTimeout(() => {
+          this.resetMapa();
+          this.toast_pedido_completado();
+        }, 2000);
+
         setTimeout(() => {
           this.getRating();
-          this.resetMapa();
         }, 6000);
       }
+
     });
   }
 
@@ -359,7 +371,7 @@ export class HomePage implements OnInit, OnDestroy {
         pagoPendiente: false
       });
 
-    }, 25 * 1000);
+    }, 45 * 1000);
   }
 
   handShake(id) {
@@ -431,7 +443,6 @@ export class HomePage implements OnInit, OnDestroy {
       nuevaSolicitud: true,
       pagoPendiente: true,
       created: new Date().getTime(),
-      fase: 'esperando_confirmacion',
       dataPedido: {
         cliente: {
           _id: this.usuario._id,
@@ -459,7 +470,7 @@ export class HomePage implements OnInit, OnDestroy {
     this.riderSub$.unsubscribe();
     clearTimeout(this.timer);
 
-    this._fire.updateRider(this.riderActivoEnBusqueda, 'rider', { nuevaSolicitud: false, pagoPendiente: false, fase: '', cliente_activo: '' });
+    this._fire.updateRider(this.riderActivoEnBusqueda, 'rider', { nuevaSolicitud: false, pagoPendiente: false, cliente_activo: '' });
     this._fire.updateRider(this.riderActivoEnBusqueda, 'coors', { pagoPendiente: false });
 
     this.loadingRider = false;
@@ -611,6 +622,7 @@ export class HomePage implements OnInit, OnDestroy {
             }
 
             this.showMoto = true;
+            this.isMoto = true;
             // this.showMoto = res.isMoto;
             this.showBici = res.isBici;
 
@@ -857,6 +869,39 @@ export class HomePage implements OnInit, OnDestroy {
     await alert.present();
   }
 
+  async toast_pedido_completado() {
+    const toast = await this.toastController.create({
+      message: 'Pedido completado!',
+      duration: 2500,
+      position: 'middle'
+    });
+    toast.present();
+  }
+
+  async alert_cancelacion22(m) {
+    const alert = await this.alertController.create({
+      header: 'test',
+      message: m,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: (blah) => {
+            // this.cancelarServicio(id);
+          }
+        },
+        {
+          text: 'Ok',
+          handler: () => {
+            // this.cancelarServicio(id);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
   resetMapaFromBusquedaCancelada() {
     this.isMoto = false;
     this.isBicicleta = false;
@@ -900,7 +945,7 @@ export class HomePage implements OnInit, OnDestroy {
     this.pedidoActivo = false;
     this.directionsDisplay.setMap(null);
     this.riderSub$.unsubscribe();
-    this._fire.updateRider(this.rider._id, 'rider', { pagoPendiente: false, aceptadoId: '', fase: '', cliente_activo: '' });
+    this._fire.updateRider(this.rider._id, 'rider', { pagoPendiente: false, aceptadoId: '', cliente_activo: '' });
     this._fire.updateRider(this.rider._id, 'coors', { pagoPendiente: false });
     this.rider = null;
     this.riderIndex = 0;
