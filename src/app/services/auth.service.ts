@@ -20,6 +20,8 @@ export class AuthService {
   tipo: string;
   tokenPhone: string;
 
+  storage_counter = 0;
+
   constructor(
     private http: HttpClient,
     private platform: Platform,
@@ -79,25 +81,43 @@ export class AuthService {
     }
   }
 
+  storageTry() {
+    this.storage.get('authData').then(res => {
+
+      if (res) {
+
+        const token = JSON.parse(res).token;
+        const uid = JSON.parse(res).uid;
+
+        this.getUser(token, uid).then(usuario => {
+          this.usuario = usuario;
+          this.token = token;
+          this.authState.next({ isAuth: true, usuario, token, readyState: true  });
+        });
+
+      } else {
+        this.authState.next({ isAuth: false, usuario: null, token: null, readyState: true  });
+      }
+
+      this.storage_counter = 0;
+
+    }).catch(() => {
+      
+      this.storage_counter++;
+
+      if (this.storage_counter <= 3) {
+        setTimeout(() => {
+          this.storageTry();
+        }, 200);
+      } else {
+        this.storage_counter = 0;
+      }
+    })
+  }
+
   loadStorage() {
     if (this.platform.is('cordova')) {
-      this.storage.get('authData').then(res => {
-
-        if (res) {
-
-          const token = JSON.parse(res).token;
-          const uid = JSON.parse(res).uid;
-
-          this.getUser(token, uid).then(usuario => {
-            this.usuario = usuario;
-            this.token = token;
-            this.authState.next({ isAuth: true, usuario, token, readyState: true  });
-          });
-
-        } else {
-          this.authState.next({ isAuth: false, usuario: null, token: null, readyState: true  });
-        }
-      });
+      this.storageTry();
     } else {
       if (localStorage.getItem('authData')) {
 

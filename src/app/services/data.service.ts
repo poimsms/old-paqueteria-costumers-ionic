@@ -115,14 +115,20 @@ export class DataService {
     return this.http.post(url, body, { headers }).toPromise();
   }
 
-  creteCheckoutTime(body) {
-    const url = `${this._config.apiURL}/core/checkout-time-create`;
+  creteCheckout(body) {
+    const url = `${this._config.apiURL}/core/checkout-create`;
     const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
     return this.http.post(url, body, { headers }).toPromise();
   }
 
-  getCheckoutTime(id) {
-    const url = `${this._config.apiURL}/core/checkout-time-get?id=${id}`;
+  getCheckout(id) {
+    const url = `${this._config.apiURL}/core/checkout-get?id=${id}`;
+    const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
+    return this.http.get(url, { headers }).toPromise();
+  }
+
+  updateCheckout(id) {
+    const url = `${this._config.apiURL}/core/checkout-update?id=${id}`;
     const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
     return this.http.get(url, { headers }).toPromise();
   }

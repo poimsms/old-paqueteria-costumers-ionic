@@ -49,7 +49,9 @@ export class AppComponent {
 
       this._config.checkUpdate().then((data: any) => {
 
-        this._auth.loadStorage();
+        setTimeout(() => {
+          this._auth.loadStorage();
+        }, 500);
 
         if (data.forceUpgrade) {
 

@@ -79,7 +79,6 @@ export class FireService {
     });
   }
 
-
   detectarRidersCercanos(body) {
 
     const { ciudad, lat, lng } = body;
@@ -108,9 +107,6 @@ export class FireService {
 
     const { vehiculo, ciudad, lat, lng } = body;
 
-    console.log(body, 'body neer')
-
-    console.log(this.riders_consultados, 'consultadooos')
     return new Promise((resolve, reject) => {
       this.db.collection('riders_coors', ref =>
         ref.where('isOnline', '==', true)
@@ -120,24 +116,20 @@ export class FireService {
           .where('actividad', '==', 'disponible')
           .where('vehiculo', '==', vehiculo))
         .valueChanges().pipe(take(1)).subscribe((riders: any) => {
-          console.log(riders, 'resp riderss fire')
+
           if (riders.length == 0) {
             return resolve({ isMoto: false, isBici: false });
           }
 
-          console.log('keep')
           const riders_zero = this.filtro_zero(riders);
-          console.log(riders_zero, 'zero')
 
           const data = this.filtro_uno(riders_zero, lat, lng, vehiculo);
-          console.log(data, 'uno')
 
           if (!data.ok) {
             return resolve({ ok: false });
           }
 
           const id = this.riders_loop(data.riders, lat, lng);
-          console.log(id, 'id')
 
           resolve({ ok: true, id });
         });
@@ -186,10 +178,10 @@ export class FireService {
 
       const distance = this.haversineDistance(riderCoors, destinoCoors);
 
-      if (distance < 6000 && rider.vehiculo == 'moto') {
+      if (distance < 10000 && rider.vehiculo == 'moto') {
         riders_moto.push(rider);
       }
-      if (distance < 1500 && rider.vehiculo == 'bicicleta') {
+      if (distance < 3000 && rider.vehiculo == 'bicicleta') {
         riders_bici.push(rider);
       }
     });
@@ -204,7 +196,7 @@ export class FireService {
 
     if (vehiculo == 'bicicleta' && riders_bici.length > 0) {
       ok = true;
-      riders_filtrados = riders_moto;
+      riders_filtrados = riders_bici;
     }
 
     return { ok, riders: riders_filtrados };
@@ -223,10 +215,11 @@ export class FireService {
       const destinoCoors = [lat, lng];
 
       const distance = this.haversineDistance(riderCoors, destinoCoors);
-      if (distance < 6000 && rider.vehiculo == 'moto') {
+      if (distance < 10000 && rider.vehiculo == 'moto') {
         riders_moto.push(rider);
       }
-      if (distance < 1500 && rider.vehiculo == 'bicicleta') {
+      if (distance < 3000 && rider.vehiculo == 'bicicleta') {
+        console.log('pasooo bici')
         riders_bici.push(rider);
       }
     });

@@ -35,6 +35,8 @@ export class PayComponent implements OnInit {
   instrucciones = '';
   tiempo_entrega = '';
 
+  checkout_id: string;
+
   constructor(
     public modalCtrl: ModalController,
     private navParams: NavParams,
@@ -68,9 +70,11 @@ export class PayComponent implements OnInit {
 
     this.isLoading = true;
 
-    this._data.creteCheckoutTime(body)
-      .then(() => this.isLoading = false)
-      .catch(() => this.isLoading = false);
+    this._data.creteCheckout(body)
+      .then((data: any) => {
+        this.checkout_id = data._id;
+        this.isLoading = false;
+      });
   }
 
   async confirmar_envio() {
@@ -81,7 +85,7 @@ export class PayComponent implements OnInit {
       usuario: this.usuario._id
     };
 
-    const pedido = {
+    const pedido: any = {
       costo: this.monto,
       costo_real: this.monto,
       metodo_de_pago: this.metodo_pago,
@@ -96,6 +100,8 @@ export class PayComponent implements OnInit {
       tiempo_entrega: this.tiempo_entrega
     };
 
+    pedido.checkout = this.checkout_id;
+
     if (this.cuponData.ok) {
       flow.monto = this.precio_descuento;
       pedido.costo = this.precio_descuento;
@@ -103,9 +109,9 @@ export class PayComponent implements OnInit {
 
     this.isLoading = true;
 
-    const checkout_time: any = await this._data.getCheckoutTime(this._auth.usuario._id);
+    const checkout: any = await this._data.getCheckout(this.checkout_id);
 
-    if (!checkout_time.ok) {
+    if (!checkout.ok) {
       this.isLoading = false;
       return this.alert_tiempo_expirado();
     }
@@ -125,7 +131,7 @@ export class PayComponent implements OnInit {
             this.save(pedido);
           });
         } else {
-          this.modalCtrl.dismiss({ state: 'PAGO_NO_REALIZADO', tiempoExpirado: false });
+          this.close();
         }
       });
     }
@@ -158,8 +164,8 @@ export class PayComponent implements OnInit {
   }
 
   close() {
-    this._data.getCheckoutTime(this._auth.usuario._id);
     this.updateRiderEstadoDisponible();
+    this._data.updateCheckout(this.checkout_id);
     this.modalCtrl.dismiss({ state: 'PAGO_NO_REALIZADO' });
   }
 

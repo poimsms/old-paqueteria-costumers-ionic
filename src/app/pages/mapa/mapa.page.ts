@@ -45,6 +45,7 @@ export class MapaPage implements OnInit {
     private router: Router,
     private platform: Platform
   ) {
+    console.log('entroo counstr')
     this.service = new google.maps.DistanceMatrixService();
     this.autocomplete = { input: '' };
     this.geocoder = new google.maps.Geocoder();
@@ -62,6 +63,9 @@ export class MapaPage implements OnInit {
     if (this.timer) {
       clearTimeout(this.timer);
     }
+
+    google.maps.event.clearListeners(this.map, 'center_changed');
+    this.map = null;
   }
 
   start_map() {
@@ -82,17 +86,22 @@ export class MapaPage implements OnInit {
       disableDefaultUI: true
     });
 
+    console.log(this.center, 'cargoo mapa')
+
     this.codeLatLng(this.center);
     this.lastCenter = JSON.parse(JSON.stringify(this.center));
 
     this.interval = setInterval(() => {
       if ((this.lastCenter.lat != this.center.lat)) {
+        console.log('calculo')
         this.codeLatLng(this.center);
         this.lastCenter = JSON.parse(JSON.stringify(this.center));
       }
     }, 1800);
 
     google.maps.event.addListener(this.map, 'center_changed', () => {
+
+      console.log('escuchando')
 
       this.center.lat = this.map.getCenter().lat();
       this.center.lng = this.map.getCenter().lng();
@@ -103,6 +112,7 @@ export class MapaPage implements OnInit {
   }
 
   codeLatLng(coors) {
+    console.log('geolattt')
     this.geocoder.geocode({
       'location': coors
     }, (results, status) => {
@@ -123,7 +133,8 @@ export class MapaPage implements OnInit {
   }
 
   back() {
-    this.openModal();
+    this.router.navigateByUrl('direcciones');
+    // this.openModal();
   }
 
   save() {

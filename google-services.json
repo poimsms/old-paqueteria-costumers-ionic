@@ -8,9 +8,46 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:905180881415:android:b229cd827873ca38",
+        "mobilesdk_app_id": "1:905180881415:android:79a3a54cb5b358ec7180a2",
         "android_client_info": {
           "package_name": "cl.joopiter.paqueteria01"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "905180881415-cuedc0orga0bver1fjv1eq6qell3oqef.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "cl.joopiter.paqueteria01",
+            "certificate_hash": "075409cd4c21317be05269f158d7708c43bceea3"
+          }
+        },
+        {
+          "client_id": "905180881415-mac1sr9fus0ir9mibf9kii4aknak313g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHybp1lqkyWW-Wgq7VolwJo46xY84wkjc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "905180881415-mac1sr9fus0ir9mibf9kii4aknak313g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:905180881415:android:34c310ef24272bb0",
+        "android_client_info": {
+          "package_name": "cl.joopiter.paqueteriarider01"
         }
       },
       "oauth_client": [
@@ -21,7 +58,7 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBzOexvZRlWzMRkI5nlsRZLthVFiESfb1c"
+          "current_key": "AIzaSyDHybp1lqkyWW-Wgq7VolwJo46xY84wkjc"
         }
       ],
       "services": {

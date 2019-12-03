@@ -217,12 +217,13 @@ export class HomePage implements OnInit, OnDestroy {
       if (rider.cliente != this.usuario._id) {
         this.riderCoorsSub$.unsubscribe();
 
-        setTimeout(() => {
-          this.resetMapa();
-          this.toast_pedido_completado();
-        }, 2000);
+        // setTimeout(() => {
+        //   this.resetMapa();
+        //   this.toast_pedido_completado();
+        // }, 2000);
 
         setTimeout(() => {
+          this.resetMapa();
           this.getRating();
         }, 6000);
       }
@@ -503,11 +504,6 @@ export class HomePage implements OnInit, OnDestroy {
 
   async openUbicaciones() {
     this.router.navigateByUrl('direcciones');
-    // const modal = await this.modalController.create({
-    //   component: UbicacionComponent
-    // });
-
-    // await modal.present();
   }
 
   async openPayModal(pago) {
@@ -619,18 +615,28 @@ export class HomePage implements OnInit, OnDestroy {
 
             if (!res.isMoto && !res.isBici) {
               this.no_riders_area = true;
+              this.showBici = false;
+              this.showMoto = true;
+              this.isMoto = true;
             }
 
-            this.showMoto = true;
-            this.isMoto = true;
-            // this.showMoto = res.isMoto;
-            this.showBici = res.isBici;
+            if (res.isMoto || res.isBici) {
+              this.no_riders_area = false;
 
-            if (distancia > 6000) {
+              res.isMoto ? this.isMoto = true : this.isBicicleta = true;
+              this.showMoto = res.isMoto;
+              this.showBici = res.isBici;
+            }
+
+            if (distancia > 5500) {
               this.showBici = false
             }
 
-            if (distancia > 70000) {
+            if (distancia > 70000 && this.ciudad == 'santiago') {
+              this.distancia_excedida_moto = true;
+            }
+
+            if (distancia > 40000 && this.ciudad == 'la_serena_coquimbo') {
               this.distancia_excedida_moto = true;
             }
 

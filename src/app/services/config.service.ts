@@ -7,7 +7,7 @@ import { HttpClient } from '@angular/common/http';
 export class ConfigService {
 
   apiURL = '';
-  version = '1.6.3'
+  version = '1.6.7';
   ENTORNO = 'PROD';
 
   constructor(private http: HttpClient) {
@@ -15,23 +15,37 @@ export class ConfigService {
   }
 
   setApi() {
-    if (this.ENTORNO == 'DEV') {
-      this.apiURL = `http://localhost:3000/v1.0.1`;
-    }
-    if (this.ENTORNO == 'PROD') {
-      this.apiURL = `https://joopiterweb.com/v1.0.1`;
+
+    switch (this.ENTORNO) {
+      case 'DEV':
+        this.apiURL = `http://localhost:3000/v1.0.1`;
+        break;
+
+      case 'PROD':
+        this.apiURL = `https://joopiterweb.com/v1.0.1`;
+        break;
+
+      case 'TEST':
+        this.apiURL = `https://footballonapp.com/v1.0.1`;
+        break;
     }
   }
 
   checkUpdate() {
     let serverURL = '';
 
-    if (this.ENTORNO == 'DEV') {
-      serverURL = `http://localhost:3000`;
-    }
+    switch (this.ENTORNO) {
+      case 'DEV':
+        serverURL = `http://localhost:3000`;
+        break;
 
-    if (this.ENTORNO == 'PROD') {
-      serverURL = `https://joopiterweb.com`;
+      case 'PROD':
+        serverURL = `https://joopiterweb.com`;
+        break;
+
+      case 'TEST':
+        serverURL = `https://footballonapp.com`;
+        break;
     }
 
     return new Promise((resolve, reject) => {
