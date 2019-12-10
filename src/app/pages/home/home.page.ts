@@ -355,6 +355,7 @@ export class HomePage implements OnInit, OnDestroy {
 
       if (this.counter == 4) {
         this.loadingRider = false;
+        this.counter = 0;
         return this.alert_alta_demanda();
       }
 

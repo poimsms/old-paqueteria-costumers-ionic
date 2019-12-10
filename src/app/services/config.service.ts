@@ -7,7 +7,7 @@ import { HttpClient } from '@angular/common/http';
 export class ConfigService {
 
   version = '1.6.8';
-  ENTORNO = 'DEV';
+  ENTORNO = 'PROD';
 
   coleccion_riders = '';
   path_riders = '';

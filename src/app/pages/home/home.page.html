@@ -162,12 +162,12 @@
       </div>
 
 
-   
+
 
     </div>
 
 
-  
+
 
     <div *ngIf="!rutaReady" style="color:#666;font-weight:300">
       Buenas tardes <span style="text-transform:capitalize"> {{usuario.nombre.split(' ')[0] }}</span>
@@ -315,13 +315,7 @@
           <div class="burbuja burbujaActiva" style="position:absolute;bottom:-10px;right:-40px">
             <img *ngIf="rider.vehiculo == 'Moto'" src="assets/moto.png" style="width:45px">
             <img *ngIf="rider.vehiculo == 'Bicicleta'" src="assets/bici.png" style="width:45px">
-           <div>
             <img *ngIf="rider.vehiculo == 'Auto'" src="assets/auto.png" style="width:45px">
-            <!-- <div style="font-size:14px;color:#999;margin-top:-10px;margin-bottom:2px">
-              AD-C5
-            </div> -->
-           </div>
-          
           </div>
         </div>
 
@@ -341,14 +335,14 @@
             <ion-icon *ngIf="rider?.stats?.startsAvg >= 5" name="star" class="start"></ion-icon>
             ({{rider?.stats?.startsAvg}})
           </div>
-          <div style="font-size:14px;color:#999;margin-top:2px;margin-bottom:2px">
-            Toyota Prius AD-C5
+          <div *ngIf="rider?.vehiculo == 'Auto'" style="font-size:14px;color:#999;margin-top:2px;margin-bottom:2px">
+            {{rider.patente}}
           </div>
           <div style="font-size:14px;color:#999;margin-top:2px;margin-bottom:2px">
             Entrega estimada: {{pedido.entrega_estimada}}
           </div>
-          <ion-button *ngIf="pedido.metodo_de_pago == 'Efectivo'" (click)="alert_cancelacion(rider._id)"
-            color="light" size="small">
+          <ion-button *ngIf="pedido.metodo_de_pago == 'Efectivo'" (click)="alert_cancelacion(rider._id)" color="light"
+            size="small">
             Cancelar
           </ion-button>
         </div>
