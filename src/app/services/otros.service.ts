@@ -26,7 +26,6 @@ export class OtrosService {
     return new Promise((resolve, reject) => {
 
       if (this._auth.usuario.role == 'USUARIO_ROLE') {
-        console.log('entroo...')
         this._data.getPedidoActivo(this._auth.usuario._id).then((data: any) => {
           this.pedido$.next(data);
           resolve();
@@ -34,10 +33,8 @@ export class OtrosService {
       }
 
       if (this._auth.usuario.role == 'EMPRESA_ROLE') {
-        console.log('aca vaa...')
 
         if (tipo == 'buscar_pedido_activo_mas_reciente') {
-
           this._data.getPedidoActivo(this._auth.usuario._id).then((data: any) => {
             this.pedido$.next(data);
             resolve();
@@ -45,36 +42,15 @@ export class OtrosService {
         }
 
         if (tipo == 'buscar_pedido_seleccionado') {
-          console.log('okkk')
           this._data.getOnePedido(pedidoID).then((data: any) => {
             this.pedido$.next(data);
             resolve();
           });
         }
+
       }
-
     });
   }
-
-
-
-  verificarPedidosProgramados(seleccion) {
-
-    // Verificar que un cliente no tenga mas de 20 pedidos en la franja horaria seleccionada
-    return new Promise((resolve, reject) => {
-      this._data.cuotaPedidosProgramado(this._auth.usuario._id, { seleccion }).then((res: any) => {
-
-        if (!res.ok) {
-          this.presentAlert(res.message)
-          return resolve({ ok: false });
-        }
-
-        resolve({ ok: true });
-
-      });
-    });
-  }
-
 
   async presentAlert(message) {
     const alert = await this.alertController.create({

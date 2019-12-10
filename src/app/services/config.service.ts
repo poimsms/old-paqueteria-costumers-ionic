@@ -6,12 +6,20 @@ import { HttpClient } from '@angular/common/http';
 })
 export class ConfigService {
 
+  version = '1.6.8';
+  ENTORNO = 'DEV';
+
+  coleccion_riders = '';
+  path_riders = '';
+
+  coleccion_coors = '';
+  path_coors = '';
+  
   apiURL = '';
-  version = '1.6.7';
-  ENTORNO = 'PROD';
 
   constructor(private http: HttpClient) {
     this.setApi();
+    this.setCollections();
   }
 
   setApi() {
@@ -27,6 +35,35 @@ export class ConfigService {
 
       case 'TEST':
         this.apiURL = `https://footballonapp.com/v1.0.1`;
+        break;
+    }
+  }
+
+  setCollections() {
+
+    switch (this.ENTORNO) {
+      case 'DEV':
+        this.coleccion_riders = 'riders_dev';
+        this.path_riders = 'riders_dev/';
+
+        this.coleccion_coors = 'riders_coors_dev';
+        this.path_coors = 'riders_coors_dev/';
+        break;
+
+      case 'PROD':
+        this.coleccion_riders = 'riders';
+        this.path_riders = 'riders/';
+
+        this.coleccion_coors = 'riders_coors';
+        this.path_coors = 'riders_coors/';
+        break;
+
+      case 'TEST':
+        this.coleccion_riders = 'riders_dev';
+        this.path_riders = 'riders_dev/';
+
+        this.coleccion_coors = 'riders_coors_dev';
+        this.path_coors = 'riders_coors_dev/';
         break;
     }
   }

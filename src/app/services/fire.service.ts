@@ -3,6 +3,8 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { take, switchMap } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
 import { ToastController } from '@ionic/angular';
+import { ConfigService } from './config.service';
+import { DataService } from './data.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,43 +20,53 @@ export class FireService {
 
   constructor(
     private db: AngularFirestore,
-    public toastController: ToastController
+    public toastController: ToastController,
+    private _config: ConfigService,
+    private _data: DataService
   ) { }
 
   getRider(id) {
-    return this.db.collection('riders', ref => ref.where('rider', '==', id)).valueChanges();
+    return this.db.collection(this._config.coleccion_riders, ref => ref.where('rider', '==', id)).valueChanges();
   }
 
   getRiderCoors(id) {
-    return this.db.collection('riders_coors', ref => ref.where('rider', '==', id)).valueChanges();
+    return this.db.collection(this._config.coleccion_coors, ref => ref.where('rider', '==', id)).valueChanges();
   }
 
   updateRider(id, tipo, data) {
     if (tipo == 'coors') {
-      return this.db.doc('riders_coors/' + id).update(data);
-    } else {
-      return this.db.doc('riders/' + id).update(data);
+      return this.db.doc(this._config.path_coors + id).update(data);
+    }
+    if (tipo == 'rider') {
+      return this.db.doc(this._config.path_riders + id).update(data);
     }
   }
 
-  async cancelarServicio(id) {
+  async cancelarServicio(id, pedido) {
     const rider: any = await this.getRiderPromise(id);
-    if (rider.fase == 'navegando_al_origen') {
+    if (rider.evento == 'navegando_al_origen') {
 
       const data_rider = {
         actividad: 'disponible',
         cliente_activo: '',
         pedido: '',
         servicio_cancelado: true
-      }
+      };
 
       const data_coors = {
         actividad: 'disponible',
         cliente: ''
-      }
+      };
 
       this.updateRider(id, 'rider', data_rider);
       this.updateRider(id, 'coors', data_coors);
+
+      const bodyPedido = {
+        pedido: pedido._id,
+        rider: id
+      };
+
+      this._data.cancelarPedido(bodyPedido);
     }
 
     if (rider.fase != 'navegando_al_origen') {
@@ -66,12 +78,19 @@ export class FireService {
 
       this.updateRider(id, 'rider', data_rider);
       this.toast_devolucion_paquete();
+
+      const bodyPedido = {
+        pedido: pedido._id,
+        rider: id
+      };
+
+      this._data.cancelarPedido(bodyPedido);
     }
   }
 
   getRiderPromise(id) {
     return new Promise((resolve, reject) => {
-      this.db.collection('riders', ref =>
+      this.db.collection(this._config.coleccion_riders, ref =>
         ref.where('rider', '==', id))
         .valueChanges().pipe(take(1)).subscribe(riders => {
           resolve(riders[0]);
@@ -84,7 +103,7 @@ export class FireService {
     const { ciudad, lat, lng } = body;
 
     return new Promise((resolve, reject) => {
-      this.db.collection('riders_coors', ref =>
+      this.db.collection(this._config.coleccion_coors, ref =>
         ref.where('isOnline', '==', true)
           .where('isActive', '==', true)
           .where('ciudad', '==', ciudad)
@@ -92,13 +111,17 @@ export class FireService {
           .where('actividad', '==', 'disponible'))
         .valueChanges().pipe(take(1)).subscribe((riders: any) => {
 
+          console.log(riders, 'RIDERS detectar')
+
           if (riders.length == 0) {
-            return resolve({ isMoto: false, isBici: false });
+            return resolve({ isMoto: false, isBici: false, isAuto: false });
           }
 
           const data = this.filtro_dos(riders, lat, lng);
 
-          resolve({ isMoto: data.isMoto, isBici: data.isBici });
+          console.log(data, 'data detectar')
+
+          resolve({ isMoto: data.isMoto, isBici: data.isBici, isAuto: data.isAuto });
         });
     });
   }
@@ -108,7 +131,7 @@ export class FireService {
     const { vehiculo, ciudad, lat, lng } = body;
 
     return new Promise((resolve, reject) => {
-      this.db.collection('riders_coors', ref =>
+      this.db.collection(this._config.coleccion_coors, ref =>
         ref.where('isOnline', '==', true)
           .where('ciudad', '==', ciudad)
           .where('isActive', '==', true)
@@ -117,13 +140,17 @@ export class FireService {
           .where('vehiculo', '==', vehiculo))
         .valueChanges().pipe(take(1)).subscribe((riders: any) => {
 
+          console.log(riders, 'RIDERS neer')
+
           if (riders.length == 0) {
-            return resolve({ isMoto: false, isBici: false });
+            return resolve({ isMoto: false, isBici: false, isAuto: false });
           }
 
           const riders_zero = this.filtro_zero(riders);
 
           const data = this.filtro_uno(riders_zero, lat, lng, vehiculo);
+
+          console.log(data, 'data neer')
 
           if (!data.ok) {
             return resolve({ ok: false });
@@ -170,6 +197,7 @@ export class FireService {
 
     const riders_moto = [];
     const riders_bici = [];
+    const riders_auto = [];
 
     riders.forEach(rider => {
 
@@ -183,6 +211,9 @@ export class FireService {
       }
       if (distance < 3000 && rider.vehiculo == 'bicicleta') {
         riders_bici.push(rider);
+      }
+      if (distance < 10000 && rider.vehiculo == 'auto') {
+        riders_auto.push(rider);
       }
     });
 
@@ -199,6 +230,11 @@ export class FireService {
       riders_filtrados = riders_bici;
     }
 
+    if (vehiculo == 'auto' && riders_auto.length > 0) {
+      ok = true;
+      riders_filtrados = riders_auto;
+    }
+
     return { ok, riders: riders_filtrados };
   }
 
@@ -206,21 +242,28 @@ export class FireService {
 
     const riders_moto = [];
     const riders_bici = [];
+    const riders_auto = [];
 
     let isMoto = false;
     let isBici = false;
+    let isAuto = false;
 
     riders.forEach(rider => {
       const riderCoors = [rider.lat, rider.lng];
       const destinoCoors = [lat, lng];
 
       const distance = this.haversineDistance(riderCoors, destinoCoors);
+
       if (distance < 10000 && rider.vehiculo == 'moto') {
         riders_moto.push(rider);
       }
+
       if (distance < 3000 && rider.vehiculo == 'bicicleta') {
-        console.log('pasooo bici')
         riders_bici.push(rider);
+      }
+
+      if (distance < 10000 && rider.vehiculo == 'auto') {
+        riders_auto.push(rider);
       }
     });
 
@@ -232,7 +275,11 @@ export class FireService {
       isBici = true;
     }
 
-    return { isMoto, isBici };
+    if (riders_auto.length > 0) {
+      isAuto = true;
+    }
+
+    return { isMoto, isBici, isAuto };
   }
 
   riders_loop(riders, lat, lng) {
@@ -349,7 +396,6 @@ export class FireService {
         id = ciudad.value
       }
     });
-
 
     return id;
   }

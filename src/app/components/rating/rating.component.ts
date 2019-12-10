@@ -84,7 +84,7 @@ export class RatingComponent implements OnInit {
 
   async calificacionToast() {
     const toast = await this.toastController.create({
-      message: 'Gracias por calificar al rider!',
+      message: 'Gracias por calificar al Rider!',
       duration: 2000,
       position: 'middle'
     });

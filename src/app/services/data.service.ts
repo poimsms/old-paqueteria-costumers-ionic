@@ -133,8 +133,8 @@ export class DataService {
     return this.http.get(url, { headers }).toPromise();
   }
 
-  updatePedido(id, body) {
-    const url = `${this._config.apiURL}/core/pedido-update?id=${id}`;
+  cancelarPedido(body) {
+    const url = `${this._config.apiURL}/core/pedido-cancelar`;
     const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
     return this.http.put(url, body, { headers }).toPromise();
   }

@@ -55,11 +55,11 @@ export class AppComponent {
 
         if (data.forceUpgrade) {
 
-          this.nuevaVersionAlert();
+          this.alert_nueva_actualizacion();
 
         } else if (data.recommendUpgrade) {
 
-          this.nuevaVersionAlert();
+          this.alert_nueva_actualizacion();
 
         } else {
 
@@ -121,7 +121,7 @@ export class AppComponent {
     this.router.navigateByUrl('login');
   }
 
-  async nuevaVersionAlert() {
+  async alert_nueva_actualizacion() {
     const alert = await this.alertController.create({
       header: 'Nueva versión disponible',
       subHeader: 'Por favor actualiza la app para poder seguir usandola',

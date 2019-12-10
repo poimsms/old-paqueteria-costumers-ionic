@@ -124,15 +124,24 @@ export class PayComponent implements OnInit {
 
       this._pagar.pagarConFlow(flow).then(pagoExitoso => {
 
-        this.isLoading = false;
+        this._data.getCheckout(this.checkout_id).then((checkout: any) => {
+        
+          this.isLoading = false;
 
-        if (pagoExitoso) {
-          this._data.crearPedido(pedido).then((pedido: any) => {
-            this.save(pedido);
-          });
-        } else {
-          this.close();
-        }
+          if (!checkout.ok) {            
+            return this.close();;
+          }
+
+          if (pagoExitoso) {
+            this._data.crearPedido(pedido).then((pedido: any) => {
+              this.save(pedido);
+            });
+          } else {
+            this.close();
+          }
+        })
+
+
       });
     }
 
@@ -178,7 +187,8 @@ export class PayComponent implements OnInit {
       pagoPendiente: false,
       actividad: 'ocupado',
       pedido: pedidoId,
-      aceptadoId: ''
+      aceptadoId: '',
+      evento: 1
     });
 
     this._fire.updateRider(this.rider._id, 'coors', {

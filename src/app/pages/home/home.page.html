@@ -106,6 +106,34 @@
       </div>
 
 
+      <div *ngIf="showAuto" (click)="vehiculoToggle('auto')" class="holder" [ngClass]="{'holderActivo': isAuto}">
+        <div style="display:flex;align-items:center;">
+          <div class="burbuja" [ngClass]="{'burbujaActiva': isAuto}">
+            <img src="assets/auto.png" class="transporte" [ngClass]="{'transporteActivo': isAuto}">
+          </div>
+          <div style="margin-left:15px">
+            <div class="small" [ngClass]="{'smallActivo': isAuto}">
+              Auto
+            </div>
+            <div class="smallDos" [ngClass]="{'smallActivoDos': isAuto}">
+              Mensajero
+            </div>
+          </div>
+        </div>
+        <div>
+          <div *ngIf="!distancia_excedida_auto" class="large" [ngClass]="{'largeActivo': isAuto}">
+            ${{precioAuto}}
+          </div>
+          <div *ngIf="distancia_excedida_auto" class="large" [ngClass]="{'largeActivo': isAuto}">
+            --
+          </div>
+          <div class="smallTres" [ngClass]="{'smallActivoTres': isAuto}">
+            {{tiempoAuto}}
+          </div>
+        </div>
+      </div>
+
+
       <div *ngIf="showMoto" (click)="vehiculoToggle('moto')" class="holder" [ngClass]="{'holderActivo': isMoto}">
         <div style="display:flex;align-items:center;">
           <div class="burbuja" [ngClass]="{'burbujaActiva': isMoto}">
@@ -133,7 +161,13 @@
         </div>
       </div>
 
+
+   
+
     </div>
+
+
+  
 
     <div *ngIf="!rutaReady" style="color:#666;font-weight:300">
       Buenas tardes <span style="text-transform:capitalize"> {{usuario.nombre.split(' ')[0] }}</span>
@@ -190,7 +224,7 @@
 
     </ion-button> -->
 
-    <ion-button *ngIf="rutaReady" [disabled]="!(isMoto || isBicicleta)" mode="ios" (click)="iniciarPedido()"
+    <ion-button *ngIf="rutaReady" [disabled]="!(isMoto || isBicicleta || isAuto)" mode="ios" (click)="iniciarPedido()"
       expand="block" color="secondary" style="margin:15px;margin-top:25px">
       <div style="font-size:20px;font-weight:600">
         Solicitar Rider
@@ -217,8 +251,6 @@
         El Rider está en camino al punto de inicio
       </div>
       <div *ngIf="evento == 2">
-        <!-- Tu pedido se está recogiendo -->
-        <!-- El Rider ha llegado! -->
         Vé al punto de inicio, el Rider ha llegado!
       </div>
       <div *ngIf="evento == 3">
@@ -283,6 +315,13 @@
           <div class="burbuja burbujaActiva" style="position:absolute;bottom:-10px;right:-40px">
             <img *ngIf="rider.vehiculo == 'Moto'" src="assets/moto.png" style="width:45px">
             <img *ngIf="rider.vehiculo == 'Bicicleta'" src="assets/bici.png" style="width:45px">
+           <div>
+            <img *ngIf="rider.vehiculo == 'Auto'" src="assets/auto.png" style="width:45px">
+            <!-- <div style="font-size:14px;color:#999;margin-top:-10px;margin-bottom:2px">
+              AD-C5
+            </div> -->
+           </div>
+          
           </div>
         </div>
 
@@ -303,16 +342,19 @@
             ({{rider?.stats?.startsAvg}})
           </div>
           <div style="font-size:14px;color:#999;margin-top:2px;margin-bottom:2px">
+            Toyota Prius AD-C5
+          </div>
+          <div style="font-size:14px;color:#999;margin-top:2px;margin-bottom:2px">
             Entrega estimada: {{pedido.entrega_estimada}}
           </div>
           <ion-button *ngIf="pedido.metodo_de_pago == 'Efectivo'" (click)="alert_cancelacion(rider._id)"
-            color="secondary" size="small">
+            color="light" size="small">
             Cancelar
           </ion-button>
         </div>
       </div>
 
-      <div (click)="callPhone(cliente.telefono)"
+      <div (click)="callPhone(rider.telefono)"
         style="width:45px;height:45px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:0px solid #eee;background:#9EDF1F">
         <ion-icon name="ios-call" style="font-size:28px;color:white"></ion-icon>
       </div>

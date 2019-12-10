@@ -35,8 +35,6 @@ export class HomePage implements OnInit, OnDestroy {
   gpsMarker: any;
 
   distancia: number;
-  precioBici = 0;
-  precioMoto = 0;
 
   riderPrevio = '';
 
@@ -48,11 +46,24 @@ export class HomePage implements OnInit, OnDestroy {
 
   distancia_excedida_moto = false;
   distancia_excedida_bici = false;
+  distancia_excedida_auto = false;
+
 
   isBicicleta = false;
   isMoto = false;
+  isAuto = false;
+
   tiempoMoto = '';
   tiempoBici = '';
+  tiempoAuto = '';
+
+  precioBici = 0;
+  precioMoto = 0;
+  precioAuto = 0;
+
+  showMoto: boolean;
+  showBici: boolean;
+  showAuto: boolean;
 
   pedidoActivo = false;
 
@@ -124,10 +135,8 @@ export class HomePage implements OnInit, OnDestroy {
     scaledSize: new google.maps.Size(36, 36),
     origin: new google.maps.Point(0, 0),
     anchor: new google.maps.Point(4, 36)
-  };
+  }; 
 
-  showMoto: boolean;
-  showBici: boolean;
 
   no_riders_area = false;
 
@@ -291,12 +300,23 @@ export class HomePage implements OnInit, OnDestroy {
       return this.limite_moto_excedido();
     }
 
+    if (this.isAuto && this.distancia_excedida_auto) {
+      return this.limite_auto_excedido();
+    }
+
     if (this.isBicicleta) {
       this.vehiculo = 'bicicleta';
       this.precio = this.precioBici;
-    } else {
+    }
+
+    if (this.isMoto) {
       this.vehiculo = 'moto';
       this.precio = this.precioMoto;
+    }
+
+    if (this.isAuto) {
+      this.vehiculo = 'auto';
+      this.precio = this.precioAuto;
     }
 
     this._control.estaBuscandoRider = true;
@@ -377,6 +397,8 @@ export class HomePage implements OnInit, OnDestroy {
 
   handShake(id) {
     this._fire.getRiderPromise(id).then((rider: any) => {
+
+      console.log(rider, 'RIDERRRRRR!!')
 
       if (rider.cliente_activo == '') {
         this._fire.updateRider(id, 'rider', { cliente_activo: this.usuario._id })
@@ -483,9 +505,9 @@ export class HomePage implements OnInit, OnDestroy {
 
   cancelarServicio(id) {
     this.riderCoorsSub$.unsubscribe();
-    this._fire.cancelarServicio(this.rider._id);
+    this._fire.cancelarServicio(this.rider._id, this.pedido);
     this._fcm.sendPushNotification(this.rider._id, 'servicio-cancelado');
-    this._data.updatePedido(this.pedido._id, { cancelado: true, activo: false });
+    // this._data.cancelarPedido({ pedido: this.pedido._id, rider: this.rider._id });
     this.resetMapa();
 
     this.graficarMarcador(this._control.gpsCoors, 'gps');
@@ -509,7 +531,18 @@ export class HomePage implements OnInit, OnDestroy {
   async openPayModal(pago) {
 
     let tiempo = '';
-    this.isMoto ? tiempo = this.tiempoMoto : tiempo = this.tiempoBici;
+
+    if (this.isMoto) {
+      tiempo = this.tiempoMoto
+    }
+
+    if (this.isBicicleta) {
+      tiempo = this.tiempoBici
+    }
+
+    if (this.isAuto) {
+      tiempo = this.tiempoAuto
+    }
 
     const modal = await this.modalController.create({
       component: PayComponent,
@@ -565,10 +598,18 @@ export class HomePage implements OnInit, OnDestroy {
     if (tipo == 'bicicleta') {
       this.isBicicleta = true;
       this.isMoto = false;
+      this.isAuto = false;
     }
     if (tipo == 'moto') {
       this.isBicicleta = false;
       this.isMoto = true;
+      this.isAuto = false;
+
+    }
+    if (tipo == 'auto') {
+      this.isBicicleta = false;
+      this.isMoto = false;
+      this.isAuto = true;
     }
   }
 
@@ -611,37 +652,71 @@ export class HomePage implements OnInit, OnDestroy {
               lng: data.origen.lng
             };
 
-            const res: any = await this._fire.detectarRidersCercanos(body)
+            const res: any = await this._fire.detectarRidersCercanos(body);
 
-            if (!res.isMoto && !res.isBici) {
+            console.log(res, 'resssss')
+            console.log(res.isAuto, 'resssss auto')
+
+
+            if (!res.isMoto && !res.isBici && !res.isAuto) {
               this.no_riders_area = true;
+
               this.showBici = false;
               this.showMoto = true;
+              this.showAuto = false;
+
               this.isMoto = true;
             }
 
-            if (res.isMoto || res.isBici) {
+            if (res.isMoto || res.isBici || res.isAuto) {
               this.no_riders_area = false;
 
-              res.isMoto ? this.isMoto = true : this.isBicicleta = true;
+              if (res.isMoto) {
+                this.isMoto = true;
+              }
+
+              if (res.isBici) {
+                this.isBicicleta = true;
+              }
+
+              if (res.isAuto) {
+                this.isAuto = true;
+              }
+
               this.showMoto = res.isMoto;
               this.showBici = res.isBici;
+              this.showAuto = res.isAuto;
             }
+
+            console.log(this.isMoto, this.showMoto, 'moto');
+
+            
+            console.log(this.isAuto, this.showAuto, 'auto');
+            
 
             if (distancia > 5500) {
               this.showBici = false
             }
 
-            if (distancia > 70000 && this.ciudad == 'santiago') {
+            if (distancia > 40000 && this.ciudad == 'la_serena_coquimbo' && this.isMoto) {
               this.distancia_excedida_moto = true;
             }
 
-            if (distancia > 40000 && this.ciudad == 'la_serena_coquimbo') {
+            if (distancia > 70000 && this.ciudad == 'santiago' && this.isMoto) {
               this.distancia_excedida_moto = true;
             }
+
+            if (distancia > 40000 && this.ciudad == 'la_serena_coquimbo' && this.isAuto) {
+              this.distancia_excedida_auto = true;
+            }
+
+            if (distancia > 70000 && this.ciudad == 'santiago' && this.isAuto) {
+              this.distancia_excedida_auto = true;
+            }           
 
             this.tiempoMoto = `${Math.round(seconds / 60 / 1.15) + 3} min`;
             this.tiempoBici = `${Math.round(distancia / (13 * 1000) * 60) + 3} min`;
+            this.tiempoAuto = `${Math.round(seconds / 60 / 1.15) + 3} min`;
 
             const tarifasBody = {
               distancia: this.distancia,
@@ -649,8 +724,10 @@ export class HomePage implements OnInit, OnDestroy {
             };
 
             const precios: any = await this._global.calcularPrecios(tarifasBody);
-            this.precioBici = precios.bici;
+           
             this.precioMoto = precios.moto;
+            this.precioBici = precios.bici;
+            this.precioAuto = precios.auto;
 
             this.graficarRuta(data.origen, data.destino, 'Moto');
           });
@@ -757,8 +834,27 @@ export class HomePage implements OnInit, OnDestroy {
 
   async limite_moto_excedido() {
     const alert = await this.alertController.create({
-      header: 'Distancia execida',
-      message: 'La distancia supera nuestro limite',
+      header: 'Lo sentimos mucho!',
+      message: 'Es mucha distancia para nuestras motos',
+      buttons: [
+        {
+          text: 'Ok',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: (blah) => {
+            this.resetMapaAndRider();
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async limite_auto_excedido() {
+    const alert = await this.alertController.create({
+      header: 'Lo sentimos mucho!',
+      message: 'Es mucha distancia para nuestros automóviles',
       buttons: [
         {
           text: 'Ok',
@@ -796,7 +892,7 @@ export class HomePage implements OnInit, OnDestroy {
   async alert_area_sin_riders() {
     const alert = await this.alertController.create({
       header: 'No hay riders en el área',
-      message: 'Enviaremos nuevos riders en unos momentos.',
+      message: 'Enviaremos nuevos riders en unos momentos',
       buttons: [
         {
           text: 'Ok',
@@ -815,7 +911,7 @@ export class HomePage implements OnInit, OnDestroy {
   async alert_zona_no_cubierta() {
     const alert = await this.alertController.create({
       header: 'Atención!',
-      message: 'No hay cobertura en esta zona.',
+      message: 'No hay cobertura en esta zona',
       buttons: [
         {
           text: 'Ok',
@@ -834,7 +930,7 @@ export class HomePage implements OnInit, OnDestroy {
   async alert_alta_demanda() {
     const alert = await this.alertController.create({
       header: 'Lo sentimos mucho!',
-      message: 'Debido a una alta demanda no podemos procesar nuevos pedidos. Inténtalo de nuevo en unos minutos.',
+      message: 'Debido a una alta demanda no podemos procesar nuevos pedidos. Inténtalo en unos minutos.',
       buttons: [
         {
           text: 'Ok',
@@ -852,8 +948,8 @@ export class HomePage implements OnInit, OnDestroy {
 
   async alert_cancelacion(id) {
     const alert = await this.alertController.create({
-      header: 'Atención!',
-      message: 'Estás a punto de cancelar el viaje. ¿Desea continuar?',
+      header: 'Cancelar viaje',
+      message: '¿Quieres cancelar el viaje?',
       buttons: [
         {
           text: 'Cancelar',
@@ -911,6 +1007,7 @@ export class HomePage implements OnInit, OnDestroy {
   resetMapaFromBusquedaCancelada() {
     this.isMoto = false;
     this.isBicicleta = false;
+    this.isAuto = false;
     this.counter = 0;
     this.directionsDisplay.setMap(null);
     this.pedidoActivo = false;
@@ -930,6 +1027,7 @@ export class HomePage implements OnInit, OnDestroy {
   resetMapa() {
     this.isMoto = false;
     this.isBicicleta = false;
+    this.isAuto = false;
     this.counter = 0;
     this.pedidoActivo = false;
     this.isEmpresa = false;
