@@ -1,7 +1,7 @@
-import { Component, OnInit, NgZone, OnDestroy } from '@angular/core';
+import { Component, OnInit, NgZone, OnDestroy, ViewChild } from '@angular/core';
 import { DataService } from 'src/app/services/data.service';
 import { AuthService } from 'src/app/services/auth.service';
-import { NavParams, ModalController } from '@ionic/angular';
+import { NavParams, ModalController, IonInput } from '@ionic/angular';
 import { Subject } from 'rxjs';
 
 import { Subscription } from 'rxjs';
@@ -53,6 +53,11 @@ export class DireccionesPage implements OnInit, OnDestroy {
 
   ubicacionSub$: Subscription;
 
+  isGPSLocation = true;
+
+  @ViewChild('inputId') inputElement: IonInput;
+
+
   constructor(
     private _data: DataService,
     private _auth: AuthService,
@@ -66,14 +71,26 @@ export class DireccionesPage implements OnInit, OnDestroy {
     this.autocompleteItems = [];
     this.geocoder = new google.maps.Geocoder();
 
+    this._control.isGPSLocation = true;
+
     this.getUbicaciones();
+    this.setUbicacionGPS();
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.inputElement.setFocus();
+      this.togglePinMap('destino');
+    }, 400);
   }
 
   ngOnInit() {
     this.ubicacionSub$ = this._control.ubicacionState.subscribe(done => {
 
-      if (this._control.origenReady) {
-        this.inputOrigen = this._control.origen.direccion;
+      if (!this.isGPSLocation) {
+        if (this._control.origenReady) {
+          this.inputOrigen = this._control.origen.direccion;
+        }
       }
 
       if (this._control.destinoReady) {
@@ -98,9 +115,7 @@ export class DireccionesPage implements OnInit, OnDestroy {
     this.ubicacionSub$.unsubscribe();
   }
 
-
   updateSearchResults(type) {
-
     this.tipo = type;
 
     if (!this.google_flag) {
@@ -114,6 +129,8 @@ export class DireccionesPage implements OnInit, OnDestroy {
     }, 1500);
 
     if (this.tipo == 'origen' && this.inputOrigen == '') {
+      this.isGPSLocation = false;
+      this._control.isGPSLocation = false;
       this.itemsOrigen = [];
       return;
     }
@@ -203,20 +220,56 @@ export class DireccionesPage implements OnInit, OnDestroy {
     });
   }
 
+  async setUbicacionGPS() {
+    this.inputOrigen = 'Ubicación actual';
+    const direccion: any = await this.codeLatLng(this._control.gpsCoors);
+
+    console.log(this._control.gpsCoors)
+    console.log(direccion)
+    this._control.origenReady = true;
+    this._control.origen.direccion = direccion;
+    this._control.origen.lat = this._control.gpsCoors.lat;
+    this._control.origen.lng = this._control.gpsCoors.lng;
+  }
+
+  codeLatLng(coors) {
+    return new Promise((resolve, reject) => {
+      this.geocoder.geocode({
+        'location': coors
+      }, (results, status) => {
+
+        if (status === google.maps.GeocoderStatus.OK) {
+          if (results[1]) {
+            resolve(results[1].formatted_address);
+          } else {
+            console.log('No results found');
+          }
+        }
+        if (status === google.maps.GeocoderStatus.ZERO_RESULTS) {
+          resolve('Calle desconocida');
+        }
+      });
+    })
+  }
+
   clear(tipo) {
 
     if (tipo == 'origen') {
       this.inputOrigen = null;
       this.itemsOrigen = [];
       this._control.origenReady = false;
-      this._control.origen = null;
+      this._control.origen.direccion = '';
+      this._control.origen.lat = 0;
+      this._control.origen.lng = 0;
     }
 
     if (tipo == 'destino') {
       this.inputDestino = null;
       this.itemsDestino = [];
       this._control.origenReady = false;
-      this._control.destino = null;
+      this._control.destino.direccion = '';
+      this._control.destino.lat = 0;
+      this._control.destino.lng = 0;
     }
   }
 
@@ -292,7 +345,7 @@ export class DireccionesPage implements OnInit, OnDestroy {
     this._control.checkDirecciones();
   }
 
-  toggleMap(tipo) {
+  togglePinMap(tipo) {
     this.showOpenMap = false;
     this._control.tipo = tipo;
     setTimeout(() => {
@@ -314,10 +367,16 @@ export class DireccionesPage implements OnInit, OnDestroy {
     if (this._control.origenReady && this._control.destinoReady) {
       return;
     }
-    
+
     this._control.origenReady = false;
-    this._control.origen = null;
+    this._control.origen.direccion = '';
+    this._control.origen.lat = 0;
+    this._control.origen.lng = 0;
+
     this._control.destinoReady = false;
-    this._control.destino = null;
+    this._control.destino.direccion = '';
+    this._control.destino.lat = 0;
+    this._control.destino.lng = 0;
+
   }
 }

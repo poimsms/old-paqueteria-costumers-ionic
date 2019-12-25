@@ -1,0 +1,44 @@
+<ion-header no-border>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-buttons slot="start">
+        <ion-back-button></ion-back-button>
+      </ion-buttons>
+    </ion-buttons>
+    <ion-title>Pagos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div style="margin-left:15px;margin-bottom:10px;margin-top:15px">
+    Formas de pago
+  </div>
+
+  <ion-item (click)="toggleMetodoPago('Efectivo')" lines="none" style="font-size:18px;">
+    <ion-icon slot="start" name="cash" style="color:#666"></ion-icon>
+    <ion-label>En efectivo</ion-label>
+    <ion-icon *ngIf="_control.metodo_pago == 'Efectivo'" slot="end" name="checkmark-circle" style="color:limegreen"></ion-icon>
+    <ion-icon *ngIf="_control.metodo_pago != 'Efectivo'" slot="end" name="checkmark-circle" style="color:white"></ion-icon>
+  </ion-item>
+
+  <ion-item (click)="toggleMetodoPago('Tarjeta')" lines="none" style="font-size:18px;">
+    <ion-icon slot="start" name="card" style="color:#666"></ion-icon>
+    <ion-label>Con tarjeta</ion-label>
+    <ion-icon *ngIf="_control.metodo_pago == 'Tarjeta'" slot="end" name="checkmark-circle" style="color:limegreen"></ion-icon>
+    <ion-icon *ngIf="_control.metodo_pago != 'Tarjeta'" slot="end" name="checkmark-circle" style="color:white"></ion-icon>
+  </ion-item>
+
+  <div style="margin-top:10px;height:10px;background:whitesmoke;width:100%">
+  </div>
+
+  <div style="margin-top:25px;margin-left:15px;margin-bottom:10px">
+    Promociones
+  </div>
+
+  <ion-item (click)="openCodigo()" lines="none" detail style="font-size:18px;">
+    <ion-icon slot="start" name="gift"></ion-icon>
+    Ingresar código promocional
+  </ion-item>
+
+
+</ion-content>

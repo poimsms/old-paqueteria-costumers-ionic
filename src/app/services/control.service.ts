@@ -11,10 +11,22 @@ export class ControlService {
 
   tipo: string;
 
-  origen: any = null;
-  destino: any;
+  origen = {
+    direccion: '',
+    lat: 0,
+    lng: 0
+  };
 
-  centro: any = { lat: -33.444600, lng: -70.655585 };
+  destino = {
+    direccion: '',
+    lat: 0,
+    lng: 0
+  };
+
+  isGPSLocation: boolean;
+
+
+  centro: any = { lat: -33.263063, lng: -70.693496 };
 
   posicion: any;
 
@@ -23,6 +35,7 @@ export class ControlService {
   rutaReady = false;
   estaBuscandoRider = false;
 
+  metodo_pago = 'Efectivo';
 
   mis_lugares = {
     tipo: '',
@@ -37,7 +50,7 @@ export class ControlService {
 
   gps_counter = 0;
 
-  gpsCoors: any = { lat: -33.444600, lng: -70.655585 };
+  gpsCoors: any = { lat: -33.263063, lng: -70.693496 };
 
   constructor(
     private geolocation: Geolocation,

@@ -5,10 +5,8 @@
   <ion-menu side="start" menuId="first">
     <ion-content>
 
-      <div style="padding-top:20px;padding-bottom:20px;border-bottom:1px solid #eee">
-
+      <div style="padding-top:20px;padding-bottom:20px;border-bottom:0px solid #eee">
         <ion-item (click)="openPage('usuario')" lines="none">
-          <!-- <ion-icon slot="start" name="pin"></ion-icon> -->
           <img slot="start" [src]="_auth.usuario?.img.url"
             style="width:55px;height:55px;border:1px solid #eee;border-radius:50%;object-fit:cover">
           <div>
@@ -20,53 +18,93 @@
               Ver perfil
             </div>
           </div>
-
         </ion-item>
+        <!-- <ion-item lines="none">
+          <img slot="start" src="assets/pro.svg" style="width:80px">
+          <img slot="start" src="assets/pro2.svg" style="width:40px">
+          Cuenta pro
+        </ion-item> -->
       </div>
 
 
 
 
-      <ion-list>
 
-        <ion-item (click)="openPage('home')" lines="none">
-          <ion-icon slot="start" name="bicycle"></ion-icon>
-          Solicitar rider
-        </ion-item>
+      <ion-item (click)="openPage('home')" lines="none">
+        <ion-icon slot="start" name="bicycle"></ion-icon>
+        Solicitar Rider
+      </ion-item>
 
-        <ion-item (click)="openPage('historial')" lines="none">
-          <ion-icon slot="start" name="ios-list"></ion-icon>
-          Mis pedidos
-        </ion-item>
+      <ion-item (click)="openPage('pedidos')" lines="none">
+        <ion-icon slot="start" name="ios-list"></ion-icon>
+        Mis pedidos
+      </ion-item>
 
-        <ion-item (click)="openPage('mis-lugares')" lines="none">
-          <ion-icon slot="start" name="pin" style="color:#999"></ion-icon>
-          Direcciones
-        </ion-item>
+      <ion-item (click)="openPage('mis-lugares')" lines="none">
+        <ion-icon slot="start" name="pin" style="color:#999"></ion-icon>
+        Direcciones
+      </ion-item>
 
-        <ion-item (click)="openPage('codigo')" lines="none">
-          <ion-icon slot="start" name="gift"></ion-icon>
-          Código promocional
-        </ion-item>
+      <ion-item (click)="openPage('codigo')" lines="none">
+        <ion-icon slot="start" name="gift"></ion-icon>
+        Código promocional
+      </ion-item>
 
-        <!-- <ion-item (click)="openPage('usuario')" lines="none">
-          <ion-icon slot="start" name="settings"></ion-icon>
-          Configuraciones
-        </ion-item> -->
+      <ion-item (click)="openPage('ayuda')" lines="none">
+        <ion-icon slot="start" name="help-circle-outline"></ion-icon>
+        Ayuda
+      </ion-item>
 
-
-        <ion-item (click)="openPage('ayuda')" lines="none">
-          <ion-icon slot="start" name="help-circle-outline"></ion-icon>
-          Ayuda
-        </ion-item>
-
-        <!-- <ion-item (click)="logout()" lines="none">
+      <!-- <ion-item (click)="logout()" lines="none">
           <ion-icon slot="start" name="log-out"></ion-icon>
           Cerrar sesión
         </ion-item> -->
 
-      </ion-list>
+
+      <!-- <div
+        style="margin-top:20px;width:100%;padding:15px;display:flex;justify-content:space-between;align-items:center;">
+        <div style="margin-right:15px">
+          <div style="font-size:20px">
+            <div style="color:#888">
+              Activa
+            </div>
+            <div style="color:#555;margin-bottom:5px;">
+              Tu cuenta premium
+            </div>
+            <div style="font-size:15px;color:#888">
+              Desbloquea y obtén ventajas de más funciones
+            </div>
+          </div>
+        </div>
+        <ion-icon name="ios-arrow-forward" style="color:#999;font-size:22px"></ion-icon>
+      </div> -->
+
+      <div
+        style="margin-top:20px;width:100%;padding:15px;display:flex;justify-content:space-between;align-items:center;">
+        <div style="margin-right:15px">
+          <div style="font-size:20px">
+            <div style="color:#666">
+              Registra
+            </div>
+            <div style="margin-bottom:5px">
+              Tu negocio
+            </div>
+            <div style="font-size:15px;color:#888">
+              Desbloquea y obtén ventajas de más funciones
+            </div>
+          </div>
+        </div>
+        <ion-icon name="ios-arrow-forward" style="color:#999;font-size:22px"></ion-icon>
+      </div>
+
     </ion-content>
+
+    <ion-footer no-border style="width:100%;display:flex;justify-content:center;padding:15px">
+      <div
+        style="border-radius:25px;font-size:18px;padding:10px;padding-left:25px;padding-right:25px;background:#9EDF1F;color:white">
+        Convierte en Rider
+      </div>
+    </ion-footer>
   </ion-menu>
 
 </ion-app>

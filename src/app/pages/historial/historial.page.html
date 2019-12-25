@@ -1,33 +1,98 @@
-<ion-header>
+<ion-header no-border>
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
-    <ion-title>Historial de envíos</ion-title>
+    <ion-title>Mis pedidos</ion-title>
   </ion-toolbar>
-  <ion-segment (ionChange)="segmentChanged($event)" value="completados" color="dark">
+  <!-- <ion-segment (ionChange)="segmentChanged($event)" value="completados" color="dark">
     <ion-segment-button value="completados">
       <ion-label>Pedidos anteriores</ion-label>
     </ion-segment-button>
     <ion-segment-button value="proximos">
       <ion-label>Próximos</ion-label>
     </ion-segment-button>
-  </ion-segment>
+  </ion-segment> -->
 </ion-header>
 
 <ion-content>
 
-  <div *ngFor="let pedido of pedidos" style="padding:15px;margin:15px;border-radius:10px;border:1px solid #eee">
-    <div style="width:100%">
-      <div style="width:100%;display:flex;justify-content:space-between">
-        <div style="color:#666;text-transform:capitalize">
+  <ion-card *ngFor="let pedido of pedidos" style="margin-bottom:25px">
+    <ion-card-header style="border-bottom:1px solid #eee">
+      <div style="width:100%;display:flex;justify-content:space-between;align-items:center;">
+
+        <div *ngIf="pedido.activo" style="color:limegreen;font-size:14px;">
+          ACTIVO
+        </div>
+        <div *ngIf="pedido.cancelado" style="color:red;font-size:14px;">
+          CANCELADO
+        </div>
+        <div *ngIf="pedido.entregado" style="color:#666;font-size:14px;">
+          ENTREGADO
+        </div>
+
+        <div style="color:#666;text-transform:capitalize;font-size:17px;">
           {{pedido.fecha_creacion}}
         </div>
-        <div *ngIf="pedido.activo" style="color:limegreen">
-          Activo
+      </div>
+
+    </ion-card-header>
+
+    <ion-card-content>
+      <div style="margin-top:5px;width:100%;display:flex;justify-content:space-between">
+
+        <div style="color:#666;font-size:17px;">
+          Costo
         </div>
-        <div *ngIf="pedido.cancelado" style="color:red">
-          Cancelado
+        <div style="color:#444;font-weight:500;text-transform:capitalize;font-size:17px;">
+          ${{pedido.costo}}
+        </div>
+      </div>
+
+      <div style="padding:15px;display:flex;align-items:center">
+        <div style="display:flex;flex-direction:column;align-items:center">
+          <ion-icon name="radio-button-on" style="font-size:18px;color:#bbb"></ion-icon>
+          <div style="height:15px;margin-top:5px;margin-bottom:5px;border:1px dashed #bbb"></div>
+          <ion-icon name="pin" style="font-size:18px;color:#bbb"></ion-icon>
+        </div>
+        <div style="margin-left:20px">
+          <div>
+            <div style="color:#555;font-size:16px;height:20px;overflow:hidden">
+              {{pedido.origen.direccion}}
+            </div>
+          </div>
+          <div style="margin-top:20px">
+            <div style="color:#555;font-size:16px;height:20px;overflow:hidden">
+              {{pedido.destino.direccion}}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="pedido.activo" (click)="openPedido(pedido._id)"
+        style="border-top:1px solid #eee;padding:10px;padding-bottom:0px;margin-top:15px;width:100%;display:flex;justify-content:flex-end">
+        <div style="color:dodgerblue;font-weight:500;font-size:13px;text-transform:uppercase">
+          Ver mapa
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- <div *ngFor="let pedido of pedidos" style="margin:15px;border-radius:10px;border:1px solid #e9e9e9">
+    <div style="border-bottom:1px solid #eee;padding:20px">
+      <div style="width:100%;display:flex;justify-content:space-between">
+
+        <div *ngIf="pedido.activo" style="color:limegreen;font-size:14px;">
+          ACTIVO
+        </div>
+        <div *ngIf="!pedido.cancelado" style="color:red;font-size:14px;">
+          CANCELADO
+        </div>
+        <div *ngIf="pedido.cancelado" style="color:#666;font-size:14px;">
+          ENTREGADO
+        </div>
+        <div style="color:#666;text-transform:capitalize;font-size:17px;">
+          {{pedido.fecha_creacion}}
         </div>
       </div>
       <div style="width:100%;display:flex;justify-content:space-between">
@@ -40,7 +105,7 @@
       </div>
     </div>
 
-    <div style="margin-top:10px;display:flex;align-items:center">
+    <div style="padding:15px;display:flex;align-items:center">
       <div style="display:flex;flex-direction:column;align-items:center">
         <ion-icon name="radio-button-on" style="font-size:18px;color:#bbb"></ion-icon>
         <div style="height:30px;margin-top:5px;margin-bottom:5px;border:1px dashed #bbb"></div>
@@ -66,14 +131,14 @@
       </div>
     </div>
 
-    <div *ngIf="tipo == 'proximos'" (click)="openPedido(pedido._id)"
+    <div *ngIf="pedido.activo" (click)="openPedido(pedido._id)"
       style="border-top:1px solid #eee;padding:10px;padding-bottom:0px;margin-top:15px;width:100%;display:flex;justify-content:flex-end">
       <div style="color:dodgerblue;font-weight:500;font-size:13px;text-transform:uppercase">
         Ver mapa
       </div>
     </div>
 
-  </div>
+  </div> -->
 
 </ion-content>
 

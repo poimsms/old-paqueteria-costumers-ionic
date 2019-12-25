@@ -60,27 +60,44 @@ export class GlobalService {
 
       const tarifas: any = await this.getTarifas(ciudad);
 
-      console.log(tarifas, 'TARIFASSS')
-
       let precioMoto = 0;
       let precioBici = 0;
       let precioAuto = 0;
 
-      if (ciudad == 'santiago') {
-
-        precioBici = this.tarifa_unica(tarifas, distancia, 'bici');
-        precioMoto = this.tarifa_triple(tarifas, distancia, 'moto');
-        precioAuto = this.tarifa_triple(tarifas, distancia, 'auto');
-
+      if (distancia < tarifas.comida.B.limite) {
+        let precio = this.tarifa_comida(tarifas, distancia);
+        precioBici = precio;
+        precioMoto = precio;
+        precioAuto = precio;
       } else {
-
-        precioBici = this.tarifa_unica(tarifas, distancia, 'bici');
-        precioMoto = this.tarifa_doble(tarifas, distancia, 'moto');
-        precioAuto = this.tarifa_doble(tarifas, distancia, 'auto');
+        if (ciudad == 'santiago') {
+          precioBici = this.tarifa_unica(tarifas, distancia, 'bici');
+          precioMoto = this.tarifa_triple(tarifas, distancia, 'moto');
+          precioAuto = this.tarifa_triple(tarifas, distancia, 'auto');
+        } else {
+          precioBici = this.tarifa_unica(tarifas, distancia, 'bici');
+          precioMoto = this.tarifa_doble(tarifas, distancia, 'moto');
+          precioAuto = this.tarifa_doble(tarifas, distancia, 'auto');
+        }
       }
 
       resolve({ moto: precioMoto, bici: precioBici, auto: precioAuto })
     });
+  }
+
+  tarifa_comida(tarifas, distancia) {
+    let precio = 0;
+    
+    if (distancia < tarifas.comida.A.limite) {
+      precio = tarifas.comida.A.costo
+    }
+
+    if (tarifas.comida.A.limite < distancia
+      && distancia < tarifas.comida.B.limite) {
+      precio = tarifas.comida.A.costo
+    }
+
+    return precio;
   }
 
   tarifa_unica(data, distancia, vehiculo) {
@@ -150,96 +167,28 @@ export class GlobalService {
   }
 
 
-  moto_tarifa_santiago(tarifas_data, distancia) {
+  aplicar_codigo(data, monto) {
 
-    let precio = 0;
-    let tarifas: any;
+    let precio_descuento = 0;
 
-    if (distancia < tarifas_data.limite_cambio) {
-      tarifas = tarifas_data.moto.A;
-    } else {
-      tarifas = tarifas_data.moto.B;
+    if (data.cupon.tipo == 'PORCENTAJE') {
+
+      const delta = monto * data.cupon.descuento / 100;
+
+      if (delta > data.cupon.tope) {
+        const diff = monto - data.cupon.tope;
+        diff < 0 ? precio_descuento = 0 :precio_descuento = diff;
+      } else {
+        precio_descuento = Math.round((monto - monto * data.cupon.descuento / 100) / 100) * 100;
+      }
     }
 
-    if (distancia < tarifas.limite_aplicacion) {
-      precio = tarifas.minima;
-    } else {
-      const costo = tarifas.distancia * distancia / 1000 + tarifas.base;
-
-      precio = Math.round(costo / 100) * 100;
+    if (data.cupon.tipo == 'DINERO') {
+      const delta = monto - data.cupon.descuento;
+      delta < 0 ? precio_descuento = 0 : precio_descuento = delta;
     }
 
-    return precio;
+    return precio_descuento;
   }
-
-  auto_tarifa_santiago(tarifas_data, distancia) {
-
-    let precio = 0;
-    let tarifas: any;
-
-    if (distancia < tarifas_data.limite_cambio) {
-      tarifas = tarifas_data.moto.A;
-    } else {
-      tarifas = tarifas_data.moto.B;
-    }
-
-    if (distancia < tarifas.limite_aplicacion) {
-      precio = tarifas.minima;
-    } else {
-      const costo = tarifas.distancia * distancia / 1000 + tarifas.base;
-
-      precio = Math.round(costo / 100) * 100;
-    }
-
-    return precio;
-  }
-
-  
-  bici_tarifa_coquimbo(tarifas, distancia) {
-
-    let precio = 0;
-
-    if (distancia < tarifas.bici.limite_aplicacion) {
-      precio = tarifas.bici.minima;
-    } else {
-      const costo = tarifas.bici.distancia * distancia / 1000 + tarifas.bici.base;
-
-      precio = Math.round(costo / 100) * 100;
-    }
-
-    return precio;
-  }
-
-  
-  moto_tarifa_coquimbo(tarifas, distancia) {
-
-    let precio = 0;
-
-    if (distancia < tarifas.moto.limite_aplicacion) {
-      precio = tarifas.moto.minima;
-    } else {
-      const costo = tarifas.moto.distancia * distancia / 1000 + tarifas.moto.base;
-
-      precio = Math.round(costo / 100) * 100;
-    }
-
-    return precio;
-  }
-
-  auto_tarifa_coquimbo(tarifas, distancia) {
-
-    let precio = 0;
-
-    if (distancia < tarifas.auto.limite_aplicacion) {
-      precio = tarifas.auto.minima;
-    } else {
-      const costo = tarifas.auto.distancia * distancia / 1000 + tarifas.auto.base;
-
-      precio = Math.round(costo / 100) * 100;
-    }
-
-    return precio;
-  }
-
 
 }

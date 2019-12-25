@@ -70,6 +70,8 @@ export class AppComponent {
               this.token = data.token;
               this.isAuth = true;
 
+              console.log(data)
+
               this._fcm.getToken(this.usuario._id);
               this._fcm.onTokenRefresh(this.usuario._id);
 
@@ -110,9 +112,9 @@ export class AppComponent {
     this.menu.open('first');
   }
 
-  openPage(page) {
+  openPage(page) {   
     this.router.navigateByUrl(page);
-    this.menu.toggle();
+    this.menu.toggle();    
   }
 
   logout() {

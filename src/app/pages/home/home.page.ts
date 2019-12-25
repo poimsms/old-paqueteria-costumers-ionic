@@ -34,6 +34,8 @@ export class HomePage implements OnInit, OnDestroy {
   destinoMarker: any;
   gpsMarker: any;
 
+  showTrip = false;
+
   distancia: number;
 
   riderPrevio = '';
@@ -53,13 +55,18 @@ export class HomePage implements OnInit, OnDestroy {
   isMoto = false;
   isAuto = false;
 
-  tiempoMoto = '';
-  tiempoBici = '';
-  tiempoAuto = '';
+  tiempoMoto: number;
+  tiempoBici: number;
+  tiempoAuto: number;
+  tiempo: number;
 
   precioBici = 0;
   precioMoto = 0;
   precioAuto = 0;
+
+  precioBici_promo = 0;
+  precioMoto_promo = 0;
+  precioAuto_promo = 0;
 
   showMoto: boolean;
   showBici: boolean;
@@ -84,6 +91,8 @@ export class HomePage implements OnInit, OnDestroy {
 
   vehiculo: string;
   precio: number;
+  precio_promo: number;
+
 
   rutaReady = false;
   isEmpresa = false;
@@ -135,12 +144,13 @@ export class HomePage implements OnInit, OnDestroy {
     scaledSize: new google.maps.Size(36, 36),
     origin: new google.maps.Point(0, 0),
     anchor: new google.maps.Point(4, 36)
-  }; 
+  };
 
 
   no_riders_area = false;
 
-  hola = 'HOOLA MUNDO'
+  metodo_pago = '';
+
   evento = 0;
 
   constructor(
@@ -177,9 +187,10 @@ export class HomePage implements OnInit, OnDestroy {
       this.mapaSubscription();
 
       this.getRating();
-      this.getCupon();
+      this.subToCodigoPromo();
 
       if (isGPS) {
+        console.log('entroo?? GPD??')
         this.graficarMarcador(this._control.gpsCoors, 'gps');
       }
 
@@ -248,7 +259,7 @@ export class HomePage implements OnInit, OnDestroy {
     });
   }
 
-  getCupon() {
+  subToCodigoPromo() {
     this.cuponSub$ = this._data.cuponData.subscribe(data => this.cuponData = data)
     this._data.getCuponActivo(this._auth.usuario._id);
   }
@@ -307,16 +318,19 @@ export class HomePage implements OnInit, OnDestroy {
     if (this.isBicicleta) {
       this.vehiculo = 'bicicleta';
       this.precio = this.precioBici;
+      this.precio_promo = this.precioBici_promo;
     }
 
     if (this.isMoto) {
       this.vehiculo = 'moto';
       this.precio = this.precioMoto;
+      this.precio_promo = this.precioMoto_promo;
     }
 
     if (this.isAuto) {
       this.vehiculo = 'auto';
       this.precio = this.precioAuto;
+      this.precio_promo = this.precioAuto_promo;
     }
 
     this._control.estaBuscandoRider = true;
@@ -399,8 +413,6 @@ export class HomePage implements OnInit, OnDestroy {
   handShake(id) {
     this._fire.getRiderPromise(id).then((rider: any) => {
 
-      console.log(rider, 'RIDERRRRRR!!')
-
       if (rider.cliente_activo == '') {
         this._fire.updateRider(id, 'rider', { cliente_activo: this.usuario._id })
           .then(() => this.handShake(id));
@@ -411,9 +423,42 @@ export class HomePage implements OnInit, OnDestroy {
       }
 
       if (rider.cliente_activo == this.usuario._id && rider.cliente_activo != '') {
-        this.subscribeToRider(id);
+        this.sendRiderRequest(id);
       }
     });
+  }
+
+  async sendRiderRequest(id) {
+
+    this._fire.riders_consultados.push(id);
+
+    await this._fire.updateRider(id, 'rider', {
+      nuevaSolicitud: true,
+      pagoPendiente: true,
+      created: new Date().getTime(),
+      dataPedido: {
+        cliente: {
+          _id: this.usuario._id,
+          nombre: this.usuario.nombre,
+          img: this.usuario.img.url,
+          role: this.usuario.role
+        },
+        pedido: {
+          distancia: this.distancia,
+          tiempo: this.tiempo,
+          origen: this._control.origen.direccion,
+          destino: this._control.destino.direccion,
+          costo: this.precio
+        }
+      }
+    });
+
+    await this._fire.updateRider(id, 'coors', {
+      pagoPendiente: true
+    });
+
+    this.subscribeToRider(id);
+    this._fcm.sendPushNotification(id, 'nuevo-pedido');
   }
 
   subscribeToRider(id) {
@@ -422,14 +467,10 @@ export class HomePage implements OnInit, OnDestroy {
       this.riderActivoEnBusqueda = riderFire.rider;
 
       if (riderFire.rechazadoId == this.usuario._id) {
-
         clearTimeout(this.timer);
         this.riderSub$.unsubscribe();
-        this._fire.riders_consultados.push(id);
-
-        this.getNeerestRider().then(() => {
-          this._fire.updateRider(id, 'rider', { rechazadoId: '', cliente_activo: '' });
-        });
+        this._fire.updateRider(id, 'rider', { rechazadoId: '', cliente_activo: '' })
+        this.getNeerestRider();
       }
 
       if (riderFire.aceptadoId == this.usuario._id) {
@@ -444,12 +485,14 @@ export class HomePage implements OnInit, OnDestroy {
 
           const data = {
             monto: this.precio,
+            monto_promo: this.precio_promo,
             rider: this.rider,
             usuario: this.usuario,
             pedido: {
               origen: this._control.origen,
               destino: this._control.destino,
-              distancia: this.distancia
+              distancia: this.distancia,
+              tiempo: this.tiempo
             }
           }
 
@@ -458,96 +501,13 @@ export class HomePage implements OnInit, OnDestroy {
       }
 
     });
-
-    this.sendRiderRequest(id);
   }
 
-  sendRiderRequest(id) {
-    this._fire.updateRider(id, 'rider', {
-      nuevaSolicitud: true,
-      pagoPendiente: true,
-      created: new Date().getTime(),
-      dataPedido: {
-        cliente: {
-          _id: this.usuario._id,
-          nombre: this.usuario.nombre,
-          img: this.usuario.img.url,
-          role: this.usuario.role
-        },
-        pedido: {
-          distancia: this.distancia,
-          origen: this._control.origen.direccion,
-          destino: this._control.destino.direccion,
-          costo: this.precio
-        }
-      }
-    });
-
-    this._fire.updateRider(id, 'coors', {
-      pagoPendiente: true
-    });
-
-    this._fcm.sendPushNotification(id, 'nuevo-pedido');
-  }
-
-  cancelarBusqueda() {
-    this.riderSub$.unsubscribe();
-    clearTimeout(this.timer);
-
-    this._fire.updateRider(this.riderActivoEnBusqueda, 'rider', { nuevaSolicitud: false, pagoPendiente: false, cliente_activo: '' });
-    this._fire.updateRider(this.riderActivoEnBusqueda, 'coors', { pagoPendiente: false });
-
-    this.loadingRider = false;
-    this.resetMapaFromBusquedaCancelada();
-
-    this.graficarMarcador(this._control.gpsCoors, 'gps');
-    this.map.setCenter(this._control.gpsCoors);
-  }
-
-  cancelarServicio(id) {
-    this.riderCoorsSub$.unsubscribe();
-    this._fire.cancelarServicio(this.rider._id, this.pedido);
-    this._fcm.sendPushNotification(this.rider._id, 'servicio-cancelado');
-    // this._data.cancelarPedido({ pedido: this.pedido._id, rider: this.rider._id });
-    this.resetMapa();
-
-    this.graficarMarcador(this._control.gpsCoors, 'gps');
-    this.map.setCenter(this._control.gpsCoors);
-  }
-
-  openMapaPage(tipo) {
-
-    if (this.pedidoActivo) {
-      return;
-    }
-
-    this._control.tipo = tipo;
-    this.router.navigateByUrl('mapa');
-  }
-
-  async openUbicaciones() {
-    this.router.navigateByUrl('direcciones');
-  }
-
-  async openPayModal(pago) {
-
-    let tiempo = '';
-
-    if (this.isMoto) {
-      tiempo = this.tiempoMoto
-    }
-
-    if (this.isBicicleta) {
-      tiempo = this.tiempoBici
-    }
-
-    if (this.isAuto) {
-      tiempo = this.tiempoAuto
-    }
+  async openPayModal(payData) {
 
     const modal = await this.modalController.create({
       component: PayComponent,
-      componentProps: { pago, cuponData: this.cuponData, tiempo }
+      componentProps: { data: payData, cuponData: this.cuponData }
     });
 
     await modal.present();
@@ -579,7 +539,7 @@ export class HomePage implements OnInit, OnDestroy {
         this._otros.getPedido('buscar_pedido_activo_mas_reciente');
       }, 2000);
 
-      this.getCupon();
+      this._data.getCuponActivo(this._auth.usuario._id);
 
       this._fcm.sendPushNotification(data.riderID, 'confirmacion-pedido');
 
@@ -592,6 +552,47 @@ export class HomePage implements OnInit, OnDestroy {
     if (data.state == 'TIEMPO_EXPIRADO') {
       this.resetMapa();
     }
+  }
+
+  cancelarBusqueda() {
+    this.riderSub$.unsubscribe();
+    clearTimeout(this.timer);
+
+    this._fire.updateRider(this.riderActivoEnBusqueda, 'rider', { nuevaSolicitud: false, pagoPendiente: false, cliente_activo: '' });
+    this._fire.updateRider(this.riderActivoEnBusqueda, 'coors', { pagoPendiente: false });
+
+    this.loadingRider = false;
+    this.resetMapaFromBusquedaCancelada();
+
+    this.graficarMarcador(this._control.gpsCoors, 'gps');
+    this.map.setCenter(this._control.gpsCoors);
+  }
+
+  cancelarServicio() {
+    this.riderCoorsSub$.unsubscribe();
+    this._fire.cancelarServicio(this.rider._id, this.pedido);
+    this._fcm.sendPushNotification(this.rider._id, 'servicio-cancelado');
+    this.resetMapa();
+    this.graficarMarcador(this._control.gpsCoors, 'gps');
+    this.map.setCenter(this._control.gpsCoors);
+  }
+
+  openMetodoPago() {
+    this.router.navigateByUrl('metodo-pago');
+  }
+
+  openMapaPage(tipo) {
+
+    if (this.pedidoActivo) {
+      return;
+    }
+
+    this._control.tipo = tipo;
+    this.router.navigateByUrl('mapa');
+  }
+
+  async openUbicaciones() {
+    this.router.navigateByUrl('direcciones');
   }
 
   vehiculoToggle(tipo) {
@@ -633,10 +634,13 @@ export class HomePage implements OnInit, OnDestroy {
 
         this.isLoading = true;
 
+        const origin1 = new google.maps.LatLng(data.origen.lat, data.origen.lng);
+        const origin2 = new google.maps.LatLng(data.destino.lat, data.destino.lng);
+
         this.service.getDistanceMatrix(
           {
-            origins: [data.origen.direccion],
-            destinations: [data.destino.direccion],
+            origins: [origin1],
+            destinations: [origin2],
             travelMode: 'DRIVING',
           }, async (response, status) => {
 
@@ -655,10 +659,6 @@ export class HomePage implements OnInit, OnDestroy {
 
             const res: any = await this._fire.detectarRidersCercanos(body);
 
-            console.log(res, 'resssss')
-            console.log(res.isAuto, 'resssss auto')
-
-
             if (!res.isMoto && !res.isBici && !res.isAuto) {
               this.no_riders_area = true;
 
@@ -672,28 +672,20 @@ export class HomePage implements OnInit, OnDestroy {
             if (res.isMoto || res.isBici || res.isAuto) {
               this.no_riders_area = false;
 
-              if (res.isMoto) {
-                this.isMoto = true;
-              }
-
               if (res.isBici) {
                 this.isBicicleta = true;
-              }
-
-              if (res.isAuto) {
-                this.isAuto = true;
+              } else if (res.isMoto) {
+                this.isMoto = true;
+              } else {
+                if (res.isAuto) {
+                  this.isAuto = true;
+                }
               }
 
               this.showMoto = res.isMoto;
               this.showBici = res.isBici;
               this.showAuto = res.isAuto;
             }
-
-            console.log(this.isMoto, this.showMoto, 'moto');
-
-            
-            console.log(this.isAuto, this.showAuto, 'auto');
-            
 
             if (distancia > 5500) {
               this.showBici = false
@@ -713,11 +705,23 @@ export class HomePage implements OnInit, OnDestroy {
 
             if (distancia > 70000 && this.ciudad == 'santiago' && this.isAuto) {
               this.distancia_excedida_auto = true;
-            }           
+            }
 
-            this.tiempoMoto = `${Math.round(seconds / 60 / 1.15) + 3} min`;
-            this.tiempoBici = `${Math.round(distancia / (13 * 1000) * 60) + 3} min`;
-            this.tiempoAuto = `${Math.round(seconds / 60 / 1.15) + 3} min`;
+            this.tiempoMoto = Math.round(seconds / 60 / 1.15) + 3;
+            this.tiempoBici = Math.round(distancia / (13 * 1000) * 60) + 3;
+            this.tiempoAuto = Math.round(seconds / 60 / 1.15) + 3;
+
+            if (this.isMoto) {
+              this.tiempo = this.tiempoMoto;
+            }
+
+            if (this.isBicicleta) {
+              this.tiempo = this.tiempoBici;
+            }
+
+            if (this.isAuto) {
+              this.tiempo = this.tiempoAuto;
+            }
 
             const tarifasBody = {
               distancia: this.distancia,
@@ -725,10 +729,20 @@ export class HomePage implements OnInit, OnDestroy {
             };
 
             const precios: any = await this._global.calcularPrecios(tarifasBody);
-           
+
             this.precioMoto = precios.moto;
             this.precioBici = precios.bici;
             this.precioAuto = precios.auto;
+
+            this.precioMoto_promo = precios.moto;
+            this.precioBici_promo = precios.bici;
+            this.precioAuto_promo = precios.auto;
+
+            if (this.cuponData.ok) {
+              this.precioMoto_promo = this._global.aplicar_codigo(this.cuponData, precios.moto);
+              this.precioBici_promo = this._global.aplicar_codigo(this.cuponData, precios.bici);
+              this.precioAuto_promo = this._global.aplicar_codigo(this.cuponData, precios.auto);
+            }
 
             this.graficarRuta(data.origen, data.destino, 'Moto');
           });
@@ -765,13 +779,15 @@ export class HomePage implements OnInit, OnDestroy {
       travelMode: modo,
     }, function (response, status) {
       self.directionsDisplay.setDirections(response);
-      let leg = response.routes[0].legs[0];
-
-      self.graficarMarcador(leg.start_location, 'origen');
-      self.graficarMarcador(leg.end_location, 'destino');
     });
-  }
 
+    if (this.gpsMarker) {
+      this.gpsMarker.setMap(null);
+    }
+
+    this.graficarMarcador({ lat: origen.lat, lng: origen.lng }, 'origen');
+    this.graficarMarcador({ lat: destino.lat, lng: destino.lng }, 'destino')
+  }
 
   graficarMarcador(coors, tipo) {
     let data: any = {};
@@ -963,7 +979,7 @@ export class HomePage implements OnInit, OnDestroy {
         {
           text: 'Ok',
           handler: () => {
-            this.cancelarServicio(id);
+            this.cancelarServicio();
           }
         }
       ]
@@ -1005,7 +1021,9 @@ export class HomePage implements OnInit, OnDestroy {
 
     await alert.present();
   }
+
   resetMapaFromBusquedaCancelada() {
+    this.showTrip = false;
     this.isMoto = false;
     this.isBicicleta = false;
     this.isAuto = false;
@@ -1017,8 +1035,6 @@ export class HomePage implements OnInit, OnDestroy {
     this.rutaReady = false;
     this.texto_origen = this.texto_origen_default;
     this.texto_destino = this.texto_destino_default;
-    this._control.origen = null;
-    this._control.destino = null;
     this._control.origenReady = false;
     this._control.destinoReady = false;
     this._control.rutaReady = false;
@@ -1026,6 +1042,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   resetMapa() {
+    this.showTrip = false;
     this.isMoto = false;
     this.isBicicleta = false;
     this.isAuto = false;
@@ -1038,8 +1055,6 @@ export class HomePage implements OnInit, OnDestroy {
     this.rutaReady = false;
     this.texto_origen = this.texto_origen_default;
     this.texto_destino = this.texto_destino_default;
-    this._control.origen = null;
-    this._control.destino = null;
     this._control.origenReady = false;
     this._control.destinoReady = false;
     this._control.rutaReady = false;
@@ -1047,6 +1062,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   resetMapaAndRider() {
+    this.showTrip = false;
     this.pedidoActivo = false;
     this.directionsDisplay.setMap(null);
     this.riderSub$.unsubscribe();
@@ -1057,8 +1073,6 @@ export class HomePage implements OnInit, OnDestroy {
     this.rutaReady = false;
     this.texto_origen = this.texto_origen_default;
     this.texto_destino = this.texto_destino_default;
-    this._control.origen = null;
-    this._control.destino = null;
     this._control.origenReady = false;
     this._control.destinoReady = false;
     this._control.rutaReady = false;

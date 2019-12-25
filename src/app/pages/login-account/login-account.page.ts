@@ -37,8 +37,8 @@ export class LoginAccountPage implements OnInit {
     }
 
     const body = {
-      nombre: this.nombre.toLowerCase() + ' ' + this.apellido.toLowerCase(),
-      email: this.email.toLowerCase(),
+      nombre: this.nombre.toLowerCase().trim() + ' ' + this.apellido.toLowerCase().trim(),
+      email: this.email.toLowerCase().trim(),
       telefono: this.telefono,
       token: this._auth.tokenPhone
     }

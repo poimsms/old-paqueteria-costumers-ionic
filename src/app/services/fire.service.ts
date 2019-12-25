@@ -17,6 +17,7 @@ export class FireService {
   distanceMatrix = [];
   ids = [];
   riders_consultados = [];
+  riders_rechazados = [];
 
   constructor(
     private db: AngularFirestore,
@@ -42,9 +43,29 @@ export class FireService {
     }
   }
 
+  async limpiar_riders_rechazados() {
+
+    if (this.riders_rechazados.length == 0) {
+      return;
+    }
+
+    let promesas = [];
+
+    this.riders_rechazados.forEach(id => {
+      promesas.push(
+        this.updateRider(id, 'rider', { rechazadoId: '' })
+      )
+    });
+
+    await Promise.all(promesas);
+    this.riders_rechazados = [];
+  }
+
   async cancelarServicio(id, pedido) {
+
     const rider: any = await this.getRiderPromise(id);
-    if (rider.evento == 'navegando_al_origen') {
+
+    if (rider.fase == 'navegando_al_origen') {
 
       const data_rider = {
         actividad: 'disponible',
@@ -102,6 +123,8 @@ export class FireService {
 
     const { ciudad, lat, lng } = body;
 
+    console.log(ciudad, this._config.coleccion_coors, 'hmm')
+
     return new Promise((resolve, reject) => {
       this.db.collection(this._config.coleccion_coors, ref =>
         ref.where('isOnline', '==', true)
@@ -110,8 +133,7 @@ export class FireService {
           .where('pagoPendiente', '==', false)
           .where('actividad', '==', 'disponible'))
         .valueChanges().pipe(take(1)).subscribe((riders: any) => {
-
-          console.log(riders, 'RIDERS detectar')
+          console.log(riders, 'riders');
 
           if (riders.length == 0) {
             return resolve({ isMoto: false, isBici: false, isAuto: false });
@@ -119,7 +141,7 @@ export class FireService {
 
           const data = this.filtro_dos(riders, lat, lng);
 
-          console.log(data, 'data detectar')
+          console.log(data, 'data1');
 
           resolve({ isMoto: data.isMoto, isBici: data.isBici, isAuto: data.isAuto });
         });
@@ -140,23 +162,24 @@ export class FireService {
           .where('vehiculo', '==', vehiculo))
         .valueChanges().pipe(take(1)).subscribe((riders: any) => {
 
-          console.log(riders, 'RIDERS neer')
-
           if (riders.length == 0) {
             return resolve({ isMoto: false, isBici: false, isAuto: false });
           }
 
           const riders_zero = this.filtro_zero(riders);
 
-          const data = this.filtro_uno(riders_zero, lat, lng, vehiculo);
+          console.log(riders_zero, 'riders_zero');
 
-          console.log(data, 'data neer')
+
+          const data = this.filtro_uno(riders_zero, lat, lng, vehiculo);
+          console.log(data, 'filtro_uno');
 
           if (!data.ok) {
             return resolve({ ok: false });
           }
 
           const id = this.riders_loop(data.riders, lat, lng);
+          console.log(id, 'id');
 
           resolve({ ok: true, id });
         });

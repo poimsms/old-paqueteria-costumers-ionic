@@ -13,6 +13,10 @@ export class CodigoPage implements OnInit {
 
   codigo: string;
   isLoading = false;
+  nombre_comercial: string;
+  tipo_tienda: string;
+  isActivacion = false;
+  isPromo = true;
 
   constructor(
     private router: Router,
@@ -29,7 +33,7 @@ export class CodigoPage implements OnInit {
     this.router.navigateByUrl(page);
   }
 
-  addCodigo() {
+  onAplicar() {
     const body = {
       usuario: this._auth.usuario._id,
       codigo: this.codigo.toLowerCase()
@@ -41,14 +45,42 @@ export class CodigoPage implements OnInit {
 
       this.isLoading = false;
 
+      this.codigo = null;
+
       if (!res.ok) {
         return this.presentAlert(res.message);
       }
 
-      this.presentToast('¡Cupón añadido!');
-      this.codigo = null;
-      this._data.getCuponActivo(this._auth.usuario._id);
+      console.log(res, 'ress')
+
+      if (res.tipo == 'PROMO') {
+        this.presentToast('¡Promoción añadida!');
+        this._data.getCuponActivo(this._auth.usuario._id);
+      }
+
+      if (res.tipo == 'ACTIVACION') {
+        this.isPromo = false;
+        this.isActivacion = true;
+        this.tipo_tienda = res.tienda;
+
+        this.presentToast('¡Activación exitosa!');
+      }
+
+     
     });
+  }
+
+  onActualizar() {
+    this.isLoading = true;
+
+    this._auth.updateUser({nombre: this.nombre_comercial}).then(() => {
+      this.isLoading = false;
+
+      this._auth.refreshUser();
+      this.isPromo = true;
+      this.isActivacion = false;
+      this.presentToast('Se actualizó el nombre correctamente.');
+    })
   }
 
   async presentAlert(message) {
@@ -64,7 +96,7 @@ export class CodigoPage implements OnInit {
   async presentToast(message) {
     const toast = await this.toastController.create({
       message,
-      duration: 2000,
+      duration: 3000,
       position: 'middle'
     });
     toast.present();

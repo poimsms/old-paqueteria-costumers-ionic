@@ -9,25 +9,69 @@
 
 <ion-content padding>
 
-  <div style="color:#555;margin-left:15px;margin-top:0px;font-size:18px">
-    Ingresa tu código
+
+  <div *ngIf="isPromo">
+
+
+    <div style="color:#555;margin-left:15px;margin-top:0px;font-size:18px">
+      Ingresa tu código
+    </div>
+
+    <div style="margin:15px;margin-top:5px;border:1px solid #eee;border-radius:6px;padding:3px;">
+      <ion-input type="text" [(ngModel)]="codigo" placeholder="" style="text-transform:uppercase;font-size:22px">
+      </ion-input>
+    </div>
+    <div style="padding:20px;padding-top:0px;padding-bottom:0px;width:100%;text-align:center;color:#999;font-size:16px">
+      Introduce el código y lo aplicaremos en tu siguiente pedido
+    </div>
+
+    <div padding style="margin-top:50px">
+      <ion-button [disabled]="isLoading" (click)="onAplicar()" mode="ios" expand="block" color="secondary">
+        <div style="font-size:18px;text-transform:uppercase">
+          Aplicar
+        </div>
+      </ion-button>
+    </div>
+
   </div>
 
-  <div style="margin:15px;margin-top:5px;border:1px solid #eee;border-radius:6px;padding:3px;">
-    <ion-input type="text" [(ngModel)]="codigo" placeholder="" style="text-transform:uppercase;font-size:22px">
-    </ion-input>
-  </div>
-  <div style="padding:20px;padding-top:0px;padding-bottom:0px;width:100%;text-align:center;color:#999;font-size:16px">
-    Introduce el código y lo aplicaremos en tu siguiente pedido
-  </div>
 
-  <div padding style="margin-top:50px">
-    <ion-button [disabled]="isLoading" (click)="addCodigo()" mode="ios" expand="block" color="secondary">
-      <div style="font-size:18px;text-transform:uppercase">
-        Aplicar
+  <div *ngIf="isActivacion">
+
+
+    <div style="color:#555;margin-left:15px;margin-top:0px;font-size:18px">
+      <h5 style="margin-top:0">
+        <ion-icon name="checkmark" style="margin-right:5px"></ion-icon>
+        Cuenta activada
+      </h5>
+      <h5 style="text-transform:capitalize">
+        <ion-icon name="checkmark" style="margin-right:5px;"></ion-icon>
+        {{tipo_tienda}}
+      </h5>
+      <div style="margin-top:20px">
+        Ingresa el Nombre Comercial de la tienda
       </div>
-    </ion-button>
+    </div>
+
+    <div style="margin:15px;margin-top:5px;border:1px solid #eee;border-radius:6px;padding:3px;">
+      <ion-input type="text" [(ngModel)]="nombre_comercial" placeholder=""
+        style="text-transform:capitalize;font-size:22px">
+      </ion-input>
+    </div>
+    <div style="padding:20px;padding-top:0px;padding-bottom:0px;width:100%;text-align:center;color:#999;font-size:16px">
+      Introduce el nombre comercial
+    </div>
+
+    <div padding style="margin-top:50px">
+      <ion-button [disabled]="isLoading" (click)="onActualizar()" mode="ios" expand="block" color="secondary">
+        <div style="font-size:18px;text-transform:uppercase">
+          Listo
+        </div>
+      </ion-button>
+    </div>
+
   </div>
+
 
   <!-- <ion-item lines="none" detail (click)="openPage('cupones')">
     <ion-icon slot="start" name="gift" style="color:#777"></ion-icon>

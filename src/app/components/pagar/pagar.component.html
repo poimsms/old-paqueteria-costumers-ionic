@@ -1,0 +1,104 @@
+<ion-header no-border>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="close()">
+        <ion-icon slot="icon-only" name="close" style="color:#444;font-size:27px"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <!-- <ion-title>Nuevo envío</ion-title> -->
+    <ion-buttons slot="end">
+      <ion-button (click)="close()" color="dark">
+        Cancelar
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <div *ngIf="false">
+    <div
+      style="padding:10px;background:#F0F8ED;width:100%;border-radius:5px;display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center">
+        <img src="https://res.cloudinary.com/ddon9fx1n/image/upload/v1573825710/tools/coupon.png" style="width:27px">
+        <div style="margin-left:20px">
+          <div style="font-size:17px;font-weight:500;color:#3D9B1F">
+            <span *ngIf="cuponData.cupon.tipo == 'DINERO'">${{cuponData.cupon.descuento}}</span>
+            <span *ngIf="cuponData.cupon.tipo == 'PORCENTAJE'">{{cuponData.cupon.descuento}}%</span>
+            de descuento
+          </div>
+          <div style="color:#3D9B1F;font-size:14px">
+            <div>
+              Válido por {{cuponData.cupon.proximos_pedidos}} pedidos
+            </div>
+          </div>
+        </div>
+      </div>
+      <ion-icon name="checkmark" style="color:#3D9B1F;font-size:22px"></ion-icon>
+    </div>
+  </div>
+
+  <div style="padding:5px;padding-left:15px;padding-right:15px">
+    <div style="font-size:20px;color:#444">
+      Costo del servicio
+      <span *ngIf="!cuponData.ok">${{monto}}</span>
+      <span *ngIf="cuponData.ok" style="text-decoration:line-through;color:#888">${{monto}}</span>
+      <span *ngIf="cuponData.ok && precio_descuento != 0">${{precio_descuento}}</span>
+      <span *ngIf="cuponData.ok && precio_descuento == 0">Gratis</span>
+    </div>
+    <div style="display:flex;align-items:center;color:#777">
+      <ion-icon name="time" style="color:#bbb;margin-right:5px;font-size:18px;"></ion-icon>
+      {{tiempo_entrega}} Tiempo estimado de entrega
+    </div>
+  </div>
+
+
+  <ion-item (click)="codigo_promo()" lines="none" style="margin-top:10px;margin-bottom:5px" detail>
+    <div style="color:#7AC602;font-size:18px">
+      Ingresar código promo
+    </div>
+  </ion-item>
+
+  <ion-item lines="none">
+    <div style="color:#444;font-size:17px">
+      Detalles de recogida
+    </div>
+  </ion-item>
+
+  <ion-item lines="none">
+    <ion-icon slot="start" name="phone-portrait" style="color:#bbb"></ion-icon>
+    <ion-input type="tel" placeholder="Teléfono de quién envía" [(ngModel)]="telefono_origen"
+      style="border-bottom:1px solid #eee;font-size:18px" autocomplete="off">
+    </ion-input>
+  </ion-item>
+
+  <ion-item lines="none">
+    <div style="color:#444;font-size:17px">
+      Detalles de entrega
+    </div>
+  </ion-item>
+
+  <ion-item lines="none">
+    <ion-icon slot="start" name="phone-portrait" style="color:#bbb"></ion-icon>
+    <ion-input type="tel" placeholder="Teléfono de quién recibe" [(ngModel)]="telefono_destino"
+      style="border-bottom:1px solid #eee;font-size:18px" autocomplete="off">
+    </ion-input>
+  </ion-item>
+
+  <div padding>
+    <ion-textarea placeholder="Agrega una nota (opcional)" [(ngModel)]="instrucciones" rows="5"
+      style="border:1px solid #eee;border-radius:5px;font-size:18px">
+    </ion-textarea>
+  </div>
+
+</ion-content>
+
+
+<ion-footer style="background:white">
+  <div style="display:flex;align-items:center;justify-content:space-between">
+    <div (click)="confirmar_envio()"
+      style="width:100%;padding:15px;font-size:17px;text-align:center;font-weight:500;background:#7AC602;color:white;">
+      CONFIRMAR
+    </div>
+  </div>
+</ion-footer>

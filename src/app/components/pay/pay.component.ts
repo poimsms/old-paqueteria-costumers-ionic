@@ -18,24 +18,35 @@ export class PayComponent implements OnInit {
 
   usuario: any;
   rider: any;
-  monto: number;
   pedido: any;
   isLoading = false;
   cuponData: any;
-  precio_descuento = 0;
-  seleccion: any = { programado: false };
 
-  index_horario = 0;
-  index_metodo_pago = 0;
-  horario_value = 'Lo antes posible';
-  fecha_recogida = '';
-  metodo_pago = 'Efectivo';
+  precio: number;
+  precio_promo: number;
+
   telefono_origen: string;
   telefono_destino: string;
+  nombre_origen: string;
+  nombre_destino: string;
   instrucciones = '';
   tiempo_entrega = '';
 
   checkout_id: string;
+
+  isRecogida = false;
+  isEntrega = true;
+
+  tipos = [
+    {
+      tipo: 'foodtruck',
+      isActive: false
+    },
+    {
+      tipo: 'restaurante',
+      isActive: false
+    }
+  ];
 
   constructor(
     public modalCtrl: ModalController,
@@ -49,17 +60,34 @@ export class PayComponent implements OnInit {
     public toastController: ToastController,
     public alertController: AlertController
   ) {
-    this.usuario = navParams.get('pago').usuario;
-    this.rider = navParams.get('pago').rider;
-    this.monto = navParams.get('pago').monto;
-    this.pedido = navParams.get('pago').pedido;
-    this.tiempo_entrega = navParams.get('tiempo');
+    this.usuario = navParams.get('data').usuario;
+    this.rider = navParams.get('data').rider;
+    this.precio = navParams.get('data').monto;
+    this.precio_promo = navParams.get('data').monto_promo;
+    this.pedido = navParams.get('data').pedido;
+    this.tiempo_entrega = navParams.get('data').pedido.tiempo;
     this.checkoutTime();
   }
 
   ngOnInit() {
-    this.codigoSubcription();
     this.clearAutocomplete();
+  }
+
+  togglePunto(tipo) {
+    this.isRecogida = false;
+    this.isEntrega = false;
+
+    setTimeout(() => {
+
+      if (tipo == 'recogida') {
+        this.isRecogida = true;
+        this.isEntrega = false;
+      }
+      if (tipo == 'entrega') {
+        this.isRecogida = false;
+        this.isEntrega = true;
+      }
+    }, 250);
   }
 
   checkoutTime() {
@@ -80,15 +108,15 @@ export class PayComponent implements OnInit {
   async confirmar_envio() {
 
     const flow = {
-      monto: this.monto,
+      monto: this.precio_promo,
       email: this.usuario.email,
       usuario: this.usuario._id
     };
 
     const pedido: any = {
-      costo: this.monto,
-      costo_real: this.monto,
-      metodo_de_pago: this.metodo_pago,
+      costo: this.precio_promo,
+      costo_real: this.precio,
+      metodo_de_pago: this._control.metodo_pago,
       distancia: this.pedido.distancia,
       origen: this.pedido.origen,
       destino: this.pedido.destino,
@@ -96,16 +124,26 @@ export class PayComponent implements OnInit {
       cliente: this.usuario._id,
       telefono_origen: this.telefono_origen,
       telefono_destino: this.telefono_destino,
+      nombre_origen: this.nombre_origen,
+      nombre_destino: this.nombre_destino,
       instrucciones: this.instrucciones,
-      tiempo_entrega: this.tiempo_entrega
+      tiempo_entrega: this.tiempo_entrega,
+      from: 'APP'
     };
 
-    pedido.checkout = this.checkout_id;
+    if (this._auth.usuario.role == 'EMPRESA_ROLE') {
 
-    if (this.cuponData.ok) {
-      flow.monto = this.precio_descuento;
-      pedido.costo = this.precio_descuento;
+      pedido.envio_pagado = false;
+      pedido.pagar_productos = true;
+      pedido.cobrar_productos = true;
+
+      if (this.precio_promo == 0) {
+        pedido.envio_pagado = true;
+      }
+
     }
+
+    pedido.checkout = this.checkout_id;
 
     this.isLoading = true;
 
@@ -116,19 +154,20 @@ export class PayComponent implements OnInit {
       return this.alert_tiempo_expirado();
     }
 
-    if (this.metodo_pago == 'Tarjeta') {
+    if (this._control.metodo_pago == 'Tarjeta') {
 
-      if (this.precio_descuento <= 350) {
+      if (this.precio_promo <= 350) {
+        this.isLoading = false;
         return this.alert_monto_minimo();
       }
 
       this._pagar.pagarConFlow(flow).then(pagoExitoso => {
 
         this._data.getCheckout(this.checkout_id).then((checkout: any) => {
-        
+
           this.isLoading = false;
 
-          if (!checkout.ok) {            
+          if (!checkout.ok) {
             return this.close();;
           }
 
@@ -140,12 +179,10 @@ export class PayComponent implements OnInit {
             this.close();
           }
         })
-
-
       });
     }
 
-    if (this.metodo_pago == 'Efectivo') {
+    if (this._control.metodo_pago == 'Efectivo') {
 
       this._data.crearPedido(pedido).then((pedido: any) => {
         this.save(pedido);
@@ -211,22 +248,6 @@ export class PayComponent implements OnInit {
     });
   }
 
-  async openMetodoPago() {
-
-    const modal = await this.modalCtrl.create({
-      component: OpcionesComponent,
-      componentProps: { metodo: this.metodo_pago }
-    });
-
-    await modal.present();
-
-    const { data } = await modal.onWillDismiss();
-
-    if (data.ok) {
-      this.metodo_pago = data.seleccion;
-    }
-  }
-
   async codigo_promo() {
     const alert = await this.alertController.create({
       header: 'Código promo',
@@ -258,13 +279,6 @@ export class PayComponent implements OnInit {
     await alert.present();
   }
 
-  codigoSubcription() {
-    this._data.cuponData.subscribe(data => {
-      this.cuponData = data;
-      this.aplicar_codigo();
-    });
-  }
-
   ingresar_codigo(codigo) {
     const body = {
       usuario: this._auth.usuario._id,
@@ -285,27 +299,6 @@ export class PayComponent implements OnInit {
     });
   }
 
-  aplicar_codigo() {
-    if (this.cuponData.ok) {
-
-      if (this.cuponData.cupon.tipo == 'PORCENTAJE') {
-
-        const delta = this.monto * this.cuponData.cupon.descuento / 100;
-
-        if (delta > this.cuponData.cupon.tope) {
-          const diff = this.monto - this.cuponData.cupon.tope;
-          diff < 0 ? this.precio_descuento = 0 : this.precio_descuento = diff;
-        } else {
-          this.precio_descuento = Math.round((this.monto - this.monto * this.cuponData.cupon.descuento / 100) / 100) * 100;
-        }
-      }
-
-      if (this.cuponData.cupon.tipo == 'DINERO') {
-        const delta = this.monto - this.cuponData.cupon.descuento;
-        delta < 0 ? this.precio_descuento = 0 : this.precio_descuento = delta;
-      }
-    }
-  }
 
   async toast(message) {
     const toast = await this.toastController.create({
@@ -318,7 +311,10 @@ export class PayComponent implements OnInit {
 
   clearAutocomplete() {
     setTimeout(() => {
+      this.nombre_origen = this._auth.usuario.nombre;
       this.telefono_origen = this._auth.usuario.telefono;
+
+      this.nombre_destino = null;
       this.telefono_destino = null;
     }, 200);
   }
@@ -359,6 +355,20 @@ export class PayComponent implements OnInit {
 
     await alert.present();
   }
+
+  tipoToggle(i) {
+
+    if (i == 0) {
+      this.tipos[0].isActive = !this.tipos[0].isActive;
+      this.tipos[1].isActive = false;
+    }
+
+    if (i == 1) {
+      this.tipos[1].isActive = !this.tipos[1].isActive;
+      this.tipos[0].isActive = false;
+    }
+  }
+
 
 
 }

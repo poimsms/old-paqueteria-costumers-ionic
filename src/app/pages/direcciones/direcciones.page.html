@@ -18,21 +18,21 @@
       <ion-icon name="pin" style="font-size:18px;color:#bbb"></ion-icon>
     </div>
     <div style="margin-left:10px;flex:1">
-      <div (click)="toggleMap('origen')"
+      <div (click)="togglePinMap('origen')"
         style="background:#F0F0F0;padding:10px;padding-left:12px;padding-right:10px;border-radius:5px;display:flex;align-items:center;justify-content:space-between">
         <div style="width:90%">
           <ion-input [(ngModel)]="inputOrigen" (ionInput)="updateSearchResults('origen')" placeholder="Buscar origen"
-            style="font-size:18px;height:22px;overflow:hidden"></ion-input>
+            style="font-size:18px;height:22px;overflow:hidden" autocomplete="off"></ion-input>
         </div>
         <ion-icon (click)="clear('origen')" *ngIf="itemsOrigen.length != 0" name="close-circle"
           style="font-size:22px;color:#888"></ion-icon>
       </div>
 
-      <div (click)="toggleMap('destino')"
+      <div (click)="togglePinMap('destino')"
         style="margin-top:8px;background:#F0F0F0;padding:12px;padding-left:10px;padding-right:10px;border-radius:5px;display:flex;align-items:center;justify-content:space-between">
         <div style="width:90%">
-          <ion-input [(ngModel)]="inputDestino" (ionInput)="updateSearchResults('destino')" placeholder="Buscar destino"
-            style="font-size:18px;height:22px;overflow:hidden"></ion-input>
+          <ion-input #inputId [(ngModel)]="inputDestino" (ionInput)="updateSearchResults('destino')" placeholder="Buscar destino"
+            style="font-size:18px;height:22px;overflow:hidden" autocomplete="off"></ion-input>
         </div>
         <ion-icon (click)="clear('destino')" *ngIf="itemsDestino.length != 0" name="close-circle"
           style="font-size:22px;color:#888"></ion-icon>

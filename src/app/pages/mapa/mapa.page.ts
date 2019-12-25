@@ -45,7 +45,6 @@ export class MapaPage implements OnInit {
     private router: Router,
     private platform: Platform
   ) {
-    console.log('entroo counstr')
     this.service = new google.maps.DistanceMatrixService();
     this.autocomplete = { input: '' };
     this.geocoder = new google.maps.Geocoder();
@@ -112,10 +111,10 @@ export class MapaPage implements OnInit {
   }
 
   codeLatLng(coors) {
-    console.log('geolattt')
     this.geocoder.geocode({
       'location': coors
     }, (results, status) => {
+
       if (status === google.maps.GeocoderStatus.OK) {
         if (results[1]) {
 
@@ -126,8 +125,12 @@ export class MapaPage implements OnInit {
         } else {
           console.log('No results found');
         }
-      } else {
-        console.log('Geocoder failed due to: ' + status);
+      }
+      
+      if (status === google.maps.GeocoderStatus.ZERO_RESULTS) {
+        this.position.address = 'Calle desconocida';
+        this.autocomplete.input = 'Calle desconocida';
+        this.position.ok = true;
       }
     });
   }
