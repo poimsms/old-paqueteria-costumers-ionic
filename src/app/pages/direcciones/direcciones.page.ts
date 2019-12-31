@@ -2,6 +2,7 @@ import { Component, OnInit, NgZone, OnDestroy, ViewChild } from '@angular/core';
 import { DataService } from 'src/app/services/data.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { NavParams, ModalController, IonInput } from '@ionic/angular';
+import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { Subject } from 'rxjs';
 
 import { Subscription } from 'rxjs';
@@ -64,7 +65,8 @@ export class DireccionesPage implements OnInit, OnDestroy {
     private zone: NgZone,
     public modalCtrl: ModalController,
     private router: Router,
-    public _control: ControlService
+    public _control: ControlService,
+    private geolocation: Geolocation
   ) {
     this.GoogleAutocomplete = new google.maps.places.AutocompleteService();
     this.autocomplete = { input: '' };
@@ -222,14 +224,30 @@ export class DireccionesPage implements OnInit, OnDestroy {
 
   async setUbicacionGPS() {
     this.inputOrigen = 'Ubicación actual';
-    const direccion: any = await this.codeLatLng(this._control.gpsCoors);
 
-    console.log(this._control.gpsCoors)
-    console.log(direccion)
-    this._control.origenReady = true;
-    this._control.origen.direccion = direccion;
-    this._control.origen.lat = this._control.gpsCoors.lat;
-    this._control.origen.lng = this._control.gpsCoors.lng;
+    this.geolocation.getCurrentPosition().then(async (resp) => {
+      console.log('acaa')
+      let coors = {
+        lat: resp.coords.latitude,
+        lng: resp.coords.longitude
+      };
+
+      const direccion: any = await this.codeLatLng(coors);
+      this._control.origenReady = true;
+      this._control.origen.direccion = direccion;
+      this._control.origen.lat = coors.lat;
+      this._control.origen.lng = coors.lng;
+
+    }).catch(async () => {
+
+      let coors = this._control.gpsCoors;
+
+      const direccion: any = await this.codeLatLng(coors);
+      this._control.origenReady = true;
+      this._control.origen.direccion = direccion;
+      this._control.origen.lat = this._control.gpsCoors.lat;
+      this._control.origen.lng = this._control.gpsCoors.lng;
+    }); 
   }
 
   codeLatLng(coors) {
@@ -258,18 +276,18 @@ export class DireccionesPage implements OnInit, OnDestroy {
       this.inputOrigen = null;
       this.itemsOrigen = [];
       this._control.origenReady = false;
-      this._control.origen.direccion = '';
-      this._control.origen.lat = 0;
-      this._control.origen.lng = 0;
+      // this._control.origen.direccion = '';
+      // this._control.origen.lat = 0;
+      // this._control.origen.lng = 0;
     }
 
     if (tipo == 'destino') {
       this.inputDestino = null;
       this.itemsDestino = [];
       this._control.origenReady = false;
-      this._control.destino.direccion = '';
-      this._control.destino.lat = 0;
-      this._control.destino.lng = 0;
+      // this._control.destino.direccion = '';
+      // this._control.destino.lat = 0;
+      // this._control.destino.lng = 0;
     }
   }
 

@@ -397,17 +397,40 @@ export class HomePage implements OnInit, OnDestroy {
 
       this.getNeerestRider();
 
-      this._fire.updateRider(id, 'rider', {
-        cliente_activo: '',
-        pagoPendiente: false,
-        nuevaSolicitud: false
-      });
+      this._fire.getRiderPromise(id).then((rider: any) => {
+        // let rider = data[0];
+        console.log(rider, 'riderr')
+        if (rider.pedidos_perdidos >= 2) {
 
-      this._fire.updateRider(id, 'coors', {
-        pagoPendiente: false
-      });
+          this._fire.updateRider(id, 'rider', {
+            cliente_activo: '',
+            pagoPendiente: false,
+            nuevaSolicitud: false,
+            isOnline: false,
+            pedidos_perdidos: 0
+          });
+    
+          this._fire.updateRider(id, 'coors', {
+            pagoPendiente: false,
+            isOnline: false
+          });
+        } else {
 
-    }, 45 * 1000);
+          this._fire.updateRider(id, 'rider', {
+            cliente_activo: '',
+            pagoPendiente: false,
+            nuevaSolicitud: false,
+            pedidos_perdidos: rider.pedidos_perdidos + 1
+          });
+    
+          this._fire.updateRider(id, 'coors', {
+            pagoPendiente: false
+          });
+
+        }
+      });     
+
+    }, 15 * 1000);
   }
 
   handShake(id) {
@@ -555,7 +578,10 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   cancelarBusqueda() {
-    this.riderSub$.unsubscribe();
+    // this.riderSub$.unsubscribe();
+
+    this.riderSub$ ? this.riderSub$.unsubscribe() : console.log();
+
     clearTimeout(this.timer);
 
     this._fire.updateRider(this.riderActivoEnBusqueda, 'rider', { nuevaSolicitud: false, pagoPendiente: false, cliente_activo: '' });

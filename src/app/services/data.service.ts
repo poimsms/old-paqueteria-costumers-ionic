@@ -138,5 +138,11 @@ export class DataService {
     const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
     return this.http.put(url, body, { headers }).toPromise();
   }
+
+  createBalance(body) {
+    const url = `${this._config.apiURL}/core/balance-empresa-create`;
+    const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
+    return this.http.post(url, body, { headers }).toPromise();
+  }
 }
 

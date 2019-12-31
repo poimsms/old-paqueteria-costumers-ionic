@@ -68,7 +68,7 @@ export class MapaPage implements OnInit {
   }
 
   start_map() {
-    this.center = this._control.gpsCoors;    
+    this.center = this._control.gpsCoors;
     this.cargarMapa();
     this.position = {
       coors: this.center,
@@ -126,7 +126,7 @@ export class MapaPage implements OnInit {
           console.log('No results found');
         }
       }
-      
+
       if (status === google.maps.GeocoderStatus.ZERO_RESULTS) {
         this.position.address = 'Calle desconocida';
         this.autocomplete.input = 'Calle desconocida';
@@ -156,13 +156,12 @@ export class MapaPage implements OnInit {
 
     if (this._control.tipo == 'origen') {
       this._control.origenReady = true;
-      this._control.origen = data;
+      this._control.origen = JSON.parse(JSON.stringify(data));
     }
 
     if (this._control.tipo == 'destino') {
       this._control.destinoReady = true;
-      this._control.destino = data;
-
+      this._control.destino = JSON.parse(JSON.stringify(data));
     }
 
     this._control.checkDirecciones();

@@ -24,7 +24,7 @@ export class CodigoPage implements OnInit {
     private _auth: AuthService,
     public alertController: AlertController,
     public toastController: ToastController
-    ) { }
+  ) { }
 
   ngOnInit() {
   }
@@ -62,18 +62,16 @@ export class CodigoPage implements OnInit {
         this.isPromo = false;
         this.isActivacion = true;
         this.tipo_tienda = res.tienda;
-
+        // this._data.createBalance({ usuario: this._auth.usuario._id });
         this.presentToast('¡Activación exitosa!');
       }
-
-     
     });
   }
 
   onActualizar() {
     this.isLoading = true;
 
-    this._auth.updateUser({nombre: this.nombre_comercial}).then(() => {
+    this._auth.updateUser({ nombre: this.nombre_comercial }).then(() => {
       this.isLoading = false;
 
       this._auth.refreshUser();

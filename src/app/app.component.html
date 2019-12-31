@@ -35,7 +35,7 @@
         Solicitar Rider
       </ion-item>
 
-      <ion-item (click)="openPage('pedidos')" lines="none">
+      <ion-item (click)="openPage('historial')" lines="none">
         <ion-icon slot="start" name="ios-list"></ion-icon>
         Mis pedidos
       </ion-item>
@@ -79,7 +79,7 @@
         <ion-icon name="ios-arrow-forward" style="color:#999;font-size:22px"></ion-icon>
       </div> -->
 
-      <div
+      <div *ngIf="false"
         style="margin-top:20px;width:100%;padding:15px;display:flex;justify-content:space-between;align-items:center;">
         <div style="margin-right:15px">
           <div style="font-size:20px">
@@ -99,7 +99,7 @@
 
     </ion-content>
 
-    <ion-footer no-border style="width:100%;display:flex;justify-content:center;padding:15px">
+    <ion-footer *ngIf="false" no-border style="width:100%;display:flex;justify-content:center;padding:15px">
       <div
         style="border-radius:25px;font-size:18px;padding:10px;padding-left:25px;padding-right:25px;background:#9EDF1F;color:white">
         Convierte en Rider
