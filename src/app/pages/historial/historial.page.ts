@@ -28,10 +28,14 @@ export class HistorialPage implements OnInit {
   }
 
   getHistorial(tipo) {
+    
+    this.isLoading = true;
+
     this._data.getPedidos(this._auth.usuario._id, tipo).then((pedidos: any) => {
       this.tipo = tipo;
       this.pedidos = [];
       this.pedidos = pedidos;
+      this.isLoading = false;
     });
   }
 

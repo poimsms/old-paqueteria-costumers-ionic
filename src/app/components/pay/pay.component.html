@@ -16,88 +16,106 @@
 
 <ion-content>
 
-  <div style="margin-left:15px;color:#666;font-weight:600">
-    Seleccione ubicación
-  </div>
+  <div style="background:whitesmoke;height:100%">
 
-  <div style="padding:15px;width:100%;display:flex;align-items:center;justify-content:flex-start">
-    <div (click)="togglePunto('recogida')" class="holder" [ngClass]="{'holder-active': isRecogida}">
-      <div style="width:100%;display:flex;justify-content:center">
-        <ion-icon name="pin" style="font-size:35px" [ngStyle]="{'color': isRecogida ? '#9EDF1F' : '#bbb'}">
-        </ion-icon>
+    <div style="width:100%;height:12px">
+    </div>
+
+    <div style="background:white">
+
+      <div style="margin-top:15px;margin-left:15px;color:#666;font-weight:600">
+        Seleccione ubicación
       </div>
-      <div style="font-size:15px;" [ngStyle]="{'color': isRecogida? '#333': '#888'}">
-        Recogida
+
+      <div style="padding:15px;width:100%;display:flex;align-items:center;justify-content:flex-start">
+        <div (click)="togglePunto('recogida')" class="holder" [ngClass]="{'holder-active': isRecogida}">
+          <div style="width:100%;display:flex;justify-content:center">
+            <ion-icon name="pin" style="font-size:35px" [ngStyle]="{'color': isRecogida ? '#9EDF1F' : '#bbb'}">
+            </ion-icon>
+          </div>
+          <div style="font-size:15px;" [ngStyle]="{'color': isRecogida? '#333': '#888'}">
+            Recogida
+          </div>
+        </div>
+        <div (click)="togglePunto('entrega')" class="holder" [ngClass]="{'holder-active': isEntrega}">
+          <div style="width:100%;display:flex;justify-content:center">
+            <ion-icon name="flag" style="font-size:35px" [ngStyle]="{'color': isEntrega ? '#9EDF1F' : '#bbb'}">
+            </ion-icon>
+          </div>
+          <div style="font-size:15px;" [ngStyle]="{'color': isEntrega? '#333': '#888'}">
+            Entrega
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!isRecogida && !isEntrega" style="height:160px;width:100%"></div>
+
+      <div *ngIf="isRecogida">
+        <ion-item lines="none">
+          <div style="color:#666;font-size:17px">
+            Detalles de recogida ¿Quién envía?
+          </div>
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-icon slot="start" name="person" style="color:#bbb;font-size:18px;"></ion-icon>
+          <ion-input type="text" [(ngModel)]="nombre_origen" placeholder="Nombre"
+            style="text-transform:capitalize;border-bottom:0px solid #eee;font-size:17px">
+          </ion-input>
+        </ion-item>
+
+        <ion-item lines="none" style="margin-bottom:10px">
+          <ion-icon slot="start" name="call" style="color:#bbb;font-size:18px;"></ion-icon>
+          <ion-input type="tel" [(ngModel)]="telefono_origen" placeholder="Teléfono"
+            style="border-bottom:0px solid #eee;font-size:17px">
+          </ion-input>
+        </ion-item>
+      </div>
+
+      <div *ngIf="isEntrega">
+        <ion-item lines="none">
+          <div style="color:#666;font-size:17px">
+            Detalles de entrega ¿Quién recibe?
+          </div>
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-icon slot="start" name="person" style="color:#bbb;font-size:18px;"></ion-icon>
+          <ion-input type="text" [(ngModel)]="nombre_destino" placeholder="Nombre"
+            style="text-transform:capitalize;border-bottom:0px solid #eee;font-size:17px">
+          </ion-input>
+        </ion-item>
+
+        <ion-item lines="none" style="margin-bottom:10px">
+          <ion-icon slot="start" name="call" style="color:#bbb;font-size:18px;"></ion-icon>
+          <ion-input type="tel" [(ngModel)]="telefono_destino" placeholder="Teléfono"
+            style="border-bottom:0px solid #eee;font-size:17px">
+          </ion-input>
+        </ion-item>
       </div>
     </div>
-    <div (click)="togglePunto('entrega')" class="holder" [ngClass]="{'holder-active': isEntrega}">
-      <div style="width:100%;display:flex;justify-content:center">
-        <ion-icon name="flag" style="font-size:35px" [ngStyle]="{'color': isEntrega ? '#9EDF1F' : '#bbb'}">
-        </ion-icon>
-      </div>
-      <div style="font-size:15px;" [ngStyle]="{'color': isEntrega? '#333': '#888'}">
-        Entrega
-      </div>
+
+
+    <div style="width:100%;height:12px">
     </div>
-  </div>
 
-  <div *ngIf="!isRecogida && !isEntrega" style="height:160px;width:100%"></div>
+    <div style="background:white;padding-top:25px">
 
-  <div *ngIf="isRecogida">
-    <ion-item lines="none">
-      <div style="color:#666;font-size:17px">
-        Detalles de recogida ¿Quién envía?
+      <div style="margin-left:15px;color:#666">
+        Describe tu entrega
       </div>
-    </ion-item>
 
-    <ion-item lines="none">
-      <ion-icon slot="start" name="contact" style="color:#bbb;font-size:22px;"></ion-icon>
-      <ion-input type="text" [(ngModel)]="nombre_origen" placeholder="Nombre"
-        style="text-transform:capitalize;border-bottom:1px solid #eee;font-size:18px">
-      </ion-input>
-    </ion-item>
+      <ion-textarea
+        placeholder="Es un café? Es una hamburguesa? Podemos llevarlo siempre que quepa en la caja de la moto!."
+        [(ngModel)]="instrucciones" rows="5" style="border:0px solid #eee;border-radius:5px;font-size:18px">
+      </ion-textarea>
+    </div>
 
-    <ion-item lines="none" style="margin-top:15px">
-      <ion-icon slot="start" name="phone-portrait" style="color:#bbb;font-size:22px;"></ion-icon>
-      <ion-input type="tel" [(ngModel)]="telefono_origen" placeholder="Teléfono"
-        style="border-bottom:1px solid #eee;font-size:18px">
-      </ion-input>
-    </ion-item>
+    <div style="width:100%;height:30px">
+    </div>
+
   </div>
 
-
-  <div *ngIf="isEntrega">
-    <ion-item lines="none">
-      <div style="color:#666;font-size:17px">
-        Detalles de entrega ¿Quién recibe?
-      </div>
-    </ion-item>
-
-    <ion-item lines="none">
-      <ion-icon slot="start" name="contact" style="color:#bbb;font-size:22px;"></ion-icon>
-      <ion-input type="text" [(ngModel)]="nombre_destino" placeholder="Nombre"
-        style="text-transform:capitalize;border-bottom:1px solid #eee;font-size:18px">
-      </ion-input>
-    </ion-item>
-
-    <ion-item lines="none" style="margin-top:15px">
-      <ion-icon slot="start" name="phone-portrait" style="color:#bbb;font-size:22px;"></ion-icon>
-      <ion-input type="tel" [(ngModel)]="telefono_destino" placeholder="Teléfono"
-        style="border-bottom:1px solid #eee;font-size:18px">
-      </ion-input>
-    </ion-item>
-  </div>
-
-  <div style="margin-top:30px;margin-left:15px;color:#666;font-weight:600">
-    Describe tu entrega
-  </div>
-
-  <div padding>
-    <ion-textarea
-      placeholder="Olvidastes tus llaves? Es un pedido para tu cliente? Podemos llevarlo siempre que quepa en la caja de la moto!."
-      [(ngModel)]="instrucciones" rows="5" style="border:1px solid #eee;border-radius:5px;font-size:18px">
-    </ion-textarea>
-  </div>
 
 </ion-content>
 

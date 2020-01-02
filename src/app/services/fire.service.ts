@@ -166,6 +166,9 @@ export class FireService {
             return resolve({ isMoto: false, isBici: false, isAuto: false });
           }
 
+          console.log(riders, 'riders---');
+
+
           const riders_zero = this.filtro_zero(riders);
 
           console.log(riders_zero, 'riders_zero');
@@ -232,7 +235,7 @@ export class FireService {
       if (distance < 10000 && rider.vehiculo == 'moto') {
         riders_moto.push(rider);
       }
-      if (distance < 3000 && rider.vehiculo == 'bicicleta') {
+      if (distance < 5000 && rider.vehiculo == 'bicicleta') {
         riders_bici.push(rider);
       }
       if (distance < 10000 && rider.vehiculo == 'auto') {
@@ -281,7 +284,7 @@ export class FireService {
         riders_moto.push(rider);
       }
 
-      if (distance < 3000 && rider.vehiculo == 'bicicleta') {
+      if (distance < 5000 && rider.vehiculo == 'bicicleta') {
         riders_bici.push(rider);
       }
 

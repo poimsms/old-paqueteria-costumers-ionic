@@ -42,14 +42,9 @@ export class HomePage implements OnInit, OnDestroy {
 
   transporte = 'moto';
   texto_origen = 'Punto de recogida';
-  texto_origen_default = 'Punto de recogida';
   texto_destino = 'Punto de entrega';
-  texto_destino_default = 'Punto de entrega';
 
-  distancia_excedida_moto = false;
-  distancia_excedida_bici = false;
-  distancia_excedida_auto = false;
-
+  distancia_excedida = false;
 
   isBicicleta = false;
   isMoto = false;
@@ -190,7 +185,6 @@ export class HomePage implements OnInit, OnDestroy {
       this.subToCodigoPromo();
 
       if (isGPS) {
-        console.log('entroo?? GPD??')
         this.graficarMarcador(this._control.gpsCoors, 'gps');
       }
 
@@ -299,20 +293,8 @@ export class HomePage implements OnInit, OnDestroy {
 
   iniciarPedido() {
 
-    if (this.texto_origen == this.texto_origen_default || this.texto_destino == this.texto_destino_default) {
-      return;
-    }
-
-    if (this.isBicicleta && this.distancia_excedida_bici) {
-      return;
-    }
-
-    if (this.isMoto && this.distancia_excedida_moto) {
-      return this.limite_moto_excedido();
-    }
-
-    if (this.isAuto && this.distancia_excedida_auto) {
-      return this.limite_auto_excedido();
+    if (this.distancia_excedida) {
+      return this.limite_excedido();
     }
 
     if (this.isBicicleta) {
@@ -409,7 +391,7 @@ export class HomePage implements OnInit, OnDestroy {
             isOnline: false,
             pedidos_perdidos: 0
           });
-    
+
           this._fire.updateRider(id, 'coors', {
             pagoPendiente: false,
             isOnline: false
@@ -422,15 +404,15 @@ export class HomePage implements OnInit, OnDestroy {
             nuevaSolicitud: false,
             pedidos_perdidos: rider.pedidos_perdidos + 1
           });
-    
+
           this._fire.updateRider(id, 'coors', {
             pagoPendiente: false
           });
 
         }
-      });     
+      });
 
-    }, 15 * 1000);
+    }, 45 * 1000);
   }
 
   handShake(id) {
@@ -578,7 +560,6 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   cancelarBusqueda() {
-    // this.riderSub$.unsubscribe();
 
     this.riderSub$ ? this.riderSub$.unsubscribe() : console.log();
 
@@ -594,7 +575,7 @@ export class HomePage implements OnInit, OnDestroy {
     this.map.setCenter(this._control.gpsCoors);
   }
 
-  cancelarServicio() {
+  cancelarViaje() {
     this.riderCoorsSub$.unsubscribe();
     this._fire.cancelarServicio(this.rider._id, this.pedido);
     this._fcm.sendPushNotification(this.rider._id, 'servicio-cancelado');
@@ -713,24 +694,16 @@ export class HomePage implements OnInit, OnDestroy {
               this.showAuto = res.isAuto;
             }
 
-            if (distancia > 5500) {
+            if (distancia > 6000) {
               this.showBici = false
             }
 
-            if (distancia > 40000 && this.ciudad == 'la_serena_coquimbo' && this.isMoto) {
-              this.distancia_excedida_moto = true;
+            if (distancia > 40000 && this.ciudad != 'santiago') {
+              this.distancia_excedida = true;
             }
 
             if (distancia > 70000 && this.ciudad == 'santiago' && this.isMoto) {
-              this.distancia_excedida_moto = true;
-            }
-
-            if (distancia > 40000 && this.ciudad == 'la_serena_coquimbo' && this.isAuto) {
-              this.distancia_excedida_auto = true;
-            }
-
-            if (distancia > 70000 && this.ciudad == 'santiago' && this.isAuto) {
-              this.distancia_excedida_auto = true;
+              this.distancia_excedida = true;
             }
 
             this.tiempoMoto = Math.round(seconds / 60 / 1.15) + 3;
@@ -875,10 +848,10 @@ export class HomePage implements OnInit, OnDestroy {
     }
   }
 
-  async limite_moto_excedido() {
+  async limite_excedido() {
     const alert = await this.alertController.create({
       header: 'Lo sentimos mucho!',
-      message: 'Es mucha distancia para nuestras motos',
+      message: 'Es mucha distancia para nuestros Riders',
       buttons: [
         {
           text: 'Ok',
@@ -989,7 +962,7 @@ export class HomePage implements OnInit, OnDestroy {
     await alert.present();
   }
 
-  async alert_cancelacion(id) {
+  async alert_cancelacion() {
     const alert = await this.alertController.create({
       header: 'Cancelar viaje',
       message: '¿Quieres cancelar el viaje?',
@@ -999,13 +972,12 @@ export class HomePage implements OnInit, OnDestroy {
           role: 'cancel',
           cssClass: 'secondary',
           handler: (blah) => {
-            // this.cancelarServicio(id);
           }
         },
         {
           text: 'Ok',
           handler: () => {
-            this.cancelarServicio();
+            this.cancelarViaje();
           }
         }
       ]
@@ -1023,31 +995,6 @@ export class HomePage implements OnInit, OnDestroy {
     toast.present();
   }
 
-  async alert_cancelacion22(m) {
-    const alert = await this.alertController.create({
-      header: 'test',
-      message: m,
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          cssClass: 'secondary',
-          handler: (blah) => {
-            // this.cancelarServicio(id);
-          }
-        },
-        {
-          text: 'Ok',
-          handler: () => {
-            // this.cancelarServicio(id);
-          }
-        }
-      ]
-    });
-
-    await alert.present();
-  }
-
   resetMapaFromBusquedaCancelada() {
     this.showTrip = false;
     this.isMoto = false;
@@ -1059,8 +1006,6 @@ export class HomePage implements OnInit, OnDestroy {
     this.rider = null;
     this.riderIndex = 0;
     this.rutaReady = false;
-    this.texto_origen = this.texto_origen_default;
-    this.texto_destino = this.texto_destino_default;
     this._control.origenReady = false;
     this._control.destinoReady = false;
     this._control.rutaReady = false;
@@ -1079,8 +1024,6 @@ export class HomePage implements OnInit, OnDestroy {
     this.rider = null;
     this.riderIndex = 0;
     this.rutaReady = false;
-    this.texto_origen = this.texto_origen_default;
-    this.texto_destino = this.texto_destino_default;
     this._control.origenReady = false;
     this._control.destinoReady = false;
     this._control.rutaReady = false;
@@ -1088,6 +1031,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   resetMapaAndRider() {
+    this.distancia_excedida = false;
     this.showTrip = false;
     this.pedidoActivo = false;
     this.directionsDisplay.setMap(null);
@@ -1097,8 +1041,6 @@ export class HomePage implements OnInit, OnDestroy {
     this.rider = null;
     this.riderIndex = 0;
     this.rutaReady = false;
-    this.texto_origen = this.texto_origen_default;
-    this.texto_destino = this.texto_destino_default;
     this._control.origenReady = false;
     this._control.destinoReady = false;
     this._control.rutaReady = false;

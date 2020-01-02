@@ -70,6 +70,10 @@ export class ControlService {
 
       this.geolocation.getCurrentPosition().then((resp) => {
 
+        console.log('ENTRO_PLUGIN')
+        console.log(resp.coords.latitude, 'LAT')
+        console.log(resp.coords.longitude, 'LNG')
+
         this.gpsCoors = {
           lat: resp.coords.latitude,
           lng: resp.coords.longitude
@@ -78,6 +82,10 @@ export class ControlService {
         resolve(true)
 
       }).catch((error) => {
+
+        console.log('PLUGIN_ERROR')
+        console.log(error, 'ERROR_DESCRIPCION')
+
 
         resolve(false);
 

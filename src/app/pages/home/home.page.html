@@ -190,6 +190,15 @@
 
     </div>
 
+    <div *ngIf="false" style="color:#666;font-weight:300;display:flex;justify-content:flex-end;">
+      <div style="color:#9EDF1F;font-weight:500;text-transform:uppercase;font-size:14px">
+        Entregar
+      </div>
+      <div style="margin-left:20px;color:#555;font-weight:500;text-transform:uppercase;font-size:14px">
+        Traer
+      </div>
+    </div>
+
     <div *ngIf="!rutaReady" style="color:#666;font-weight:300">
       Buenas tardes <span style="text-transform:capitalize"> {{usuario.nombre.split(' ')[0] }}</span>
     </div>
@@ -395,7 +404,7 @@
           LLAMAR
         </div>
       </div>
-      <div (click)="alert_cancelacion(rider._id)" style="margin-right:0px">
+      <div (click)="alert_cancelacion()" style="margin-right:0px">
         <div style="display:flex;justify-content:center">
           <div
             style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid #eee">
@@ -421,7 +430,7 @@
       </div>
     </div>
     <div style="color:#222;font-size:18px">
-      $5600
+      ${{pedido.costo}}
     </div>
   </div>
 
