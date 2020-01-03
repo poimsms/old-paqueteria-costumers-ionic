@@ -25,6 +25,9 @@ export class ControlService {
 
   isGPSLocation: boolean;
 
+  riderID: string;
+  pedidoID: string;
+
 
   centro: any = { lat: -33.263063, lng: -70.693496 };
 

@@ -22,7 +22,8 @@ const routes: Routes = [
   { path: 'buscar', loadChildren: './pages/buscar/buscar.module#BuscarPageModule' },
   { path: 'mis-lugares', loadChildren: './pages/mis-lugares/mis-lugares.module#MisLugaresPageModule' },
   { path: 'registro', loadChildren: './pages/registro/registro.module#RegistroPageModule' },
-  { path: 'metodo-pago', loadChildren: './pages/metodo-pago/metodo-pago.module#MetodoPagoPageModule' }
+  { path: 'metodo-pago', loadChildren: './pages/metodo-pago/metodo-pago.module#MetodoPagoPageModule' },
+  { path: 'add-info', loadChildren: './pages/add-info/add-info.module#AddInfoPageModule' }
 
 
 

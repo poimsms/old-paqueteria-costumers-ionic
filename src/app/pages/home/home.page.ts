@@ -108,7 +108,7 @@ export class HomePage implements OnInit, OnDestroy {
   bodyNeerRider: any;
   counter = 0;
 
-  imageURL = 'https://res.cloudinary.com/ddon9fx1n/image/upload/v1555014076/tools/bike-parking.svg';
+  imageURL = 'https://res.cloudinary.com/ddon9fx1n/image/upload/v1578060689/tools/ninja.svg';
   origenImg = 'https://res.cloudinary.com/ddon9fx1n/image/upload/v1570429346/tools/pin_origen.png';
   destinoImg = 'https://res.cloudinary.com/ddon9fx1n/image/upload/v1571242743/tools/pin_destino.png';
   gpsImg = 'https://res.cloudinary.com/ddon9fx1n/image/upload/v1574420400/tools/current.png';
@@ -147,6 +147,7 @@ export class HomePage implements OnInit, OnDestroy {
   metodo_pago = '';
 
   evento = 0;
+  tiempoLlegada = 0;
 
   constructor(
     private menu: MenuController,
@@ -216,16 +217,26 @@ export class HomePage implements OnInit, OnDestroy {
     await modal.present();
   }
 
-  riderSubCoors() {
+  riderSubCoors(origen, destino) {
     this.riderCoorsSub$ = this._fire.getRiderCoors(this.rider._id).subscribe((riders: any) => {
 
       let rider = riders[0];
       this.evento = rider.evento;
 
+      this.tiempoLlegada = rider.tiempoLlegada;
+
       if (rider.cliente == this.usuario._id) {
 
         const coors = { lat: rider.lat, lng: rider.lng };
         this.graficarMarcador(coors, 'rider');
+
+        let bounds = new google.maps.LatLngBounds();
+
+        bounds.extend(new google.maps.LatLng(rider.lat, rider.lng));
+        bounds.extend(new google.maps.LatLng(origen.lat, origen.lng));
+        bounds.extend(new google.maps.LatLng(destino.lat, destino.lng));
+
+        this.map.fitBounds(bounds);
       }
 
       if (rider.cliente != this.usuario._id) {
@@ -280,7 +291,7 @@ export class HomePage implements OnInit, OnDestroy {
     }
 
     this.graficarRuta(origen, destino, data.pedido.vehiculo);
-    this.riderSubCoors();
+    this.riderSubCoors(origen, destino);
   }
 
   crearNuevoPedido() {
@@ -451,8 +462,8 @@ export class HomePage implements OnInit, OnDestroy {
         pedido: {
           distancia: this.distancia,
           tiempo: this.tiempo,
-          origen: this._control.origen.direccion,
-          destino: this._control.destino.direccion,
+          origen: this._control.origen,
+          destino: this._control.destino,
           costo: this.precio
         }
       }
@@ -508,6 +519,57 @@ export class HomePage implements OnInit, OnDestroy {
     });
   }
 
+  async confirmar(payData) {
+
+    const modal = await this.modalController.create({
+      component: PayComponent,
+      componentProps: { data: payData, cuponData: this.cuponData }
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+
+    if (!data) {
+      return this.resetMapa();
+    }
+
+    if (data.state == 'PAGO_EXITOSO') {
+
+      this.directionsDisplay.setMap(null);
+
+      this.service = new google.maps.DistanceMatrixService();
+      this.directionsDisplay = new google.maps.DirectionsRenderer({
+        suppressMarkers: true, polylineOptions: {
+          strokeColor: '#404042'
+        }
+      });
+      this.directionsService = new google.maps.DirectionsService();
+
+      this.cargarMapa();
+
+      this.graciasPorComprar = true;
+
+      setTimeout(() => {
+        this.graciasPorComprar = false;
+        this._otros.getPedido('buscar_pedido_activo_mas_reciente');
+      }, 2000);
+
+      this._data.getCuponActivo(this._auth.usuario._id);
+
+      this._fcm.sendPushNotification(data.riderID, 'confirmacion-pedido');
+
+    }
+
+    if (data.state == 'PAGO_NO_REALIZADO') {
+      this.alert_pedido_cancelado();
+    }
+
+    if (data.state == 'TIEMPO_EXPIRADO') {
+      this.resetMapa();
+    }
+  }
+
   async openPayModal(payData) {
 
     const modal = await this.modalController.create({
@@ -558,6 +620,7 @@ export class HomePage implements OnInit, OnDestroy {
       this.resetMapa();
     }
   }
+
 
   cancelarBusqueda() {
 
@@ -706,9 +769,9 @@ export class HomePage implements OnInit, OnDestroy {
               this.distancia_excedida = true;
             }
 
-            this.tiempoMoto = Math.round(seconds / 60 / 1.15) + 3;
-            this.tiempoBici = Math.round(distancia / (13 * 1000) * 60) + 3;
-            this.tiempoAuto = Math.round(seconds / 60 / 1.15) + 3;
+            this.tiempoMoto = Math.round(seconds / 60 / 1.15);
+            this.tiempoBici = Math.round(distancia / (13 * 1000) * 60);
+            this.tiempoAuto = Math.round(seconds / 60 / 1.15);
 
             if (this.isMoto) {
               this.tiempo = this.tiempoMoto;
@@ -744,6 +807,9 @@ export class HomePage implements OnInit, OnDestroy {
             }
 
             this.graficarRuta(data.origen, data.destino, 'Moto');
+
+
+
           });
       }
     });
@@ -785,7 +851,11 @@ export class HomePage implements OnInit, OnDestroy {
     }
 
     this.graficarMarcador({ lat: origen.lat, lng: origen.lng }, 'origen');
-    this.graficarMarcador({ lat: destino.lat, lng: destino.lng }, 'destino')
+    this.graficarMarcador({ lat: destino.lat, lng: destino.lng }, 'destino');
+
+
+
+
   }
 
   graficarMarcador(coors, tipo) {
@@ -993,6 +1063,12 @@ export class HomePage implements OnInit, OnDestroy {
       position: 'middle'
     });
     toast.present();
+  }
+
+  openPage(page) {
+    this._control.riderID = this.rider._id;
+    this._control.pedidoID = this.pedido._id;
+    this.router.navigateByUrl(page);
   }
 
   resetMapaFromBusquedaCancelada() {

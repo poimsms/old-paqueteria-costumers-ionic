@@ -53,10 +53,18 @@
     <div *ngIf="pedidoActivo && isEmpresa" style="position:absolute;bottom:30px;left:10px">
       <div (click)="crearNuevoPedido()"
         style="background:white;color:#444;height:35px;padding:20px;display:flex;align-items:center;justify-content:center;border-radius:2px;box-shadow: 0 0 20px #bbb;">
-        <ion-icon name="add" style="margin-right:5px;color:#444;font-size:22px"></ion-icon>
+        <ion-icon name="pin" style="margin-right:5px;color:#999;font-size:22px"></ion-icon>
         Crear más pedidos
       </div>
     </div>
+
+    <div *ngIf="pedidoActivo && isEmpresa" style="position:absolute;bottom:30px;right:10px">
+      <div (click)="openPage('add-info')"
+        style="background:white;border-radius:50%;color:#444;height:45px;width:45px;display:flex;align-items:center;justify-content:center;box-shadow: 0 0 20px #bbb;">
+        <ion-icon name="add" style="color:#444;font-size:22px"></ion-icon>
+      </div>
+    </div>
+
   </div>
 
 </ion-content>
@@ -64,6 +72,11 @@
 
 
 <ion-footer style="background:#fff">
+  <!-- <div style="padding:10px">
+    <h5>
+      El Rider llega en 6 min
+    </h5>
+  </div> -->
   <div *ngIf="cuponData?.ok && !rutaReady && !pedidoActivo"
     style="width:100%;padding:7px;padding-left:15px;color:white;font-size:14px;background:#df1f9f">
     Se aplicó la promoción
@@ -276,18 +289,28 @@
 
   <div *ngIf="pedidoActivo" style="padding:15px">
 
+    <h5 style="margin-top:0">
+      Llega en {{tiempoLlegada}} min
+    </h5>
+
     <div style="margin-bottom:15px;font-size:18px;color:#444">
       <div *ngIf="evento == 0">
         Solicitud confirmada
       </div>
       <div *ngIf="evento == 1">
-        El Rider está en camino al punto de inicio
+        <span style="text-transform:capitalize;">
+          {{rider.nombre.split(' ')[0]}}
+        </span>
+        está en camino al punto de inicio
       </div>
       <div *ngIf="evento == 2">
         Vé al punto de inicio, el Rider ha llegado!
       </div>
       <div *ngIf="evento == 3">
-        El Rider está en camino al punto de entrega
+        <span style="text-transform:capitalize;">
+          {{rider.nombre.split(' ')[0]}}
+        </span>
+        está en camino al punto de entrega
       </div>
       <div *ngIf="evento == 4">
         Tu pedido se está entregando
@@ -396,8 +419,8 @@
       <div (click)="callPhone(rider.telefono)" style="margin-right:0px">
         <div style="display:flex;justify-content:center">
           <div
-            style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid #eee">
-            <ion-icon name="ios-call" style="font-size:22px;color:#bbb"></ion-icon>
+            style="width:43px;height:43px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid #eee">
+            <ion-icon name="ios-call" style="font-size:23px;color:#bbb"></ion-icon>
           </div>
         </div>
         <div style="margin-top:5px;text-align:center;font-size:12.5px;color:#777">
@@ -407,8 +430,8 @@
       <div (click)="alert_cancelacion()" style="margin-right:0px">
         <div style="display:flex;justify-content:center">
           <div
-            style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid #eee">
-            <ion-icon name="close" style="font-size:22px;color:#bbb"></ion-icon>
+            style="width:43px;height:43px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid #eee">
+            <ion-icon name="close" style="font-size:23px;color:#bbb"></ion-icon>
           </div>
         </div>
         <div style="margin-top:5px;text-align:center;font-size:12.5px;color:#777">
