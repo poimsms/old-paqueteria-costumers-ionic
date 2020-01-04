@@ -66,6 +66,7 @@ export class PayComponent implements OnInit {
     this.precio_promo = navParams.get('data').monto_promo;
     this.pedido = navParams.get('data').pedido;
     this.tiempo_entrega = navParams.get('data').pedido.tiempo;
+    console.log(this.tiempo_entrega,'tiempo_entrega')
     this.checkoutTime();
   }
 

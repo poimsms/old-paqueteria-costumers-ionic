@@ -11,7 +11,13 @@
 
   <div style="background:whitesmoke;height:100%">
 
-    <div style="padding-left:15px;padding-top:35px;font-size:18px;color:#555">
+    <div *ngIf="_auth.usuario.role == 'USUARIO_ROLE'"
+      style="padding-left:15px;padding-top:35px;font-size:18px;color:#555">
+      Añade información del viaje
+    </div>
+
+    <div *ngIf="_auth.usuario.role == 'EMPRESA_ROLE'"
+      style="padding-left:15px;padding-top:35px;font-size:18px;color:#555">
       Añade información de la entrega
     </div>
 
@@ -20,8 +26,14 @@
 
     <div style="background:white">
 
-      <div style="padding-left:15px;padding-top:25px;padding-bottom:10px;color:#666">
-        Datos personales ¿Quién recibe?
+      <div *ngIf="_auth.usuario.role == 'USUARIO_ROLE'"
+        style="padding-left:15px;padding-top:25px;padding-bottom:10px;color:#666">
+        A quién le hacemos la entrega?
+      </div>
+
+      <div *ngIf="_auth.usuario.role == 'EMPRESA_ROLE'"
+        style="padding-left:15px;padding-top:25px;padding-bottom:10px;color:#666">
+        Datos del cliente
       </div>
 
       <div>
@@ -61,11 +73,7 @@
       </ion-textarea>
     </div>
 
-
   </div>
-
-
-
 
 </ion-content>
 
@@ -79,3 +87,17 @@
     Guardando...
   </div>
 </ion-footer>
+
+
+<div *ngIf="isCargando"
+  style="z-index:999;position:fixed;top:0px;left:0px;height:100%;width:100%;display:flex;align-items:center;justify-content:center;background:rgb(34, 34, 34, 0.5)">
+  <div
+    style="box-shadow: 0 0 20px rgba(68, 68, 68, 0.75);padding:30px;padding-top:20px;padding-bottom:20px;width:80%;border-radius:3px;background:white;">
+    <div style="width:100%;display:flex;align-items:center">
+      <ion-spinner color="secondary"></ion-spinner>
+      <div style="margin-left:20px;font-size:17px;margin-right:10px">
+        Cargando...
+      </div>
+    </div>
+  </div>
+</div>

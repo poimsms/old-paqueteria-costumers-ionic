@@ -9,6 +9,7 @@ import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { ControlService } from 'src/app/services/control.service';
 import { LugaresComponent } from 'src/app/components/lugares/lugares.component';
+import { FireService } from 'src/app/services/fire.service';
 
 declare var google: any;
 
@@ -66,7 +67,8 @@ export class DireccionesPage implements OnInit, OnDestroy {
     public modalCtrl: ModalController,
     private router: Router,
     public _control: ControlService,
-    private geolocation: Geolocation
+    private geolocation: Geolocation,
+    private _fire: FireService
   ) {
     this.GoogleAutocomplete = new google.maps.places.AutocompleteService();
     this.autocomplete = { input: '' };
@@ -146,7 +148,35 @@ export class DireccionesPage implements OnInit, OnDestroy {
 
     this.tipo == 'origen' ? input = this.inputOrigen : input = this.inputDestino;
 
-    this.GoogleAutocomplete.getPlacePredictions({ input, componentRestrictions: { country: 'cl' } },
+    // var cityBounds = new google.maps.LatLngBounds(
+    //   new google.maps.LatLng(-39.852979, -73.255130),
+    //   new google.maps.LatLng(-39.817916, -73.292552),
+    //   new google.maps.LatLng(-39.788639, -73.240711),
+    //   new google.maps.LatLng(-39.772544, -73.191959),
+    //   new google.maps.LatLng(-39.772544, -73.191959)
+    //   );
+
+    let options = {};
+
+    let coors = [this._control.origen.lat, this._control.origen.lng]
+
+    let ciudad = this._fire.calcular_ciudad(coors);
+
+    if (ciudad == 'valdivia') {
+      options = {
+        input,
+        componentRestrictions: { country: 'cl' },
+        location: new google.maps.LatLng(-39.825958, -73.237449),
+        radius: 8000
+      }
+    } else {
+      options = {
+        input,
+        componentRestrictions: { country: 'cl' }
+      }
+    }
+
+    this.GoogleAutocomplete.getPlacePredictions(options,
       (predictions, status) => {
 
         if (!predictions) {
@@ -247,7 +277,7 @@ export class DireccionesPage implements OnInit, OnDestroy {
       this._control.origen.direccion = direccion;
       this._control.origen.lat = this._control.gpsCoors.lat;
       this._control.origen.lng = this._control.gpsCoors.lng;
-    }); 
+    });
   }
 
   codeLatLng(coors) {

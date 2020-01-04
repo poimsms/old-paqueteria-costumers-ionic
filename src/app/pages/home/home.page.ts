@@ -141,7 +141,6 @@ export class HomePage implements OnInit, OnDestroy {
     anchor: new google.maps.Point(4, 36)
   };
 
-
   no_riders_area = false;
 
   metodo_pago = '';
@@ -491,6 +490,11 @@ export class HomePage implements OnInit, OnDestroy {
 
       if (riderFire.aceptadoId == this.usuario._id) {
 
+        this.tiempoLlegada = riderFire.tiempoLlegada;
+
+        console.log(this.tiempoLlegada, 'tiempoLlegada')
+
+
         clearTimeout(this.timer);
         this.riderSub$.unsubscribe();
         this.loadingRider = false;
@@ -508,7 +512,7 @@ export class HomePage implements OnInit, OnDestroy {
               origen: this._control.origen,
               destino: this._control.destino,
               distancia: this.distancia,
-              tiempo: this.tiempo
+              tiempo: this.tiempo + this.tiempoLlegada
             }
           }
 
@@ -720,6 +724,7 @@ export class HomePage implements OnInit, OnDestroy {
             this.distancia = distancia;
 
             this.ciudad = this._fire.calcular_ciudad(origen);
+            this._control.ciudad = this.ciudad;
 
             const body = {
               ciudad: this.ciudad,
@@ -784,6 +789,12 @@ export class HomePage implements OnInit, OnDestroy {
             if (this.isAuto) {
               this.tiempo = this.tiempoAuto;
             }
+
+            // this.tiempo += this.tiempoLlegada;
+
+            // console.log(this.tiempoLlegada, 'tiempoLlegada')
+
+            // console.log(this.tiempo, 'tiempo')
 
             const tarifasBody = {
               distancia: this.distancia,
@@ -1067,7 +1078,9 @@ export class HomePage implements OnInit, OnDestroy {
 
   openPage(page) {
     this._control.riderID = this.rider._id;
+    this._control.pedido = this.pedido;
     this._control.pedidoID = this.pedido._id;
+
     this.router.navigateByUrl(page);
   }
 

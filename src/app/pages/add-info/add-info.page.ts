@@ -3,6 +3,7 @@ import { FireService } from 'src/app/services/fire.service';
 import { ControlService } from 'src/app/services/control.service';
 import { Router } from '@angular/router';
 import { DataService } from 'src/app/services/data.service';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-add-info',
@@ -16,15 +17,30 @@ export class AddInfoPage implements OnInit {
   instrucciones: string;
 
   isLoading = false;
+  isCargando = false;
 
   constructor(
     private _fire: FireService,
     private _data: DataService,
     public _control: ControlService,
-    private router: Router
+    private router: Router,
+    public _auth: AuthService
   ) { }
 
   ngOnInit() {
+    this.setInfo();
+  }  
+
+  setInfo() {
+    this.isCargando = true,
+
+    this._data.getOnePedido(this._control.pedidoID).then((data: any) => {
+      this.isCargando = false;
+      const pedido = data.pedido;
+      this.nombre_entrega = pedido.nombre_destino;
+      this.telefono_entrega = pedido.telefono_destino;
+      this.instrucciones = pedido.instrucciones;
+    }).catch(() => this.isCargando = false);   
   }
 
   async onGuardar() {
@@ -37,13 +53,8 @@ export class AddInfoPage implements OnInit {
       instrucciones: this.instrucciones
     };
 
-    console.log('pasooo')
-
-    await this._data.updatePedido(this._control.pedidoID, body);
+    await this._data.updatePedido(this._control.pedido._id, body);
     await this._fire.updateRider(this._control.riderID, 'rider', { updatePedido: true })
-
-    console.log(this._control.riderID, 'rider')
-    console.log(this._control.pedidoID, 'pedidoID')
 
     this.isLoading = false;
 
