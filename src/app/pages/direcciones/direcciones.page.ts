@@ -1,7 +1,7 @@
 import { Component, OnInit, NgZone, OnDestroy, ViewChild } from '@angular/core';
 import { DataService } from 'src/app/services/data.service';
 import { AuthService } from 'src/app/services/auth.service';
-import { NavParams, ModalController, IonInput } from '@ionic/angular';
+import { NavParams, ModalController, IonInput, Platform } from '@ionic/angular';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { Subject } from 'rxjs';
 
@@ -57,6 +57,8 @@ export class DireccionesPage implements OnInit, OnDestroy {
 
   isGPSLocation = true;
 
+  location: any;
+
   @ViewChild('inputId') inputElement: IonInput;
 
 
@@ -68,7 +70,8 @@ export class DireccionesPage implements OnInit, OnDestroy {
     private router: Router,
     public _control: ControlService,
     private geolocation: Geolocation,
-    private _fire: FireService
+    private _fire: FireService,
+    private platform: Platform
   ) {
     this.GoogleAutocomplete = new google.maps.places.AutocompleteService();
     this.autocomplete = { input: '' };
@@ -89,6 +92,19 @@ export class DireccionesPage implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.subToUbicacion();
+    this.getWhatsapp();
+  }
+
+  ngOnDestroy() {
+    if (this.timer) {
+      clearTimeout(this.timer);
+    }
+    this.reset();
+    this.ubicacionSub$.unsubscribe();
+  }
+
+  subToUbicacion() {
     this.ubicacionSub$ = this._control.ubicacionState.subscribe(done => {
 
       if (!this.isGPSLocation) {
@@ -111,12 +127,8 @@ export class DireccionesPage implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy() {
-    if (this.timer) {
-      clearTimeout(this.timer);
-    }
-    this.reset();
-    this.ubicacionSub$.unsubscribe();
+  async getWhatsapp() {
+    this.location = await this._data.getLocation(this._auth.usuario._id);
   }
 
   updateSearchResults(type) {
@@ -306,18 +318,12 @@ export class DireccionesPage implements OnInit, OnDestroy {
       this.inputOrigen = null;
       this.itemsOrigen = [];
       this._control.origenReady = false;
-      // this._control.origen.direccion = '';
-      // this._control.origen.lat = 0;
-      // this._control.origen.lng = 0;
     }
 
     if (tipo == 'destino') {
       this.inputDestino = null;
       this.itemsDestino = [];
       this._control.origenReady = false;
-      // this._control.destino.direccion = '';
-      // this._control.destino.lat = 0;
-      // this._control.destino.lng = 0;
     }
   }
 
@@ -340,6 +346,17 @@ export class DireccionesPage implements OnInit, OnDestroy {
 
   ubicacionHandler(tipo) {
 
+    if (tipo == 'whatsapp') {
+
+      if (this.location.activo) {
+        this.setPositionFromWhatsapp();
+      } else {
+        this.launch_whatsapp();
+      }
+
+      return;
+    }
+
     this._data.getUbicaciones(this._auth.usuario._id).then((data: any) => {
 
       if (!data.ok) {
@@ -352,6 +369,19 @@ export class DireccionesPage implements OnInit, OnDestroy {
         this.openUbicacionModal(tipo, 'editar', data.ubicacion._id);
       }
     });
+  }
+
+  launch_whatsapp() {
+
+    let url = '';
+
+    if (this.platform.is('cordova')) {
+      url = `whatsapp://send?phone=56967618088&text=Hola!`;
+    } else {
+      url = `https://web.whatsapp.com/send?phone=56967618088&text=Hola!`;
+    }
+
+    window.open(url, '_blank');
   }
 
   async openUbicacionModal(tipo, accion, id?) {
@@ -368,6 +398,23 @@ export class DireccionesPage implements OnInit, OnDestroy {
     if (data.ok) {
       this.getUbicaciones();
     }
+  }
+
+  setPositionFromWhatsapp() {
+
+    if (this._control.tipo == 'origen') {
+      this._control.origen = this.location.destino;
+      this._control.origenReady = true;
+      this.inputOrigen = this.location.destino.direccion;
+    }
+
+    if (this._control.tipo == 'destino') {
+      this._control.destino = this.location.destino;
+      this._control.destinoReady = true;
+      this.inputDestino = this.location.destino.direccion;
+    }
+
+    this._control.checkDirecciones();
   }
 
   setPositionFromUbicacion(tipo, ubicacion) {

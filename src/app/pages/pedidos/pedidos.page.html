@@ -5,275 +5,132 @@
                 <ion-icon slot="icon-only" name="close" style="color:#444;font-size:27px"></ion-icon>
             </ion-button>
         </ion-buttons>
-        <!-- <ion-title>Nuevo envío</ion-title> -->
-        <ion-buttons slot="end">
-            <ion-button (click)="close()" color="dark">
-                Cancelar
-            </ion-button>
-        </ion-buttons>
+        <ion-title>Información adicional</ion-title>
     </ion-toolbar>
 </ion-header>
 
 <ion-content>
 
-    <div style="width:100%;background:whitesmoke;height:10px">
-    </div>
+    <div style="background:whitesmoke;height:100%">
 
-    <div style="margin-top:15px;margin-left:15px;color:#666;font-weight:600">
-        Seleccione ubicación
-    </div>
-
-    <div style="padding:15px;width:100%;display:flex;align-items:center;justify-content:flex-start">
-        <div (click)="isEntrega = false; isRecogida = true" class="holder" [ngClass]="{'holder-active': isRecogida}">
-            <div style="width:100%;display:flex;justify-content:center">
-                <ion-icon name="pin" style="font-size:35px" [ngStyle]="{'color': isRecogida ? '#9EDF1F' : '#bbb'}">
-                </ion-icon>
-            </div>
-            <div style="color:#999;font-size:15px;">
-                Recogida
-            </div>
+        <div *ngIf="_auth.usuario.role == 'USUARIO_ROLE'"
+            style="padding-left:15px;padding-top:35px;font-size:18px;color:#555">
+            <!-- Añade información del viaje -->
         </div>
-        <div (click)="isEntrega = true; isRecogida = false" class="holder" [ngClass]="{'holder-active': isEntrega}">
-            <div style="width:100%;display:flex;justify-content:center">
-                <ion-icon name="flag" style="font-size:35px" [ngStyle]="{'color': isEntrega ? '#9EDF1F' : '#bbb'}">
-                </ion-icon>
-            </div>
-            <div style="color:#888;font-size:15px;">
-                Entrega
-            </div>
+
+        <div *ngIf="_auth.usuario.role == 'EMPRESA_ROLE'"
+            style="padding-left:15px;padding-top:35px;font-size:18px;color:#555">
+            <!-- Añade información de la entrega -->
+            Añade información del viaje
+
         </div>
-    </div>
 
-    <div *ngIf="isRecogida">
-        <ion-item lines="none">
-            <div style="color:#777;font-size:17px">
-                Detalles de recogida ¿Quién envía?
+        <div style="width:100%;height:12px">
+        </div>
+
+        <div style="background:white">
+
+            <div *ngIf="_auth.usuario.role == 'USAURIO_ROLE'"
+                style="padding-left:15px;padding-top:25px;padding-bottom:10px;color:#666">
+                A quién le hacemos la entrega?
             </div>
-        </ion-item>
 
-        <ion-item lines="none">
-            <ion-icon slot="start" name="contact" style="color:#bbb;font-size:22px;"></ion-icon>
-            <ion-input type="text" [(ngModel)]="nombre_origen" placeholder="Nombre"
-                style="text-transform:capitalize;border-bottom:1px solid #eee;font-size:18px">
-            </ion-input>
-        </ion-item>
+            <div *ngIf="_auth.usuario.role == 'EMPRESA_ROLE'"
+                style="padding-left:15px;padding-top:25px;padding-bottom:10px;color:#666">
+                <!-- Datos del cliente -->
+                A quién le hacemos la entrega?
 
-        <ion-item lines="none" style="margin-top:15px">
-            <ion-icon slot="start" name="phone-portrait" style="color:#bbb;font-size:22px;"></ion-icon>
-            <ion-input type="tel" [(ngModel)]="telefono_origen" placeholder="Teléfono"
-                style="border-bottom:1px solid #eee;font-size:18px">
-            </ion-input>
-        </ion-item>
-    </div>
-
-
-    <div *ngIf="isEntrega">
-        <ion-item lines="none">
-            <div style="color:#777;font-size:17px">
-                Detalles de entrega ¿Quién recibe?
             </div>
-        </ion-item>
 
-        <!-- <ion-item>
-            <ion-label position="floating">Nombre</ion-label>
-            <ion-input clearInput ></ion-input>
-        </ion-item> -->
-
-        <!-- <ion-item lines="none">
+            <ion-item lines="none">
+                <ion-icon slot="start" name="person" style="color:#bbb"></ion-icon>
                 <ion-input type="text" [(ngModel)]="nombre_destino" placeholder="Nombre"
-                    style="text-transform:capitalize;border-bottom:0px solid #eee;font-size:17px">
+                    style="text-transform:capitalize;font-size:17px;border-bottom:1px solid #eee"></ion-input>
+            </ion-item>
+
+            <ion-item lines="none">
+                <ion-icon slot="start" name="call" style="color:#bbb"></ion-icon>
+                <ion-input type="tel" [(ngModel)]="telefono_destino" placeholder="Teléfono"
+                    style="font-size:17px;border-bottom:1px solid #eee">
                 </ion-input>
             </ion-item>
-    
-            <ion-item lines="none" style="margin-bottom:10px">
-                <ion-input type="tel" [(ngModel)]="telefono_destino" placeholder="Teléfono"
-                    style="border-bottom:0px solid #eee;font-size:17px">
-                </ion-input>
-            </ion-item> -->
 
 
-        <ion-item lines="none">
-            <ion-icon slot="start" name="person" style="color:#bbb;font-size:18px;"></ion-icon>
-            <ion-input type="text" [(ngModel)]="nombre_destino" placeholder="Nombre"
-                style="text-transform:capitalize;border-bottom:0px solid #eee;font-size:17px">
-            </ion-input>
-        </ion-item>
+            <div style="height:20px"></div>
+        </div>
 
-        <ion-item lines="none" style="margin-bottom:10px">
-            <ion-icon slot="start" name="call" style="color:#bbb;font-size:18px;"></ion-icon>
-            <ion-input type="tel" [(ngModel)]="telefono_destino" placeholder="Teléfono"
-                style="border-bottom:0px solid #eee;font-size:17px">
-            </ion-input>
-        </ion-item>
+        <!-- <div style="background:white">
 
-        <!-- <ion-item lines="none">
-                <ion-input type="text" [(ngModel)]="nombre_destino" placeholder="Nombre"
-                    style="text-transform:capitalize;border-bottom:1px solid #eee;font-size:17px">
-                </ion-input>
+            <div *ngIf="_auth.usuario.role == 'USAURIO_ROLE'"
+                style="padding-left:15px;padding-top:25px;padding-bottom:10px;color:#666">
+               Precio de los productos?
+            </div>
+
+            <div *ngIf="_auth.usuario.role == 'EMPRESA_ROLE'"
+                style="padding-left:15px;padding-top:25px;padding-bottom:10px;color:#666">
+                Datos del cliente
+            </div>
+
+            <ion-item lines="none">
+                <ion-icon slot="start" name="person" style="color:#bbb"></ion-icon>
+                <ion-input type="text" [(ngModel)]="nombre_destino" placeholder="$4500"
+                    style="text-transform:capitalize;font-size:17px;border-bottom:1px solid #eee"></ion-input>
             </ion-item>
-    
-            <ion-item lines="none" style="margin-bottom:10px">
-                <ion-input type="tel" [(ngModel)]="telefono_destino" placeholder="Teléfono"
-                    style="border-bottom:1px solid #eee;font-size:17px">
-                </ion-input>
-            </ion-item> -->
-    </div>
+        </div> -->
 
-    <div style="width:100%;background:whitesmoke;height:10px">
-    </div>
 
-    <!-- <div style="margin-top:15px;margin-left:15px;color:#666;font-weight:600">
-        Método de pago:
-    </div> -->
-    <div style="height:10px;"></div>
+        <div style="width:100%;height:12px"></div>
 
-    <!-- <ion-item (click)="openPicker()" detail lines="nones">
-            <div style="color:#666;font-weight:600">
-                    Método de pago
-                </div>
-        <div slot="end" style="font-size:17px;color:#333">
-                <ion-icon name="cash" style="color:#999;margin-right:5px"></ion-icon>
-            Efectivo
+        <div style="background:white">
+
+            <div style="padding-left:15px;padding-top:25px;color:#666">
+                Describe la entrega (Opcional)
+            </div>
+
+            <ion-textarea
+                placeholder="Es un café? Es una hamburguesa? Podemos llevarlo siempre que quepa en la caja de la moto!."
+                [(ngModel)]="instrucciones" rows="5" style="border:0px solid #eee;border-radius:5px;font-size:18px">
+            </ion-textarea>
         </div>
-    </ion-item> -->
-
-    <ion-item (click)="openPicker()" detail lines="none">
-        <ion-icon slot="start" name="pricetag" style="color:#bbb"></ion-icon>
-        <div style="color:#666;font-size:17px;">
-            Dividir cuenta
-            <div style="font-size:15px;color:#999">
-                Elige lo que quieres pagar
-            </div>
-        </div>
-        <div *ngIf="monto_compartido" slot="end" style="font-size:17px">
-            ${{monto_compartido}}
-        </div>
-    </ion-item>
-    <div style="padding:15px;font-size:15px">
-        Te cobraremos $500 y pediremos $1000 en la entrega
-    </div>
-
-    <div style="height:10px;"></div>
-
-
-
-
-    <div style="width:100%;background:whitesmoke;height:10px">
-    </div>
-
-
-    <!-- <div style="margin:15px;margin-top:5px;border:1px solid #eee;border-radius:6px;padding:5px;">
-        <ion-input type="text" [(ngModel)]="nombre" placeholder="Nombre" style="font-size:18px">
-        </ion-input>
-    </div>  
-
-
-    <div
-        style="margin:15px;margin-top:5px;border:1px solid #eee;border-radius:6px;padding:5px;display:flex;align-items:center;">
-        <ion-icon slot="start" name="phone-portrait" style="color:#bbb;font-size:22px;"></ion-icon>
-        <ion-input type="text" [(ngModel)]="telefono" placeholder="Teléfono" style="font-size:18px">
-        </ion-input>
-    </div> -->
-
-
-    <div style="margin-top:15px;margin-left:15px;color:#666">
-        Describe tu entrega
-    </div>
-
-    <div>
-        <ion-textarea
-            placeholder="Olvidastes tus llaves? Es una hamburguesa? Podemos llevarlo siempre que quepa en la caja de la moto!."
-            [(ngModel)]="instrucciones" rows="5" style="border:0px solid #eee;border-radius:5px;font-size:17px">
-        </ion-textarea>
-    </div>
-
-
-    <div style="width:100%;background:whitesmoke;height:100%">
-    </div>
-
-
-    <div *ngIf="false">
-
-        <div style="margin-top:10px;margin-bottom:5px;margin-left:15px;color:#666;font-weight:600">
-            ¿Cómo te encontramos?
-        </div>
-        <ion-item (click)="tipoToggle(0)">
-            <ion-icon *ngIf="tipos[0].isActive" slot="start" name="radio-button-on" style="color:dodgerblue"></ion-icon>
-            <ion-icon *ngIf="!tipos[0].isActive" slot="start" name="radio-button-off"></ion-icon>
-            <img slot="end" src="assets/food-truck.svg" style="width:35px;opacity:0.7;">
-            <div>
-                Soy un Foodtruck
-            </div>
-        </ion-item>
-
-        <ion-item (click)="tipoToggle(1)">
-            <ion-icon *ngIf="tipos[1].isActive" slot="start" name="radio-button-on" style="color:dodgerblue"></ion-icon>
-            <ion-icon *ngIf="!tipos[1].isActive" slot="start" name="radio-button-off"></ion-icon>
-            <img slot="end" src="assets/restaurant.svg" style="width:35px;opacity:0.7">
-            <div>
-                Soy un Restaurante
-            </div>
-        </ion-item>
 
     </div>
-
-
-    <!-- <div style="height:20px"></div>
-
-    <div
-        style="margin:15px;margin-bottom:30px;border: 1px solid #bbb;border-radius:10px;position:relative;padding:15px">
-        <div style="position:absolute;top:-15px;left:0;width:100%;display:flex;justify-content:center">
-            <div style="background:white;padding:5px;width:150px;text-align:center;color:#666;font-weight:600">
-                Navegar
-            </div>
-        </div>
-        <ion-item>
-            <img slot="start" src="assets/food-truck.svg" style="width:35px;opacity:0.7;">
-            <div>
-                Continuar con Google Maps
-            </div>
-        </ion-item>
-        <ion-item>
-            <img slot="start" src="assets/restaurant.svg" style="width:35px;opacity:0.7">
-            <div>
-                Continuar con Waze
-            </div>
-        </ion-item>
-    </div>
-
-
-    <div style="margin:15px;border: 1px solid #bbb;border-radius:10px;position:relative;padding:15px">
-        <div style="position:absolute;top:-15px;left:0;width:100%;display:flex;justify-content:center">
-            <div style="background:white;padding:5px;width:150px;text-align:center;color:#666;font-weight:600">
-                Posición exacta
-            </div>
-        </div>
-        <ion-item>
-            <img slot="start" src="assets/food-truck.svg" style="width:35px;opacity:0.7;">
-            <div>
-                Ver punto
-            </div>
-        </ion-item>
-    </div> -->
-
-
 
 </ion-content>
 
 
+
 <ion-footer style="background:white">
-    <div
+    <div (click)="confirmar_envio()"
         style="padding:15px;font-size:18px;background:#9EDF1F;display:flex;align-items:center;justify-content:space-between">
         <div
             style="background:#7AC602;border-radius:5px;padding:5px;font-size:15px;display:flex;align-items:center;color:#fff;">
             <ion-icon name="time" style="color:#fff;margin-right:2px;font-size:18px;"></ion-icon>
-            15min
+            13min
         </div>
-        <div (click)="confirmar_envio()" style="width:100%;text-align:center;font-weight:500;color:white;">
+        <div style="font-weight:500;color:white;">
             Confirmar envío
         </div>
-        <div style="color:#fff">
-            $1500
+        <div *ngIf="precio_promo != 0" style="color:#fff">
+            $1200
+        </div>
+        <div *ngIf="precio_promo == 0" style="color:#fff">
+            Gratis
         </div>
     </div>
 </ion-footer>
+
+
+
+
+<div *ngIf="isLoading"
+    style="z-index:999;position:fixed;top:0px;left:0px;height:100%;width:100%;display:flex;align-items:center;justify-content:center;background:rgb(34, 34, 34, 0.5)">
+    <div
+        style="box-shadow: 0 0 20px rgba(68, 68, 68, 0.75);padding:30px;padding-top:20px;padding-bottom:20px;width:80%;border-radius:3px;background:white;">
+        <div style="width:100%;display:flex;align-items:center">
+            <ion-spinner color="secondary"></ion-spinner>
+            <div style="margin-left:20px;font-size:17px;margin-right:10px">
+                Cargando...
+            </div>
+        </div>
+    </div>
+</div>

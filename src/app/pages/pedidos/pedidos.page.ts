@@ -36,7 +36,7 @@ export class PedidosPage implements OnInit {
     public alertController: AlertController,
     private router: Router,
     private _data: DataService,
-    private _auth: AuthService,
+    public _auth: AuthService,
     public pickerCtrl: PickerController
   ) { }
 

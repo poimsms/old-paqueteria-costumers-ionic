@@ -48,6 +48,8 @@ export class PayComponent implements OnInit {
     }
   ];
 
+  actividad_rider: string;
+
   constructor(
     public modalCtrl: ModalController,
     private navParams: NavParams,
@@ -60,13 +62,14 @@ export class PayComponent implements OnInit {
     public toastController: ToastController,
     public alertController: AlertController
   ) {
+    this.actividad_rider = navParams.get('data').actividad;
     this.usuario = navParams.get('data').usuario;
     this.rider = navParams.get('data').rider;
     this.precio = navParams.get('data').monto;
     this.precio_promo = navParams.get('data').monto_promo;
     this.pedido = navParams.get('data').pedido;
     this.tiempo_entrega = navParams.get('data').pedido.tiempo;
-    console.log(this.tiempo_entrega,'tiempo_entrega')
+    console.log(this.tiempo_entrega, 'tiempo_entrega')
     this.checkoutTime();
   }
 
@@ -132,6 +135,11 @@ export class PayComponent implements OnInit {
       from: 'APP'
     };
 
+    if (this.actividad_rider == 'ocupado') {
+      pedido.proximo = true;
+      pedido.activo = false;
+    }
+
     if (this._auth.usuario.role == 'EMPRESA_ROLE') {
 
       pedido.envio_pagado = false;
@@ -191,9 +199,15 @@ export class PayComponent implements OnInit {
     }
   }
 
-  save(pedido) {
+  async save(pedido) {
 
-    this.updateRiderEstadoOcupado(pedido._id);
+    if (this.actividad_rider == 'disponible') {
+      await this.updateRiderEstadoOcupado(pedido._id);
+    }
+
+    if (this.actividad_rider == 'ocupado') {
+      await this.updateRiderPedidoEnCola(pedido._id);
+    }
 
     if (this.cuponData.ok) {
 
@@ -214,6 +228,35 @@ export class PayComponent implements OnInit {
     this.updateRiderEstadoDisponible();
     this._data.updateCheckout(this.checkout_id);
     this.modalCtrl.dismiss({ state: 'PAGO_NO_REALIZADO' });
+  }
+
+  async updateRiderPedidoEnCola(pedidoId) {
+
+    this._control.estaBuscandoRider = false;
+
+    // const data: any = await this._fire.getRiderPromise(this.rider._id);
+
+    // let flag = true;
+
+    // if (data.pedidos_en_cola.length == 0) {
+    //   flag = false;
+    // }
+
+    this._fire.updateRider(this.rider._id, 'rider', {
+      pedidos_en_cola: [{
+        id: pedidoId,
+        cliente: this._auth.usuario._id,
+        lat: this._control.origen.lat,
+        lng: this._control.origen.lng
+      }],
+      pagoPendiente: false,
+      aceptadoId: ''
+    });
+
+    this._fire.updateRider(this.rider._id, 'coors', {
+      pagoPendiente: false,
+      cola: false
+    });
   }
 
   updateRiderEstadoOcupado(pedidoId) {

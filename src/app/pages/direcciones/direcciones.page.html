@@ -31,8 +31,9 @@
       <div (click)="togglePinMap('destino')"
         style="margin-top:8px;background:#F0F0F0;padding:12px;padding-left:10px;padding-right:10px;border-radius:5px;display:flex;align-items:center;justify-content:space-between">
         <div style="width:90%">
-          <ion-input #inputId [(ngModel)]="inputDestino" (ionInput)="updateSearchResults('destino')" placeholder="Buscar destino"
-            style="font-size:18px;height:22px;overflow:hidden" autocomplete="off"></ion-input>
+          <ion-input #inputId [(ngModel)]="inputDestino" (ionInput)="updateSearchResults('destino')"
+            placeholder="Buscar destino" style="font-size:18px;height:22px;overflow:hidden" autocomplete="off">
+          </ion-input>
         </div>
         <ion-icon (click)="clear('destino')" *ngIf="itemsDestino.length != 0" name="close-circle"
           style="font-size:22px;color:#888"></ion-icon>
@@ -74,6 +75,23 @@
       </div>
     </ion-item>
   </ion-list>
+
+  <ion-item *ngIf="location" (click)="ubicacionHandler('whatsapp')" lines="none">
+    <ion-icon slot="start" name="logo-whatsapp" style="font-size:27px;color:limegreen"></ion-icon>
+    <div style="width:100%;font-size:18px;color:#333">
+      Localización
+      <div style="color:#777;font-size:15.5px;overflow:hidden;height:20px">
+        <div *ngIf="!location.activo">
+          Fijar destino con Whatsapp
+        </div>
+        <div *ngIf="location.activo">
+          {{location.destino.direccion}}
+        </div>
+      </div>
+    </div>
+    <!-- <ion-icon slot="end" name="checkmark" style="font-size:27px;color:#999"></ion-icon> -->
+
+  </ion-item>
 
   <ion-item (click)="ubicacionHandler('casa')" lines="none">
     <div slot="start"

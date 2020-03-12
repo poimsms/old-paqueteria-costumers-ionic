@@ -47,6 +47,7 @@ import { UbicacionComponent } from './components/ubicacion/ubicacion.component';
 import { SeleccionarHoraComponent } from './components/seleccionar-hora/seleccionar-hora.component';
 import { OpcionesComponent } from './components/opciones/opciones.component';
 import { LugaresComponent } from './components/lugares/lugares.component';
+import { RiderComponent } from './components/rider/rider.component';
 
 
 @NgModule({
@@ -62,7 +63,8 @@ import { LugaresComponent } from './components/lugares/lugares.component';
     UbicacionComponent,
     SeleccionarHoraComponent,
     OpcionesComponent,
-    LugaresComponent
+    LugaresComponent,
+    RiderComponent
   ],
   entryComponents: [
     ForceUpgradeComponent,
@@ -75,7 +77,8 @@ import { LugaresComponent } from './components/lugares/lugares.component';
     UbicacionComponent,
     SeleccionarHoraComponent,
     OpcionesComponent,
-    LugaresComponent
+    LugaresComponent,
+    RiderComponent
   ],
   imports: [
     BrowserModule,

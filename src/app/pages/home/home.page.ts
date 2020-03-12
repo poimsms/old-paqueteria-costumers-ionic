@@ -13,6 +13,7 @@ import { PayComponent } from 'src/app/components/pay/pay.component';
 import { FcmService } from 'src/app/services/fcm.service';
 import { CallNumber } from '@ionic-native/call-number/ngx';
 import { OtrosService } from 'src/app/services/otros.service';
+import { RiderComponent } from 'src/app/components/rider/rider.component';
 
 declare var google: any;
 
@@ -148,6 +149,8 @@ export class HomePage implements OnInit, OnDestroy {
   evento = 0;
   tiempoLlegada = 0;
 
+  vehiculo_alternativo: string;
+
   constructor(
     private menu: MenuController,
     private _control: ControlService,
@@ -206,16 +209,6 @@ export class HomePage implements OnInit, OnDestroy {
     this.cuponSub$.unsubscribe();
   }
 
-  async presentRating(rating) {
-
-    const modal = await this.popoverController.create({
-      component: RatingComponent,
-      componentProps: { rating }
-    });
-
-    await modal.present();
-  }
-
   riderSubCoors(origen, destino) {
     this.riderCoorsSub$ = this._fire.getRiderCoors(this.rider._id).subscribe((riders: any) => {
 
@@ -263,6 +256,34 @@ export class HomePage implements OnInit, OnDestroy {
     });
   }
 
+  async presentRating(rating) {
+
+    const modal = await this.popoverController.create({
+      component: RatingComponent,
+      componentProps: { rating }
+    });
+
+    await modal.present();
+  }
+
+  async presentAlternative(vehiculo, alternativo, payData) {
+
+    const modal = await this.popoverController.create({
+      component: RiderComponent,
+      componentProps: { vehiculo, alternativo }
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+
+    if (!data || !data.ok) {
+      return this.cancelarBusqueda();
+    }
+
+    this.openPayModal(payData);
+  }
+
   subToCodigoPromo() {
     this.cuponSub$ = this._data.cuponData.subscribe(data => this.cuponData = data)
     this._data.getCuponActivo(this._auth.usuario._id);
@@ -281,7 +302,6 @@ export class HomePage implements OnInit, OnDestroy {
     const destino = data.pedido.destino;
     this.texto_origen = data.pedido.origen.direccion;
     this.texto_destino = data.pedido.destino.direccion;
-
 
     this.pedidoActivo = true;
 
@@ -338,7 +358,7 @@ export class HomePage implements OnInit, OnDestroy {
         this.loadingRider = false;
         this.no_riders_area = false;
         this.alert_area_sin_riders();
-      }, 5 * 1000);
+      }, 25 * 1000);
     }
 
     this._fire.riders_consultados = [];
@@ -367,12 +387,16 @@ export class HomePage implements OnInit, OnDestroy {
 
       this._fire.getNeerestRider(this.bodyNeerRider).then((res: any) => {
 
+        console.log(res, 'RES NEEREST');
+
         if (!res.ok) {
           return setTimeout(() => {
             this.loadingRider = false;
             this.alert_alta_demanda();
           }, 5 * 1000);
         }
+
+        this.vehiculo_alternativo = res.vehiculo;
 
         this.handShake(res.id);
         this.sleepRider(res.id);
@@ -390,9 +414,8 @@ export class HomePage implements OnInit, OnDestroy {
       this.getNeerestRider();
 
       this._fire.getRiderPromise(id).then((rider: any) => {
-        // let rider = data[0];
-        console.log(rider, 'riderr')
-        if (rider.pedidos_perdidos >= 2) {
+
+        if (rider.pedidos_perdidos >= 1) {
 
           this._fire.updateRider(id, 'rider', {
             cliente_activo: '',
@@ -422,7 +445,7 @@ export class HomePage implements OnInit, OnDestroy {
         }
       });
 
-    }, 45 * 1000);
+    }, 5 * 1000);
   }
 
   handShake(id) {
@@ -492,9 +515,6 @@ export class HomePage implements OnInit, OnDestroy {
 
         this.tiempoLlegada = riderFire.tiempoLlegada;
 
-        console.log(this.tiempoLlegada, 'tiempoLlegada')
-
-
         clearTimeout(this.timer);
         this.riderSub$.unsubscribe();
         this.loadingRider = false;
@@ -504,6 +524,7 @@ export class HomePage implements OnInit, OnDestroy {
           this.rider = rider;
 
           const data = {
+            actividad: riderFire.actividad,
             monto: this.precio,
             monto_promo: this.precio_promo,
             rider: this.rider,
@@ -516,7 +537,12 @@ export class HomePage implements OnInit, OnDestroy {
             }
           }
 
-          this.openPayModal(data);
+          if (this.vehiculo != this.vehiculo_alternativo) {
+            this.presentAlternative(this.vehiculo, this.vehiculo_alternativo, data);
+          } else {
+            this.openPayModal(data);
+          }
+
         });
       }
 
@@ -733,6 +759,8 @@ export class HomePage implements OnInit, OnDestroy {
             };
 
             const res: any = await this._fire.detectarRidersCercanos(body);
+
+            console.log(res, 'res-cercanos')
 
             if (!res.isMoto && !res.isBici && !res.isAuto) {
               this.no_riders_area = true;

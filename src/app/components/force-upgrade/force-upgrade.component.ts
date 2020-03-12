@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Market } from '@ionic-native/market/ngx';
 
 @Component({
   selector: 'app-force-upgrade',
@@ -7,8 +8,12 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ForceUpgradeComponent implements OnInit {
 
-  constructor() { }
+  constructor(private market: Market) { }
 
-  ngOnInit() {}
+  ngOnInit() { }
+
+  onActualizar() {
+    this.market.open('cl.joopiter.paqueteria01');
+  }
 
 }

@@ -21,6 +21,9 @@
     <ion-card-header style="border-bottom:1px solid #eee">
       <div style="width:100%;display:flex;justify-content:space-between;align-items:center;">
 
+        <div *ngIf="pedido.proximo" style="color:#666;font-size:14px;">
+          PROXIMO
+        </div>
         <div *ngIf="pedido.activo" style="color:limegreen;font-size:14px;">
           ACTIVO
         </div>

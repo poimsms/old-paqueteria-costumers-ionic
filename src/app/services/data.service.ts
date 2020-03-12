@@ -150,5 +150,11 @@ export class DataService {
     const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
     return this.http.put(url, body, { headers }).toPromise();
   }
+
+  getLocation(id) {
+    const url = `${this._config.apiURL}/core/location-get?id=${id}`;
+    const headers = new HttpHeaders({ token: this._auth.token, version: this._config.version });
+    return this.http.get(url, { headers }).toPromise();
+  }
 }
 

@@ -34,7 +34,6 @@ export class AppComponent {
     private _fcm: FcmService,
     private _config: ConfigService,
     public alertController: AlertController,
-    private market: Market,
     private _control: ControlService
   ) {
     this.initializeApp();
@@ -55,11 +54,11 @@ export class AppComponent {
 
         if (data.forceUpgrade) {
 
-          this.alert_nueva_actualizacion();
+          this.openForceModal();
 
         } else if (data.recommendUpgrade) {
 
-          this.alert_nueva_actualizacion();
+          this.openForceModal();
 
         } else {
 
@@ -80,7 +79,7 @@ export class AppComponent {
                 this.openBloqueadoModal();
 
               } else {
-                
+
                 this.router.navigateByUrl('home');
               }
 
@@ -112,9 +111,9 @@ export class AppComponent {
     this.menu.open('first');
   }
 
-  openPage(page) {   
+  openPage(page) {
     this.router.navigateByUrl(page);
-    this.menu.toggle();    
+    this.menu.toggle();
   }
 
   logout() {
@@ -122,37 +121,6 @@ export class AppComponent {
     this.menu.toggle();
     this.router.navigateByUrl('login');
   }
-
-  async alert_nueva_actualizacion() {
-    const alert = await this.alertController.create({
-      header: 'Nueva versión disponible',
-      subHeader: 'Por favor actualiza la app para poder seguir usandola',
-      buttons: [{
-        text: 'Actualizar',
-        handler: () => {
-          this.market.open('cl.joopiter.paqueteria01');
-        }
-      }]
-    });
-
-    await alert.present();
-  }
-
-  async alert_test(text) {
-    const alert = await this.alertController.create({
-      header: 'Hmmm',
-      subHeader: text,
-      buttons: [{
-        text: 'Actualizar',
-        handler: () => {
-          // this.market.open('cl.joopiter.paqueteria01');
-        }
-      }]
-    });
-
-    await alert.present();
-  }
-
 
 
 }
